@@ -42,60 +42,25 @@ class Tile {
     /** @type {'thin'|'thick'} */ type; // тонкий | толстый
 
     /** @type {SVGSVGElement} */ root;
-}
 
-class ThinTile extends Tile {
-    type = 'thin';
-
-    constructor(
-        /** @type {Point} */ center,
-        /** @type {number} */ size,
-        /** @type {number} */ rotation,
-    ) {
-        super();
-        
-        const diagonalsHalfs = this._calculateDiagonalsHalfs(size);
-        const point0 = new Point(0,                   -diagonalsHalfs.small);
-        const point1 = new Point(diagonalsHalfs.big,  0);
-        const point2 = new Point(0,                   diagonalsHalfs.small);
-        const point3 = new Point(-diagonalsHalfs.big, 0);
-        const line0 = new Line(point3, point0);
-        const line1 = new Line(point0, point1);
-        const line2 = new Line(point1, point2);
-        const line3 = new Line(point2, point3);
-        
-        this.points = [ point0, point1, point2, point3 ];
-        this.lines = [ line0, line1, line2, line3 ];
-
+    /**
+     * @param {Point} center 
+     * @param {number} rotation 
+     * @param {number} size 
+     * @param {'thin'|'thick'} type 
+     */
+    constructor(center, size, rotation, type) {
         this.center = center;
         this.rotation = rotation;
+        this.size = size;
+        this.type = type;
 
+        this._setPointsAndLines();
         this._generateRoot();
     }
 
-    /**
-     * @param {number} size 
-     * @returns {Object} An object containing the half lengths of the big and small diagonals.
-     * @property {number} big - The half length of the big diagonal.
-     * @property {number} small - The half length of the small diagonal.
- 
-     */
-    _calculateDiagonalsHalfs(size) {
-        const angle1 = 36; // deg
-        const angle2 = 144; // deg
 
-        const angle1Prepared = (angle1 * Math.PI) / 180 / 2; // rad(angle1 / 2)
-        // const angle2Prepared = (angle2 * Math.PI) / 180 / 2; // rad(angle2 / 2)
-
-        const big = size * Math.cos(angle1Prepared);
-        const small = size * Math.sin(angle1Prepared);
-      
-        return {
-            big,
-            small,
-        };
-    }
-
+    
     /** Assumes, everything is filled, sets root, and adds it to container */
     _generateRoot() {
         const root = document.createElementNS(SVG_NS, 'svg');
@@ -110,8 +75,66 @@ class ThinTile extends Tile {
 
         window.tilesContainer.appendChild(root);
     }
-      
+
+    _setPointsAndLines() {
+        /**
+         * @param {number} size 
+         * @param {number} angle in deg. Full left angle (36 or 72)
+         * @returns {Object} An object containing the half lengths of the big and small diagonals.
+         * @property {number} big - The half length of the big diagonal.
+         * @property {number} small - The half length of the small diagonal.
+     
+        */
+        function calculateDiagonalsHalfs(size, angle) {
+            const anglePrepared = (angle / 2 * Math.PI) / 180; // rad(angle1 / 2)
+
+            const big = size * Math.cos(anglePrepared);
+            const small = size * Math.sin(anglePrepared);
+        
+            return {
+                big,
+                small,
+            };
+        }
+
+        const angle = this.type === 'thin' ? 36 : this.type === 'thick' ? 72 : undefined;
+        if (!angle) {
+            throw new Error('Incorrect tile type: ', this.type);
+        }
+        const diagonalsHalfs = calculateDiagonalsHalfs(this.size, angle);
+        const point0 = new Point(0,                   -diagonalsHalfs.small);
+        const point1 = new Point(diagonalsHalfs.big,  0);
+        const point2 = new Point(0,                   diagonalsHalfs.small);
+        const point3 = new Point(-diagonalsHalfs.big, 0);
+        const line0 = new Line(point3, point0);
+        const line1 = new Line(point0, point1);
+        const line2 = new Line(point1, point2);
+        const line3 = new Line(point2, point3);
+        
+        this.points = [ point0, point1, point2, point3 ];
+        this.lines = [ line0, line1, line2, line3 ];
+    }
+}
+
+class ThinTile extends Tile {
+    constructor(
+        /** @type {Point} */ center,
+        /** @type {number} */ size,
+        /** @type {number} */ rotation,
+    ) {
+        super(center, size, rotation, 'thin');
+    }
+}
+class ThickTile extends Tile {
+    constructor(
+        /** @type {Point} */ center,
+        /** @type {number} */ size,
+        /** @type {number} */ rotation,
+    ) {
+        super(center, size, rotation, 'thick');
+    }
 }
 
 
-new ThinTile(new Point(100, 100), 50, 6);
+new ThinTile(new Point(200, 100), 200, 0);
+new ThickTile(new Point(200, 300), 200, 0);

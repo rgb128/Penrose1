@@ -17,6 +17,7 @@ svg.tile {
     transform-origin: top left;
     background-color: transparent;
     overflow: visible;
+    position: absolute;
 }
 
 svg.tile > polygon.main {
