@@ -21,7 +21,18 @@ svg.tile {
 }
 
 svg.tile > polygon.main {
-    stroke: purple;
-    stroke-width: 5;
-    fill: red;
+    stroke: black;
+    stroke-width: 10;
+    fill: gray;
+}
+
+svg.tile > path.path1 {
+    stroke: blue;
+    stroke-width: 10;
+    fill: none;
+}
+svg.tile > path.path2 {
+    stroke: red;
+    stroke-width: 10;
+    fill: none;
 }

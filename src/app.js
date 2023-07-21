@@ -4,6 +4,8 @@
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
 const TILE_SIZE = 200;
+const PATTERN_SMALL_RADIUS = 50;
+// const STROKE_HALF = 5;
 
 /**
  * @param {number} deg 
@@ -29,6 +31,30 @@ function rotateVectorClockwise(x, y, angle) {
         y: newY,
     }
 }
+
+/** Draws clockwise */
+function createCircleSector(cx, cy, r, startDeg, endDeg, pathType) {
+    // Convert degrees to radians
+    const aRad = degToRad(startDeg);
+    const bRad = degToRad(endDeg);
+  
+    // Calculate the start and end points of the sector
+    const startX = cx + r * Math.cos(aRad);
+    const startY = cy + r * Math.sin(aRad);
+    const endX = cx + r * Math.cos(bRad);
+    const endY = cy + r * Math.sin(bRad);
+  
+    // Determine the arc flag (1 if b - a <= 180, otherwise 0 for large arc)
+    const largeArcFlag = endDeg - startDeg <= 180 ? 0 : 1;
+  
+    // Create the SVG path element and set its attributes
+    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    path.setAttribute('d', `M ${startX},${startY} A ${r},${r} 0 ${largeArcFlag},1 ${endX},${endY}`);
+    // path.setAttribute('d', `M ${cx},${cy} L ${startX},${startY} A ${r},${r} 0 ${largeArcFlag},1 ${endX},${endY} Z`);
+    path.classList.add(pathType);
+    
+    return path;
+  }
 
 window.tilesContainer = document.getElementById('main');
 
@@ -84,9 +110,6 @@ class Tile {
                 const { x, y } = rotateVectorClockwise(0, -vectorSize, 18);
                 const centerX = this.center.x + x;
                 const centerY = this.center.y + y;
-                console.log(this._bigHalfDiagonal, this._smallHalfDiagonal);
-                console.log(this.center.y);
-                console.log(centerY);
                 return new ThinTile(new Point(centerX, centerY), rotation);
             },
         }
@@ -98,29 +121,15 @@ class Tile {
      * @param {number} size 
      * @param {'thin'|'thick'} type 
      */
-    constructor(center, size, rotation, type) {
+    constructor(center, rotation, type) {
         this.center = center;
         this.rotation = rotation;
-        this.size = size;
+        this.size = TILE_SIZE;
         this.type = type;
 
         this._setPointsAndLines();
         this._generateRoot();
-    }
-    
-    /** Assumes, everything is filled, sets root, and adds it to container */
-    _generateRoot() {
-        const root = document.createElementNS(SVG_NS, 'svg');
-        root.style.transform = `translate(${this.center.x}px, ${this.center.y}px) rotate(${this.rotation}deg)`;
-        root.classList.add('tile');
-
-        const mainPolygon = document.createElementNS(SVG_NS, 'polygon');
-        mainPolygon.setAttribute('points', this.points.map(p => `${p.x},${p.y}`).join(' '))
-        mainPolygon.classList.add('main');
-
-        root.appendChild(mainPolygon);
-
-        window.tilesContainer.appendChild(root);
+        this._generatePattern();
     }
 
     _setPointsAndLines() {
@@ -155,6 +164,38 @@ class Tile {
         this.points = [ point0, point1, point2, point3 ];
         this.lines = [ line0, line1, line2, line3 ];
     }
+    
+    /** Assumes, everything is filled, sets root, and adds it to container */
+    _generateRoot() {
+        const root = document.createElementNS(SVG_NS, 'svg');
+        root.style.transform = `translate(${this.center.x}px, ${this.center.y}px) rotate(${this.rotation}deg)`;
+        root.classList.add('tile');
+
+        const mainPolygon = document.createElementNS(SVG_NS, 'polygon');
+        mainPolygon.setAttribute('points', this.points.map(p => `${p.x},${p.y}`).join(' '))
+        mainPolygon.classList.add('main');
+
+        root.appendChild(mainPolygon);
+        this.root = root;
+
+        window.tilesContainer.appendChild(root);
+    }
+
+    _generatePattern() {
+        if (this.type === 'thin') {
+            const path1 = createCircleSector(0, -this._smallHalfDiagonal, PATTERN_SMALL_RADIUS, 18, 18 + 144, 'path1');
+            this.root.appendChild(path1);
+            const path2 = createCircleSector(0, this._smallHalfDiagonal, PATTERN_SMALL_RADIUS, -18 - 144, -18, 'path2');
+            this.root.appendChild(path2);
+        } else if (this.type === 'thick') {
+            const path1 = createCircleSector(-this._bigHalfDiagonal, 0, PATTERN_SMALL_RADIUS, -36, 36, 'path1');
+            this.root.appendChild(path1);
+            const path2 = createCircleSector(this._bigHalfDiagonal, 0, TILE_SIZE - PATTERN_SMALL_RADIUS, 180 - 36, 36 - 180, 'path2');
+            this.root.appendChild(path2);
+        } else {
+            throw new Error('Unknown tile type', this.type);
+        }
+    }
 }
 
 class ThinTile extends Tile {
@@ -162,11 +203,10 @@ class ThinTile extends Tile {
     /**
      * 
      * @param {Point} center 
-     * @param {number} size 
      * @param {number} rotation 
      */
-    constructor(center, rotation, size = TILE_SIZE) {
-        super(center, size, rotation, 'thin');
+    constructor(center, rotation) {
+        super(center, rotation, 'thin');
     }
 }
 class ThickTile extends Tile {
@@ -174,11 +214,10 @@ class ThickTile extends Tile {
     /**
      * 
      * @param {Point} center 
-     * @param {number} size 
      * @param {number} rotation 
      */
-    constructor(center, rotation, size = TILE_SIZE) {
-        super(center, size, rotation, 'thick');
+    constructor(center, rotation) {
+        super(center, rotation, 'thick');
     }
 }
 
