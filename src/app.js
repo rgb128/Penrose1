@@ -117,7 +117,92 @@ class Tile {
                 const centerY = this.center.y + y;
                 return new ThinTile(new Point(centerX, centerY), rotation);
             },
-        }
+        },
+        { 
+            src:  { type: 'thin', line: 1 }, 
+            dest: { type: 'thin', line: 0 }, 
+            /** @returns {ThinTine} */ getTile: () => {
+                const rotation = this.rotation - 144;
+                const vectorSize = 2 * this._smallHalfDiagonal * this._bigHalfDiagonal / this.size;
+                const { x, y } = rotateVectorClockwise(0, -vectorSize, -18 - this.rotation);
+                const centerX = this.center.x + x;
+                const centerY = this.center.y + y;
+                return new ThinTile(new Point(centerX, centerY), rotation);
+            },
+        },
+        // Almost 100% sure, they are unavailable
+        // { 
+        //     src:  { type: 'thin', line: 2 }, 
+        //     dest: { type: 'thin', line: 3 }, 
+        //     /** @returns {ThinTine} */ getTile: () => {
+        //         const rotation = this.rotation + 144;
+        //         const vectorSize = 2 * this._smallHalfDiagonal * this._bigHalfDiagonal / this.size;
+        //         const { x, y } = rotateVectorClockwise(0, vectorSize, 18 - this.rotation);
+        //         const centerX = this.center.x + x;
+        //         const centerY = this.center.y + y;
+        //         return new ThinTile(new Point(centerX, centerY), rotation);
+        //     },
+        // },
+        // { 
+        //     src:  { type: 'thin', line: 3 }, 
+        //     dest: { type: 'thin', line: 2 }, 
+        //     /** @returns {ThinTine} */ getTile: () => {
+        //         const rotation = this.rotation - 144;
+        //         const vectorSize = 2 * this._smallHalfDiagonal * this._bigHalfDiagonal / this.size;
+        //         const { x, y } = rotateVectorClockwise(0, vectorSize, -18 - this.rotation);
+        //         const centerX = this.center.x + x;
+        //         const centerY = this.center.y + y;
+        //         return new ThinTile(new Point(centerX, centerY), rotation);
+        //     },
+        // },
+        { 
+            src:  { type: 'thick', line: 0 }, 
+            dest: { type: 'thick', line: 3 }, 
+            /** @returns {ThickTile} */ getTile: () => {
+                const rotation = this.rotation - 72;
+                const vectorSize = 2 * this._smallHalfDiagonal * this._bigHalfDiagonal / this.size;
+                const { x, y } = rotateVectorClockwise(0, -vectorSize, 36 - this.rotation);
+                const centerX = this.center.x + x;
+                const centerY = this.center.y + y;
+                return new ThickTile(new Point(centerX, centerY), rotation);
+            },
+        },
+        { 
+            src:  { type: 'thick', line: 3 }, 
+            dest: { type: 'thick', line: 0 }, 
+            /** @returns {ThickTile} */ getTile: () => {
+                const rotation = this.rotation + 72;
+                const vectorSize = 2 * this._smallHalfDiagonal * this._bigHalfDiagonal / this.size;
+                const { x, y } = rotateVectorClockwise(0, vectorSize, -36 - this.rotation);
+                const centerX = this.center.x + x;
+                const centerY = this.center.y + y;
+                return new ThickTile(new Point(centerX, centerY), rotation);
+            },
+        },
+        { 
+            src:  { type: 'thick', line: 1 }, 
+            dest: { type: 'thick', line: 2 }, 
+            /** @returns {ThickTile} */ getTile: () => {
+                const rotation = this.rotation + 72;
+                const vectorSize = 2 * this._smallHalfDiagonal * this._bigHalfDiagonal / this.size;
+                const { x, y } = rotateVectorClockwise(0, -vectorSize, -36 - this.rotation);
+                const centerX = this.center.x + x;
+                const centerY = this.center.y + y;
+                return new ThickTile(new Point(centerX, centerY), rotation);
+            },
+        },
+        { 
+            src:  { type: 'thick', line: 2 }, 
+            dest: { type: 'thick', line: 1 }, 
+            /** @returns {ThickTile} */ getTile: () => {
+                const rotation = this.rotation - 72;
+                const vectorSize = 2 * this._smallHalfDiagonal * this._bigHalfDiagonal / this.size;
+                const { x, y } = rotateVectorClockwise(0, vectorSize, 36 - this.rotation);
+                const centerX = this.center.x + x;
+                const centerY = this.center.y + y;
+                return new ThickTile(new Point(centerX, centerY), rotation);
+            },
+        },
     ]
 
     /**
@@ -281,7 +366,13 @@ class ThickTile extends Tile {
 
 
 
-const thin1 = new ThinTile(new Point(500, 300), 0);
-const thin2 = thin1.availableConnections[0].getTile();
-const thin3 = thin2.availableConnections[0].getTile();
+const thick1 = new ThickTile(new Point(500, 300), 0);
 
+let temp = thick1;
+for (let i = 0; i < 4; i++) {
+    temp = temp.availableConnections[3].getTile();
+}
+temp = thick1;
+for (let i = 0; i < 4; i++) {
+    temp = temp.availableConnections[5].getTile();
+}

@@ -45,10 +45,10 @@ function line_intersect(x1, y1, x2, y2, x3, y3, x4, y4)
 }
 
 
-console.log('areTilesIntersect(thin1, thin2):', areTilesIntersect(thin1, thin2), 'should', false);
-console.log('areTilesIntersect(thin2, thin3):', areTilesIntersect(thin2, thin3), 'should', false);
-console.log('areTilesIntersect(thin1, thin3):', areTilesIntersect(thin1, thin3), 'should', true);
+// console.log('areTilesIntersect(thin1, thin2):', areTilesIntersect(thin1, thin2), 'should', false);
+// console.log('areTilesIntersect(thin2, thin3):', areTilesIntersect(thin2, thin3), 'should', false);
+// console.log('areTilesIntersect(thin1, thin3):', areTilesIntersect(thin1, thin3), 'should', true);
 
-console.log('areTilesIntersect(thin2, thin1):', areTilesIntersect(thin2, thin1), 'should', false);
-console.log('areTilesIntersect(thin3, thin2):', areTilesIntersect(thin3, thin2), 'should', false);
-console.log('areTilesIntersect(thin3, thin1):', areTilesIntersect(thin3, thin1), 'should', true);
+// console.log('areTilesIntersect(thin2, thin1):', areTilesIntersect(thin2, thin1), 'should', false);
+// console.log('areTilesIntersect(thin3, thin2):', areTilesIntersect(thin3, thin2), 'should', false);
+// console.log('areTilesIntersect(thin3, thin1):', areTilesIntersect(thin3, thin1), 'should', true);
