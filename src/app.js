@@ -8,7 +8,7 @@ const SVG_NS = 'http://www.w3.org/2000/svg';
 const TILE_SIZE = 200;
 const PATTERN_SMALL_RADIUS = 50;
 const STROKE_HALF = 5;
-const INTERSECTION_MARGIN = 1;
+const INTERSECTION_MARGIN = 5;
 
 /**
  * @param {number} deg 
