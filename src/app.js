@@ -5,7 +5,7 @@
 const SVG_NS = 'http://www.w3.org/2000/svg';
 const TILE_SIZE = 200;
 const PATTERN_SMALL_RADIUS = 50;
-// const STROKE_HALF = 5;
+const STROKE_HALF = 5;
 
 /**
  * @param {number} deg 
@@ -171,8 +171,18 @@ class Tile {
         root.style.transform = `translate(${this.center.x}px, ${this.center.y}px) rotate(${this.rotation}deg)`;
         root.classList.add('tile');
 
+        const h = this._smallHalfDiagonal * this._bigHalfDiagonal / this.size;
+        const realXShift = STROKE_HALF * this._bigHalfDiagonal / h;
+        const realYShift = STROKE_HALF * this._smallHalfDiagonal / h;
+
+        const getShiftedPoint = (p) => {
+            const x = p.x - Math.sign(p.x) * realXShift;
+            const y = p.y - Math.sign(p.y) * realYShift;
+            return `${x},${y}`;
+        }
+
         const mainPolygon = document.createElementNS(SVG_NS, 'polygon');
-        mainPolygon.setAttribute('points', this.points.map(p => `${p.x},${p.y}`).join(' '))
+        mainPolygon.setAttribute('points', this.points.map(getShiftedPoint).join(' '))
         mainPolygon.classList.add('main');
 
         root.appendChild(mainPolygon);
