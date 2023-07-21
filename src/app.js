@@ -1,11 +1,14 @@
 'use strict';
 
+const absSvg = document.getElementById('absSvg');
+
 // rotation is clockwise
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
 const TILE_SIZE = 200;
 const PATTERN_SMALL_RADIUS = 50;
 const STROKE_HALF = 5;
+const INTERSECTION_MARGIN = 1;
 
 /**
  * @param {number} deg 
@@ -100,6 +103,8 @@ class Tile {
 
     /** @type {SVGSVGElement} */ root;
 
+    /** @type {Line[]} */ intersectionLines; // Lines in REAL coordinates
+
     availableConnections = [
         { 
             src:  { type: 'thin', line: 0 }, 
@@ -107,7 +112,7 @@ class Tile {
             /** @returns {ThinTine} */ getTile: () => {
                 const rotation = this.rotation + 144;
                 const vectorSize = 2 * this._smallHalfDiagonal * this._bigHalfDiagonal / this.size;
-                const { x, y } = rotateVectorClockwise(0, -vectorSize, 18);
+                const { x, y } = rotateVectorClockwise(0, -vectorSize, 18 - this.rotation);
                 const centerX = this.center.x + x;
                 const centerY = this.center.y + y;
                 return new ThinTile(new Point(centerX, centerY), rotation);
@@ -130,6 +135,7 @@ class Tile {
         this._setPointsAndLines();
         this._generateRoot();
         this._generatePattern();
+        this._generateIntersectionLines();
     }
 
     _setPointsAndLines() {
@@ -206,6 +212,41 @@ class Tile {
             throw new Error('Unknown tile type', this.type);
         }
     }
+
+    _generateIntersectionLines() {
+        const h = this._smallHalfDiagonal * this._bigHalfDiagonal / this.size;
+        const realXShift = INTERSECTION_MARGIN * this._bigHalfDiagonal / h;
+        const realYShift = INTERSECTION_MARGIN * this._smallHalfDiagonal / h;
+
+        const getShiftedAbsolutePoint = (p) => {
+            const x = p.x - Math.sign(p.x) * realXShift;
+            const y = p.y - Math.sign(p.y) * realYShift;
+            const rotated = rotateVectorClockwise(x, y, -this.rotation);
+            return new Point(this.center.x + rotated.x, this.center.y + rotated.y);
+        }
+
+        const newPoints = this.points.map(getShiftedAbsolutePoint);
+
+        const line0 = new Line(newPoints[3], newPoints[0]);
+        const line1 = new Line(newPoints[0], newPoints[1]);
+        const line2 = new Line(newPoints[1], newPoints[2]);
+        const line3 = new Line(newPoints[2], newPoints[3]);
+        const diagV = new Line(newPoints[0], newPoints[2]);
+        const diagH = new Line(newPoints[3], newPoints[1]);
+
+        // this.intersectionLines = [line0, line1, line2, line3];
+        this.intersectionLines = [line0, line1, line2, line3, diagV, diagH];
+        for(const l of this.intersectionLines) {
+            const line = document.createElementNS(SVG_NS, 'line');
+            line.setAttribute('x1', l.point1.x);
+            line.setAttribute('y1', l.point1.y);
+            line.setAttribute('x2', l.point2.x);
+            line.setAttribute('y2', l.point2.y);
+            line.style.stroke = 'green';
+            line.style.strokeWidth = '3px';
+            absSvg.appendChild(line);
+        }
+    }
 }
 
 class ThinTile extends Tile {
@@ -232,7 +273,15 @@ class ThickTile extends Tile {
 }
 
 
-const thin1 = new ThinTile(new Point(200, 100), 0);
-const thin2 = new ThinTile(new Point(600, 100), 0);
-thin1.availableConnections[0].getTile()
-new ThickTile(new Point(200, 300), 0);
+// const thin1 = new ThinTile(new Point(200, 100), 0);
+// const thin2 = new ThinTile(new Point(600, 100), 0);
+// thin1.availableConnections[0].getTile()
+// new ThickTile(new Point(200, 300), 0);
+
+
+
+
+const thin1 = new ThinTile(new Point(500, 300), 0);
+const thin2 = thin1.availableConnections[0].getTile();
+const thin3 = thin2.availableConnections[0].getTile();
+
