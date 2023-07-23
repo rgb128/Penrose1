@@ -22,12 +22,12 @@ svg.tile {
 
 svg.tile > polygon.main {
     stroke: black;
-    stroke-width: 10;
+    stroke-width: 0;
     fill: gray;
 }
 svg.tile > path.main {
     stroke: black;
-    stroke-width: 10;
+    stroke-width: 0;
     fill: gray;
 }
 

@@ -7,12 +7,12 @@ const absSvg = document.getElementById('absSvg');
 const SVG_NS = 'http://www.w3.org/2000/svg';
 const TILE_SIZE = 200;
 const PATTERN_SMALL_RADIUS = 50;
-const STROKE_HALF = 5;
+const STROKE_HALF = 0;
 const INTERSECTION_MARGIN = 5;
 
-const PATTERN_TRIANGLE_CENTER_DIST = 50;
+const PATTERN_TRIANGLE_CENTER_DIST = 40;
 const PATTERN_TRIANGLE_BASE_WIDTH = 20;
-const PATTERN_TRIANGLE_HEIGHT = 50;
+const PATTERN_TRIANGLE_HEIGHT = 20;
 const PATTERN_CIRCLE_CENTER_DIST = 50;
 const PATTERN_CIRCLE_RADIUS = 20;
 
@@ -51,8 +51,11 @@ function sq(a) {
  */
 function rotateVectorClockwise(x, y, angle) {
     angle = degToRad(-angle);
-    const newX = x * Math.cos(angle) - y * Math.sin(angle);
-    const newY = x * Math.sin(angle) + y * Math.cos(angle);
+    return rotateVectorClockwiseBySinAndCos(x, y, Math.sin(angle), Math.cos(angle))
+}
+function rotateVectorClockwiseBySinAndCos(x, y, sin, cos) {
+    const newX = x * cos - y * sin;
+    const newY = x * sin + y * cos;
     return {
         x: newX,
         y: newY,
@@ -287,21 +290,56 @@ class Tile {
             const realXShift = STROKE_HALF * this._bigHalfDiagonal / h;
             const realYShift = STROKE_HALF * this._smallHalfDiagonal / h;
 
-            // const getShiftedPoint = (p) => {
-            //     const x = p.x - Math.sign(p.x) * realXShift;
-            //     const y = p.y - Math.sign(p.y) * realYShift;
-            //     return `${x},${y}`;
-            // }
-
             const x = this._bigHalfDiagonal - realXShift;
             const y = this._smallHalfDiagonal - realYShift;
+            const s = Math.sqrt(sq(x) + sq(y));
 
             if (this.type === 'thin') {
+
+                const line0Points = [
+                    {
+                        x: -x,
+                        y: 0,
+                    },
+                    {
+                        x: Math.cos(degToRad(18)) * (PATTERN_TRIANGLE_CENTER_DIST - PATTERN_TRIANGLE_BASE_WIDTH / 2) - x,
+                        y: -Math.sin(degToRad(18)) * (PATTERN_TRIANGLE_CENTER_DIST - PATTERN_TRIANGLE_BASE_WIDTH / 2),
+                    },
+                    (() => {
+                        const hypotenuse = Math.sqrt(sq(PATTERN_TRIANGLE_CENTER_DIST) + sq(PATTERN_TRIANGLE_HEIGHT));
+                        const rotateVector1 = rotateVectorClockwise(hypotenuse, 0, -18);
+                        const rotateVector2 = rotateVectorClockwiseBySinAndCos(rotateVector1.x, rotateVector1.y, PATTERN_TRIANGLE_HEIGHT / hypotenuse, PATTERN_TRIANGLE_CENTER_DIST / hypotenuse);
+                        return {
+                            x: rotateVector2.x - x,
+                            y: -rotateVector2.y,
+                        };
+                    })(),
+                    {
+                        x: Math.cos(degToRad(18)) * (PATTERN_TRIANGLE_CENTER_DIST + PATTERN_TRIANGLE_BASE_WIDTH / 2) - x,
+                        y: -Math.sin(degToRad(18)) * (PATTERN_TRIANGLE_CENTER_DIST + PATTERN_TRIANGLE_BASE_WIDTH / 2),
+                    },
+                    {
+                        x: 0,
+                        y: -y,
+                    },
+                ];
+                const line1Points = line0Points.map(p => {
+                    const newVectorX = p.x;
+                    const newVectorY = y + p.y;
+                    const rotated = rotateVectorClockwise(newVectorX, newVectorY, 144);
+                    const retY = rotated.y - y;
+                    const retX = rotated.x;
+                    return { x: retX, y: retY };
+                });
+
                 return `M ${-x},${0} ` +
-                       `L ${0},${-y} ` + 
-                       `L ${x},${0} ` + 
-                       `L ${0},${y} ` + 
-                       `Z`;
+                    line0Points.map(p => `L ${p.x},${p.y} `).join() + 
+                    line1Points.map(p => `L ${p.x},${p.y} `).reverse().join() + 
+                    `L ${0},${y} ` + 
+                    `Z`;
+                // return `M ${-x},${0} ` +
+                //     line0Points.map(p => `L ${p.x},${p.y} `).join() + 
+                //     line1Points.map(p => `L ${p.x},${p.y} `).reverse().join();
             } else {
                 return `M ${-x},${0} ` +
                        `L ${0},${-y} ` + 
