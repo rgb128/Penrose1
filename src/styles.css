@@ -20,14 +20,9 @@ svg.tile {
     position: absolute;
 }
 
-svg.tile > polygon.main {
-    stroke: black;
-    stroke-width: 0;
-    fill: gray;
-}
 svg.tile > path.main {
     stroke: black;
-    stroke-width: 0;
+    stroke-width: 2;
     fill: gray;
 }
 

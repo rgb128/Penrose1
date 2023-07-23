@@ -7,7 +7,7 @@ const absSvg = document.getElementById('absSvg');
 const SVG_NS = 'http://www.w3.org/2000/svg';
 const TILE_SIZE = 200;
 const PATTERN_SMALL_RADIUS = 50;
-const STROKE_HALF = 0;
+const STROKE_HALF = 1;
 const INTERSECTION_MARGIN = 5;
 
 const PATTERN_TRIANGLE_CENTER_DIST = 40;
@@ -43,7 +43,7 @@ function sq(a) {
 }
 
 /**
- * 
+ * I guess, it rotates counter-clockwise
  * @param {number} x 
  * @param {number} y 
  * @param {number} angle In deg
@@ -333,7 +333,7 @@ class Tile {
                 });
                 const line2D = [
                     {
-                        a: 'M',
+                        a: 'L',
                         p: [ x, 0 ],
                     },
                     {
@@ -399,26 +399,117 @@ class Tile {
                     line1Points.map(p => `L ${p.x},${p.y} `).reverse().join() + 
                     line2D.map(x => `${x.a} ${x.p.join(' ')} `).join() + 
                     line3D.map(x => `${x.a} ${x.p.join(' ')} `).join() + 
-                    // `L ${-x} ${0}` + 
                     `Z`;
-                // return `M ${-x},${0} ` +
-                //     line0Points.map(p => `L ${p.x},${p.y} `).join() + 
-                //     line1Points.map(p => `L ${p.x},${p.y} `).reverse().join();
             } else {
+                const triangleCenterDist = s - PATTERN_TRIANGLE_CENTER_DIST;
+                const line0Points = [
+                    {
+                        x: -x,
+                        y: 0,
+                    },
+                    {
+                        x: Math.cos(degToRad(36)) * (triangleCenterDist - PATTERN_TRIANGLE_BASE_WIDTH / 2) - x,
+                        y: -Math.sin(degToRad(36)) * (triangleCenterDist - PATTERN_TRIANGLE_BASE_WIDTH / 2),
+                    },
+                    (() => {
+                        const hypotenuse = Math.sqrt(sq(triangleCenterDist) + sq(PATTERN_TRIANGLE_HEIGHT));
+                        const rotateVector1 = rotateVectorClockwise(hypotenuse, 0, -36);
+                        const rotateVector2 = rotateVectorClockwiseBySinAndCos(rotateVector1.x, rotateVector1.y, -PATTERN_TRIANGLE_HEIGHT / hypotenuse, triangleCenterDist / hypotenuse);
+                        return {
+                            x: rotateVector2.x - x,
+                            y: -rotateVector2.y,
+                        };
+                    })(),
+                    {
+                        x: Math.cos(degToRad(36)) * (triangleCenterDist + PATTERN_TRIANGLE_BASE_WIDTH / 2) - x,
+                        y: -Math.sin(degToRad(36)) * (triangleCenterDist + PATTERN_TRIANGLE_BASE_WIDTH / 2),
+                    },
+                    {
+                        x: 0,
+                        y: -y,
+                    },
+                ];
+                const line1D = [
+                    {
+                        a: 'L',
+                        p: [ 0, -y ],
+                    },
+                    {
+                        a: 'L',
+                        p: [
+                            x - Math.cos(degToRad(36)) * (PATTERN_CIRCLE_CENTER_DIST + PATTERN_CIRCLE_RADIUS),
+                            -Math.sin(degToRad(36)) * (PATTERN_CIRCLE_CENTER_DIST + PATTERN_CIRCLE_RADIUS),
+                        ],
+                    },
+                    (() => {
+                        return {
+                            a: 'A',
+                            p: [
+                                PATTERN_CIRCLE_RADIUS,
+                                PATTERN_CIRCLE_RADIUS,
+                                0,
+                                0,
+                                0,
+                                x - Math.cos(degToRad(36)) * (PATTERN_CIRCLE_CENTER_DIST - PATTERN_CIRCLE_RADIUS),
+                                -Math.sin(degToRad(36)) * (PATTERN_CIRCLE_CENTER_DIST - PATTERN_CIRCLE_RADIUS),
+                            ]
+                        }
+                    })(),
+                    {
+                        a: 'L',
+                        p: [ x, 0 ],
+                    },
+                ];
+                const line2D = [
+                    {
+                        a: 'L',
+                        p: [ x, 0 ],
+                    },
+                    {
+                        a: 'L',
+                        p: [
+                            x - Math.cos(degToRad(36)) * (PATTERN_CIRCLE_CENTER_DIST - PATTERN_CIRCLE_RADIUS),
+                            Math.sin(degToRad(36)) * (PATTERN_CIRCLE_CENTER_DIST - PATTERN_CIRCLE_RADIUS),
+                        ],
+                    },
+                    (() => {
+                        return {
+                            a: 'A',
+                            p: [
+                                PATTERN_CIRCLE_RADIUS,
+                                PATTERN_CIRCLE_RADIUS,
+                                0,
+                                0,
+                                1,
+                                x - Math.cos(degToRad(36)) * (PATTERN_CIRCLE_CENTER_DIST + PATTERN_CIRCLE_RADIUS),
+                                Math.sin(degToRad(36)) * (PATTERN_CIRCLE_CENTER_DIST + PATTERN_CIRCLE_RADIUS),
+                            ]
+                        }
+                    })(),
+                    {
+                        a: 'L',
+                        p: [ 0, y ],
+                    },
+                ];
+                const line3Points = line0Points.map(p => {
+                    const newVectorX = p.x + x;
+                    const newVectorY = p.y;
+                    const rotated = rotateVectorClockwise(newVectorX, newVectorY, -72);
+                    const retY = rotated.y;
+                    const retX = rotated.x - x;
+                    return { x: retX, y: retY };
+                });
                 return `M ${-x},${0} ` +
-                       `L ${0},${-y} ` + 
-                       `L ${x},${0} ` + 
-                       `L ${0},${y} ` + 
-                       `Z`;
+                    line0Points.map(p => `L ${p.x},${p.y} `).join() + 
+                    line1D.map(x => `${x.a} ${x.p.join(' ')} `).join() + 
+                    line2D.map(x => `${x.a} ${x.p.join(' ')} `).join() + 
+                    line3Points.map(p => `L ${p.x},${p.y} `).reverse().join() + 
+                    `Z`;
             }
         }
         const root = document.createElementNS(SVG_NS, 'svg');
         root.style.transform = `translate(${this.center.x}px, ${this.center.y}px) rotate(${this.rotation}deg)`;
         root.classList.add('tile');
-
-        
-
-        // const pathD = generatePathD();
 
         const mainPath = document.createElementNS(SVG_NS, 'path');
         mainPath.setAttribute('d', generatePathD())
@@ -514,7 +605,9 @@ class ThickTile extends Tile {
 
 
 
-const tile2 = new ThinTile(new Point(500, 300), 0);
+// const tile2 = new ThinTile(new Point(500, 300), 0);
+const tile1 = new ThinTile(new Point(500, 200), 0);
+const tile2 = new ThickTile(new Point(500, 500), 0);
 
 // let temp = thick1;
 // for (let i = 0; i < 4; i++) {
