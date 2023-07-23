@@ -11,10 +11,10 @@ const STROKE_HALF = 0;
 const INTERSECTION_MARGIN = 5;
 
 const PATTERN_TRIANGLE_CENTER_DIST = 40;
-const PATTERN_TRIANGLE_BASE_WIDTH = 20;
-const PATTERN_TRIANGLE_HEIGHT = 20;
-const PATTERN_CIRCLE_CENTER_DIST = 50;
-const PATTERN_CIRCLE_RADIUS = 20;
+const PATTERN_TRIANGLE_BASE_WIDTH = 15;
+const PATTERN_TRIANGLE_HEIGHT = 10;
+const PATTERN_CIRCLE_CENTER_DIST = 40;
+const PATTERN_CIRCLE_RADIUS = 10;
 
 const THIN_BIG_HALF_DIAGONAL_SIZE =    TILE_SIZE * Math.sin(degToRad(36 / 2));
 const THIN_SMALL_HALF_DIAGONAL_SIZE =  TILE_SIZE * Math.cos(degToRad(36 / 2));
@@ -331,11 +331,75 @@ class Tile {
                     const retX = rotated.x;
                     return { x: retX, y: retY };
                 });
+                const line2D = [
+                    {
+                        a: 'M',
+                        p: [ x, 0 ],
+                    },
+                    {
+                        a: 'L',
+                        p: [
+                            x - Math.cos(degToRad(18)) * (PATTERN_CIRCLE_CENTER_DIST - PATTERN_CIRCLE_RADIUS),
+                            Math.sin(degToRad(18)) * (PATTERN_CIRCLE_CENTER_DIST - PATTERN_CIRCLE_RADIUS),
+                        ],
+                    },
+                    (() => {
+                        return {
+                            a: 'A',
+                            p: [
+                                PATTERN_CIRCLE_RADIUS,
+                                PATTERN_CIRCLE_RADIUS,
+                                0,
+                                0,
+                                0,
+                                x - Math.cos(degToRad(18)) * (PATTERN_CIRCLE_CENTER_DIST + PATTERN_CIRCLE_RADIUS),
+                                Math.sin(degToRad(18)) * (PATTERN_CIRCLE_CENTER_DIST + PATTERN_CIRCLE_RADIUS),
+                            ]
+                        }
+                    })(),
+                    {
+                        a: 'L',
+                        p: [ 0, y ],
+                    },
+                ];
+                const line3D = [
+                    {
+                        a: 'L',
+                        p: [ 0, y ],
+                    },
+                    {
+                        a: 'L',
+                        p: [
+                            Math.cos(degToRad(18)) * (PATTERN_CIRCLE_CENTER_DIST + PATTERN_CIRCLE_RADIUS) - x,
+                            Math.sin(degToRad(18)) * (PATTERN_CIRCLE_CENTER_DIST + PATTERN_CIRCLE_RADIUS),
+                        ],
+                    },
+                    (() => {
+                        return {
+                            a: 'A',
+                            p: [
+                                PATTERN_CIRCLE_RADIUS,
+                                PATTERN_CIRCLE_RADIUS,
+                                0,
+                                0,
+                                1,
+                                Math.cos(degToRad(18)) * (PATTERN_CIRCLE_CENTER_DIST - PATTERN_CIRCLE_RADIUS) - x,
+                                Math.sin(degToRad(18)) * (PATTERN_CIRCLE_CENTER_DIST - PATTERN_CIRCLE_RADIUS),
+                            ]
+                        }
+                    })(),
+                    {
+                        a: 'L',
+                        p: [ -x, 0 ],
+                    },
+                ];
 
                 return `M ${-x},${0} ` +
                     line0Points.map(p => `L ${p.x},${p.y} `).join() + 
                     line1Points.map(p => `L ${p.x},${p.y} `).reverse().join() + 
-                    `L ${0},${y} ` + 
+                    line2D.map(x => `${x.a} ${x.p.join(' ')} `).join() + 
+                    line3D.map(x => `${x.a} ${x.p.join(' ')} `).join() + 
+                    // `L ${-x} ${0}` + 
                     `Z`;
                 // return `M ${-x},${0} ` +
                 //     line0Points.map(p => `L ${p.x},${p.y} `).join() + 
