@@ -10,12 +10,36 @@ const PATTERN_SMALL_RADIUS = 50;
 const STROKE_HALF = 5;
 const INTERSECTION_MARGIN = 5;
 
+const PATTERN_TRIANGLE_CENTER_DIST = 50;
+const PATTERN_TRIANGLE_BASE_WIDTH = 20;
+const PATTERN_TRIANGLE_HEIGHT = 50;
+const PATTERN_CIRCLE_CENTER_DIST = 50;
+const PATTERN_CIRCLE_RADIUS = 20;
+
+const THIN_BIG_HALF_DIAGONAL_SIZE =    TILE_SIZE * Math.sin(degToRad(36 / 2));
+const THIN_SMALL_HALF_DIAGONAL_SIZE =  TILE_SIZE * Math.cos(degToRad(36 / 2));
+const THICK_BIG_HALF_DIAGONAL_SIZE =   TILE_SIZE * Math.sin(degToRad(72 / 2));
+const THICK_SMALL_HALF_DIAGONAL_SIZE = TILE_SIZE * Math.cos(degToRad(72 / 2));
+
+const THIN_THIN_CENTER_DISTANCE =   THIN_BIG_HALF_DIAGONAL_SIZE *  THIN_SMALL_HALF_DIAGONAL_SIZE /  TILE_SIZE;
+const THICK_THICK_CENTER_DISTANCE = THICK_BIG_HALF_DIAGONAL_SIZE * THICK_SMALL_HALF_DIAGONAL_SIZE / TILE_SIZE;
+const THIN_THICK_CENTER_DISTANCE = Math.sqrt(sq(THIN_SMALL_HALF_DIAGONAL_SIZE) + sq(THICK_BIG_HALF_DIAGONAL_SIZE) - 2 * THIN_SMALL_HALF_DIAGONAL_SIZE * THICK_BIG_HALF_DIAGONAL_SIZE * Math.cos(degToRad(72 + 36))); // Cos theorem
+
 /**
  * @param {number} deg 
  * @returns {number}
  */
 function degToRad(deg) {
     return deg * Math.PI / 180;
+}
+
+/**
+ * Squares a
+ * @param {number} a 
+ * @returns {number}
+ */
+function sq(a) {
+    return a * a;
 }
 
 /**
@@ -258,25 +282,47 @@ class Tile {
     
     /** Assumes, everything is filled, sets root, and adds it to container */
     _generateRoot() {
+        const generatePathD = () => {
+            const h = this._smallHalfDiagonal * this._bigHalfDiagonal / this.size;
+            const realXShift = STROKE_HALF * this._bigHalfDiagonal / h;
+            const realYShift = STROKE_HALF * this._smallHalfDiagonal / h;
+
+            // const getShiftedPoint = (p) => {
+            //     const x = p.x - Math.sign(p.x) * realXShift;
+            //     const y = p.y - Math.sign(p.y) * realYShift;
+            //     return `${x},${y}`;
+            // }
+
+            const x = this._bigHalfDiagonal - realXShift;
+            const y = this._smallHalfDiagonal - realYShift;
+
+            if (this.type === 'thin') {
+                return `M ${-x},${0} ` +
+                       `L ${0},${-y} ` + 
+                       `L ${x},${0} ` + 
+                       `L ${0},${y} ` + 
+                       `Z`;
+            } else {
+                return `M ${-x},${0} ` +
+                       `L ${0},${-y} ` + 
+                       `L ${x},${0} ` + 
+                       `L ${0},${y} ` + 
+                       `Z`;
+            }
+        }
         const root = document.createElementNS(SVG_NS, 'svg');
         root.style.transform = `translate(${this.center.x}px, ${this.center.y}px) rotate(${this.rotation}deg)`;
         root.classList.add('tile');
 
-        const h = this._smallHalfDiagonal * this._bigHalfDiagonal / this.size;
-        const realXShift = STROKE_HALF * this._bigHalfDiagonal / h;
-        const realYShift = STROKE_HALF * this._smallHalfDiagonal / h;
+        
 
-        const getShiftedPoint = (p) => {
-            const x = p.x - Math.sign(p.x) * realXShift;
-            const y = p.y - Math.sign(p.y) * realYShift;
-            return `${x},${y}`;
-        }
+        // const pathD = generatePathD();
 
-        const mainPolygon = document.createElementNS(SVG_NS, 'polygon');
-        mainPolygon.setAttribute('points', this.points.map(getShiftedPoint).join(' '))
-        mainPolygon.classList.add('main');
+        const mainPath = document.createElementNS(SVG_NS, 'path');
+        mainPath.setAttribute('d', generatePathD())
+        mainPath.classList.add('main');
 
-        root.appendChild(mainPolygon);
+        root.appendChild(mainPath);
         this.root = root;
 
         window.tilesContainer.appendChild(root);
@@ -366,13 +412,13 @@ class ThickTile extends Tile {
 
 
 
-const thick1 = new ThickTile(new Point(500, 300), 0);
+const tile2 = new ThinTile(new Point(500, 300), 0);
 
-let temp = thick1;
-for (let i = 0; i < 4; i++) {
-    temp = temp.availableConnections[3].getTile();
-}
-temp = thick1;
-for (let i = 0; i < 4; i++) {
-    temp = temp.availableConnections[5].getTile();
-}
+// let temp = thick1;
+// for (let i = 0; i < 4; i++) {
+//     temp = temp.availableConnections[3].getTile();
+// }
+// temp = thick1;
+// for (let i = 0; i < 4; i++) {
+//     temp = temp.availableConnections[5].getTile();
+// }
