@@ -94,7 +94,6 @@ function rotatePointAroundPoint(pointToRotate, staticPoint, angleDeg) {
     }
 }
 function rotatePointAroundPointBySinAndCos(pointToRotate, staticPoint, sin, cos) {
-    console.log('rotate', 'st', staticPoint, 'p', pointToRotate, radToDeg(sin), radToDeg(sin));
     const ox = pointToRotate.x - staticPoint.x;
     const oy = pointToRotate.y - staticPoint.y;
 
@@ -203,10 +202,10 @@ class Tile {
             /** @returns {ThinTine} */ getTile: () => {
                 const res = calculateCoordinatesAndRotationToOverlayLines(
                     this._getAbsolutePoint(this.points[0]),
-                    this._getAbsolutePoint(this.points[1]),
+                    this._getAbsolutePoint(this.points[3]),
                     this.points[0],
-                    this.points[3],
-                );
+                    this.points[1],
+                )
                 return new ThinTile(new Point(res.x, res.y), res.rotation);
             },
         },
@@ -214,39 +213,16 @@ class Tile {
             src:  { type: 'thin', line: 1 }, 
             dest: { type: 'thin', line: 0 }, 
             /** @returns {ThinTine} */ getTile: () => {
-                const rotation = this.rotation - 144;
-                const vectorSize = THIN_THIN_CENTER_DISTANCE;
-                const { x, y } = rotateVectorClockwise(0, -vectorSize, -18 - this.rotation);
-                const centerX = this.center.x + x;
-                const centerY = this.center.y + y;
-                return new ThinTile(new Point(centerX, centerY), rotation);
+                const res = calculateCoordinatesAndRotationToOverlayLines(
+                    this._getAbsolutePoint(this.points[0]),
+                    this._getAbsolutePoint(this.points[1]),
+                    this.points[0],
+                    this.points[3],
+                )
+                return new ThinTile(new Point(res.x, res.y), res.rotation);
             },
         },
-        // Tthey are unavailable
-        // { 
-        //     src:  { type: 'thin', line: 2 }, 
-        //     dest: { type: 'thin', line: 3 }, 
-        //     /** @returns {ThinTine} */ getTile: () => {
-        //         const rotation = this.rotation + 144;
-        //         const vectorSize = 2 * this._smallHalfDiagonal * this._bigHalfDiagonal / this.size;
-        //         const { x, y } = rotateVectorClockwise(0, vectorSize, 18 - this.rotation);
-        //         const centerX = this.center.x + x;
-        //         const centerY = this.center.y + y;
-        //         return new ThinTile(new Point(centerX, centerY), rotation);
-        //     },
-        // },
-        // { 
-        //     src:  { type: 'thin', line: 3 }, 
-        //     dest: { type: 'thin', line: 2 }, 
-        //     /** @returns {ThinTine} */ getTile: () => {
-        //         const rotation = this.rotation - 144;
-        //         const vectorSize = 2 * this._smallHalfDiagonal * this._bigHalfDiagonal / this.size;
-        //         const { x, y } = rotateVectorClockwise(0, vectorSize, -18 - this.rotation);
-        //         const centerX = this.center.x + x;
-        //         const centerY = this.center.y + y;
-        //         return new ThinTile(new Point(centerX, centerY), rotation);
-        //     },
-        // },
+        // 2-3 and 3-2 are unavailable
         { 
             src:  { type: 'thick', line: 0 }, 
             dest: { type: 'thick', line: 3 }, 
@@ -695,6 +671,6 @@ class ThickTile extends Tile {
 
 
 
-const tile1 = new ThinTile(new Point(500, 200), 50);
+const tile1 = new ThinTile(new Point(500, 200), 30);
 const t2 = tile1.availableConnections[0].getTile();
 const t3 = tile1.availableConnections[1].getTile();
