@@ -3,16 +3,16 @@
 
 
 const THIN_REL_POINTS = [
-    new Point(-THIN_BIG_HALF_DIAGONAL_SIZE, 0),
     new Point(0, -THIN_SMALL_HALF_DIAGONAL_SIZE),
     new Point(THIN_BIG_HALF_DIAGONAL_SIZE, 0),
     new Point(0, THIN_SMALL_HALF_DIAGONAL_SIZE),
+    new Point(-THIN_BIG_HALF_DIAGONAL_SIZE, 0),
 ];
 const THICK_REL_POINTS = [
-    new Point(-THICK_BIG_HALF_DIAGONAL_SIZE, 0),
     new Point(0, -THICK_SMALL_HALF_DIAGONAL_SIZE),
     new Point(THICK_BIG_HALF_DIAGONAL_SIZE, 0),
     new Point(0, THICK_SMALL_HALF_DIAGONAL_SIZE),
+    new Point(-THICK_BIG_HALF_DIAGONAL_SIZE, 0),
 ];
 const LINES_POINTS = [ 
     [3, 0], 
@@ -64,7 +64,7 @@ const AVAILABLE_CONNECTIONS = [
         src:  { type: 'thin', line: 0 }, 
         dest: { type: 'thin', line: 1 }, 
     },
-    // 2-3 and 3-2 are unavailable
+    // { src:  { type: 'thin', line: 2 }, dest: { type: 'thin', line: 3 }, }, // Actually unavailable
     // Thick-Thick
     { 
         src:  { type: 'thick', line: 0 }, 
@@ -116,4 +116,12 @@ function getAvailableConnectionsForTile(tile) {
 const tile1 = new ThinTile(new Point(500, 200), 0);
 const availableTiles = getAvailableConnectionsForTile(tile1);
 console.log(availableTiles);
-availableTiles[0].getTile();
+
+let index = 0;
+let tempTile = availableTiles[0].getTile();
+
+function nextTile() {
+    tempTile.root.remove();
+    tempTile = availableTiles[++index].getTile();
+    console.log(index);
+}

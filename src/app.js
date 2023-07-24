@@ -2,7 +2,7 @@
 
 const absSvg = document.getElementById('absSvg');
 
-// rotation is clockwise
+// rotation is clockwise (??)
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
 const TILE_SIZE = 200;
@@ -16,10 +16,10 @@ const PATTERN_TRIANGLE_HEIGHT = 10;
 const PATTERN_CIRCLE_CENTER_DIST = 40;
 const PATTERN_CIRCLE_RADIUS = 10;
 
-const THIN_BIG_HALF_DIAGONAL_SIZE =    TILE_SIZE * Math.sin(degToRad(36 / 2));
-const THIN_SMALL_HALF_DIAGONAL_SIZE =  TILE_SIZE * Math.cos(degToRad(36 / 2));
-const THICK_BIG_HALF_DIAGONAL_SIZE =   TILE_SIZE * Math.sin(degToRad(72 / 2));
-const THICK_SMALL_HALF_DIAGONAL_SIZE = TILE_SIZE * Math.cos(degToRad(72 / 2));
+const THIN_BIG_HALF_DIAGONAL_SIZE =    TILE_SIZE * Math.cos(degToRad(36 / 2));
+const THIN_SMALL_HALF_DIAGONAL_SIZE =  TILE_SIZE * Math.sin(degToRad(36 / 2));
+const THICK_BIG_HALF_DIAGONAL_SIZE =   TILE_SIZE * Math.cos(degToRad(72 / 2));
+const THICK_SMALL_HALF_DIAGONAL_SIZE = TILE_SIZE * Math.sin(degToRad(72 / 2));
 
 const THIN_THIN_CENTER_DISTANCE =   2 * THIN_BIG_HALF_DIAGONAL_SIZE *  THIN_SMALL_HALF_DIAGONAL_SIZE /  TILE_SIZE;
 const THICK_THICK_CENTER_DISTANCE = 2 * THICK_BIG_HALF_DIAGONAL_SIZE * THICK_SMALL_HALF_DIAGONAL_SIZE / TILE_SIZE;
@@ -317,7 +317,7 @@ class Tile {
                                 PATTERN_CIRCLE_RADIUS,
                                 0,
                                 0,
-                                0,
+                                1,
                                 x - Math.cos(degToRad(18)) * (PATTERN_CIRCLE_CENTER_DIST + PATTERN_CIRCLE_RADIUS),
                                 Math.sin(degToRad(18)) * (PATTERN_CIRCLE_CENTER_DIST + PATTERN_CIRCLE_RADIUS),
                             ]
@@ -348,7 +348,7 @@ class Tile {
                                 PATTERN_CIRCLE_RADIUS,
                                 0,
                                 0,
-                                1,
+                                0,
                                 Math.cos(degToRad(18)) * (PATTERN_CIRCLE_CENTER_DIST - PATTERN_CIRCLE_RADIUS) - x,
                                 Math.sin(degToRad(18)) * (PATTERN_CIRCLE_CENTER_DIST - PATTERN_CIRCLE_RADIUS),
                             ]
@@ -526,16 +526,16 @@ class Tile {
 
         // this.intersectionLines = [line0, line1, line2, line3];
         this.intersectionLines = [line0, line1, line2, line3, diagV, diagH];
-        for(const l of this.intersectionLines) {
-            const line = document.createElementNS(SVG_NS, 'line');
-            line.setAttribute('x1', l.point1.x);
-            line.setAttribute('y1', l.point1.y);
-            line.setAttribute('x2', l.point2.x);
-            line.setAttribute('y2', l.point2.y);
-            line.style.stroke = 'green';
-            line.style.strokeWidth = '3px';
-            absSvg.appendChild(line);
-        }
+        // for(const l of this.intersectionLines) {
+        //     const line = document.createElementNS(SVG_NS, 'line');
+        //     line.setAttribute('x1', l.point1.x);
+        //     line.setAttribute('y1', l.point1.y);
+        //     line.setAttribute('x2', l.point2.x);
+        //     line.setAttribute('y2', l.point2.y);
+        //     line.style.stroke = 'green';
+        //     line.style.strokeWidth = '3px';
+        //     absSvg.appendChild(line);
+        // }
     }
 
     // /**
