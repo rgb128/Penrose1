@@ -21,9 +21,12 @@ const THIN_SMALL_HALF_DIAGONAL_SIZE =  TILE_SIZE * Math.cos(degToRad(36 / 2));
 const THICK_BIG_HALF_DIAGONAL_SIZE =   TILE_SIZE * Math.sin(degToRad(72 / 2));
 const THICK_SMALL_HALF_DIAGONAL_SIZE = TILE_SIZE * Math.cos(degToRad(72 / 2));
 
-const THIN_THIN_CENTER_DISTANCE =   THIN_BIG_HALF_DIAGONAL_SIZE *  THIN_SMALL_HALF_DIAGONAL_SIZE /  TILE_SIZE;
-const THICK_THICK_CENTER_DISTANCE = THICK_BIG_HALF_DIAGONAL_SIZE * THICK_SMALL_HALF_DIAGONAL_SIZE / TILE_SIZE;
+const THIN_THIN_CENTER_DISTANCE =   2 * THIN_BIG_HALF_DIAGONAL_SIZE *  THIN_SMALL_HALF_DIAGONAL_SIZE /  TILE_SIZE;
+const THICK_THICK_CENTER_DISTANCE = 2 * THICK_BIG_HALF_DIAGONAL_SIZE * THICK_SMALL_HALF_DIAGONAL_SIZE / TILE_SIZE;
 const THIN_THICK_CENTER_DISTANCE = Math.sqrt(sq(THIN_SMALL_HALF_DIAGONAL_SIZE) + sq(THICK_BIG_HALF_DIAGONAL_SIZE) - 2 * THIN_SMALL_HALF_DIAGONAL_SIZE * THICK_BIG_HALF_DIAGONAL_SIZE * Math.cos(degToRad(72 + 36))); // Cos theorem
+const THIN_THIN_CONNECTION_ANGLE = 18;
+const THICK_THICK_CONNECTION_ANGLE = 18;
+const THIN_THICK_CONNECTION_ANGLE = Math.asin(THICK_BIG_HALF_DIAGONAL_SIZE / TILE_SIZE);
 
 /**
  * @param {number} deg 
@@ -31,6 +34,9 @@ const THIN_THICK_CENTER_DISTANCE = Math.sqrt(sq(THIN_SMALL_HALF_DIAGONAL_SIZE) +
  */
 function degToRad(deg) {
     return deg * Math.PI / 180;
+}
+function radToDeg(rad) {
+    return rad / Math.PI * 180;
 }
 
 /**
@@ -40,6 +46,64 @@ function degToRad(deg) {
  */
 function sq(a) {
     return a * a;
+}
+
+/**
+ * Points should match!
+ * @param {Point} line1Start Static line
+ * @param {Point} line1End Static line
+ * @param {Point} line2Start 
+ * @param {Point} line2End 
+ * @returns 
+ */
+function calculateCoordinatesAndRotationToOverlayLines(line1Start, line1End, line2Start, line2End) {
+    const vector1 = {
+        x: line1End.x - line1Start.x,
+        y: line1End.y - line1Start.y,
+    };
+    const vector2 = {
+        x: line2End.x - line2Start.x,
+        y: line2End.y - line2Start.y,
+    };
+
+    const angleArad = Math.atan2(vector1.y, vector1.x);
+    const angleBrad = Math.atan2(vector2.y, vector2.x);
+    const rotationRad = angleArad - angleBrad;
+
+    const basicX = line1Start.x - line2Start.x; // Center's shift in abs
+    const basicY = line1Start.y - line2Start.y; // Center's shift in abs
+
+    const centerShifted = rotatePointAroundPointBySinAndCos({ x: basicX, y: basicY }, line1Start, Math.sin(rotationRad), Math.cos(rotationRad));
+
+    return {
+        x: centerShifted.x,
+        y: centerShifted.y,
+        rotation: radToDeg(rotationRad),
+    };
+}
+
+function rotatePointAroundPoint(pointToRotate, staticPoint, angleDeg) {
+    const ox = pointToRotate.x - staticPoint.x;
+    const oy = pointToRotate.y - staticPoint.y;
+
+    const rotated = rotateVectorClockwise(ox, oy, angleDeg);
+
+    return {
+        x: rotated.x + staticPoint.x,
+        y: rotated.y + staticPoint.y,
+    }
+}
+function rotatePointAroundPointBySinAndCos(pointToRotate, staticPoint, sin, cos) {
+    console.log('rotate', 'st', staticPoint, 'p', pointToRotate, radToDeg(sin), radToDeg(sin));
+    const ox = pointToRotate.x - staticPoint.x;
+    const oy = pointToRotate.y - staticPoint.y;
+
+    const rotated = rotateVectorClockwiseBySinAndCos(ox, oy, sin, cos);
+
+    return {
+        x: rotated.x + staticPoint.x,
+        y: rotated.y + staticPoint.y,
+    }
 }
 
 /**
@@ -137,12 +201,13 @@ class Tile {
             src:  { type: 'thin', line: 0 }, 
             dest: { type: 'thin', line: 1 }, 
             /** @returns {ThinTine} */ getTile: () => {
-                const rotation = this.rotation + 144;
-                const vectorSize = 2 * this._smallHalfDiagonal * this._bigHalfDiagonal / this.size;
-                const { x, y } = rotateVectorClockwise(0, -vectorSize, 18 - this.rotation);
-                const centerX = this.center.x + x;
-                const centerY = this.center.y + y;
-                return new ThinTile(new Point(centerX, centerY), rotation);
+                const res = calculateCoordinatesAndRotationToOverlayLines(
+                    this._getAbsolutePoint(this.points[0]),
+                    this._getAbsolutePoint(this.points[1]),
+                    this.points[0],
+                    this.points[3],
+                );
+                return new ThinTile(new Point(res.x, res.y), res.rotation);
             },
         },
         { 
@@ -150,14 +215,14 @@ class Tile {
             dest: { type: 'thin', line: 0 }, 
             /** @returns {ThinTine} */ getTile: () => {
                 const rotation = this.rotation - 144;
-                const vectorSize = 2 * this._smallHalfDiagonal * this._bigHalfDiagonal / this.size;
+                const vectorSize = THIN_THIN_CENTER_DISTANCE;
                 const { x, y } = rotateVectorClockwise(0, -vectorSize, -18 - this.rotation);
                 const centerX = this.center.x + x;
                 const centerY = this.center.y + y;
                 return new ThinTile(new Point(centerX, centerY), rotation);
             },
         },
-        // Almost 100% sure, they are unavailable
+        // Tthey are unavailable
         // { 
         //     src:  { type: 'thin', line: 2 }, 
         //     dest: { type: 'thin', line: 3 }, 
@@ -571,6 +636,16 @@ class Tile {
             absSvg.appendChild(line);
         }
     }
+
+    /**
+     * 
+     * @param {Point} point 
+     * @returns {Point}
+     */
+    _getAbsolutePoint(point) {
+        const rotated = rotateVectorClockwise(point.x, point.y, -this.rotation);
+        return new Point(this.center.x + rotated.x, this.center.y + rotated.y);
+    }
 }
 
 class ThinTile extends Tile {
@@ -606,8 +681,8 @@ class ThickTile extends Tile {
 
 
 // const tile2 = new ThinTile(new Point(500, 300), 0);
-const tile1 = new ThinTile(new Point(500, 200), 0);
-const tile2 = new ThickTile(new Point(500, 500), 0);
+// const tile1 = new ThinTile(new Point(500, 200), 0);
+// const tile2 = new ThickTile(new Point(500, 500), 0);
 
 // let temp = thick1;
 // for (let i = 0; i < 4; i++) {
@@ -617,3 +692,9 @@ const tile2 = new ThickTile(new Point(500, 500), 0);
 // for (let i = 0; i < 4; i++) {
 //     temp = temp.availableConnections[5].getTile();
 // }
+
+
+
+const tile1 = new ThinTile(new Point(500, 200), 50);
+const t2 = tile1.availableConnections[0].getTile();
+const t3 = tile1.availableConnections[1].getTile();
