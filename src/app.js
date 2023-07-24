@@ -1,6 +1,7 @@
 'use strict';
 
 const absSvg = document.getElementById('absSvg');
+window.tilesContainer = document.getElementById('main');
 
 // rotation is clockwise (??)
 
@@ -20,43 +21,6 @@ const THIN_BIG_HALF_DIAGONAL_SIZE =    TILE_SIZE * Math.cos(degToRad(36 / 2));
 const THIN_SMALL_HALF_DIAGONAL_SIZE =  TILE_SIZE * Math.sin(degToRad(36 / 2));
 const THICK_BIG_HALF_DIAGONAL_SIZE =   TILE_SIZE * Math.cos(degToRad(72 / 2));
 const THICK_SMALL_HALF_DIAGONAL_SIZE = TILE_SIZE * Math.sin(degToRad(72 / 2));
-
-const THIN_THIN_CENTER_DISTANCE =   2 * THIN_BIG_HALF_DIAGONAL_SIZE *  THIN_SMALL_HALF_DIAGONAL_SIZE /  TILE_SIZE;
-const THICK_THICK_CENTER_DISTANCE = 2 * THICK_BIG_HALF_DIAGONAL_SIZE * THICK_SMALL_HALF_DIAGONAL_SIZE / TILE_SIZE;
-const THIN_THICK_CENTER_DISTANCE = Math.sqrt(sq(THIN_SMALL_HALF_DIAGONAL_SIZE) + sq(THICK_BIG_HALF_DIAGONAL_SIZE) - 2 * THIN_SMALL_HALF_DIAGONAL_SIZE * THICK_BIG_HALF_DIAGONAL_SIZE * Math.cos(degToRad(72 + 36))); // Cos theorem
-const THIN_THIN_CONNECTION_ANGLE = 18;
-const THICK_THICK_CONNECTION_ANGLE = 18;
-const THIN_THICK_CONNECTION_ANGLE = Math.asin(THICK_BIG_HALF_DIAGONAL_SIZE / TILE_SIZE);
-
-
-
-class Point {
-    /** @type {number} */ x;
-    /** @type {number} */ y;
-
-    /**
-     * @param {number} x 
-     * @param {number} y 
-     */
-    constructor(x, y) {
-        this.x = x;
-        this.y = y;
-    }
-}
-
-class Line {
-    /** @type {Point} */ point1;
-    /** @type {Point} */ point2; // This i's point
-
-    /**
-     * @param {Point} point1 
-     * @param {Point} point2 
-     */
-    constructor(point1, point2) {
-        this.point1 = point1;
-        this.point2 = point2;
-    }
-}
 
 
 /**
@@ -79,62 +43,18 @@ function sq(a) {
     return a * a;
 }
 
-/**
- * Points should match!
- * @param {Point} line1Start Static line
- * @param {Point} line1End Static line
- * @param {Point} line2Start 
- * @param {Point} line2End 
- * @returns 
- */
-function calculateCoordinatesAndRotationToOverlayLines(line1Start, line1End, line2Start, line2End) {
-    const vector1 = {
-        x: line1End.x - line1Start.x,
-        y: line1End.y - line1Start.y,
-    };
-    const vector2 = {
-        x: line2End.x - line2Start.x,
-        y: line2End.y - line2Start.y,
-    };
-
-    const angleArad = Math.atan2(vector1.y, vector1.x);
-    const angleBrad = Math.atan2(vector2.y, vector2.x);
-    const rotationRad = angleArad - angleBrad;
-
-    const basicX = line1Start.x - line2Start.x; // Center's shift in abs
-    const basicY = line1Start.y - line2Start.y; // Center's shift in abs
-
-    const centerShifted = rotatePointAroundPointBySinAndCos({ x: basicX, y: basicY }, line1Start, Math.sin(rotationRad), Math.cos(rotationRad));
-
-    return {
-        x: centerShifted.x,
-        y: centerShifted.y,
-        rotation: radToDeg(rotationRad),
-    };
+function drawLine(x1, y1, x2, y2) {
+    const line = document.createElementNS(SVG_NS, 'line');
+    line.setAttribute('x1', x1);
+    line.setAttribute('y1', y1);
+    line.setAttribute('x2', x2);
+    line.setAttribute('y2', y2);
+    line.style.stroke = 'green';
+    line.style.strokeWidth = '3px';
+    absSvg.appendChild(line);
 }
 
-function rotatePointAroundPoint(pointToRotate, staticPoint, angleDeg) {
-    const ox = pointToRotate.x - staticPoint.x;
-    const oy = pointToRotate.y - staticPoint.y;
 
-    const rotated = rotateVectorClockwise(ox, oy, angleDeg);
-
-    return {
-        x: rotated.x + staticPoint.x,
-        y: rotated.y + staticPoint.y,
-    }
-}
-function rotatePointAroundPointBySinAndCos(pointToRotate, staticPoint, sin, cos) {
-    const ox = pointToRotate.x - staticPoint.x;
-    const oy = pointToRotate.y - staticPoint.y;
-
-    const rotated = rotateVectorClockwiseBySinAndCos(ox, oy, sin, cos);
-
-    return {
-        x: rotated.x + staticPoint.x,
-        y: rotated.y + staticPoint.y,
-    }
-}
 
 /**
  * I guess, it rotates counter-clockwise
@@ -178,9 +98,36 @@ function createCircleSector(cx, cy, r, startDeg, endDeg, pathType) {
     path.classList.add(pathType);
     
     return path;
-  }
+}
 
-window.tilesContainer = document.getElementById('main');
+class Point {
+    /** @type {number} */ x;
+    /** @type {number} */ y;
+
+    /**
+     * @param {number} x 
+     * @param {number} y 
+     */
+    constructor(x, y) {
+        this.x = x;
+        this.y = y;
+    }
+}
+
+class Line {
+    /** @type {Point} */ point1;
+    /** @type {Point} */ point2; // This i's point
+
+    /**
+     * @param {Point} point1 
+     * @param {Point} point2 
+     */
+    constructor(point1, point2) {
+        this.point1 = point1;
+        this.point2 = point2;
+    }
+}
+
 
 class Tile {
 
@@ -524,29 +471,8 @@ class Tile {
         const diagV = new Line(newPoints[0], newPoints[2]);
         const diagH = new Line(newPoints[3], newPoints[1]);
 
-        // this.intersectionLines = [line0, line1, line2, line3];
         this.intersectionLines = [line0, line1, line2, line3, diagV, diagH];
-        // for(const l of this.intersectionLines) {
-        //     const line = document.createElementNS(SVG_NS, 'line');
-        //     line.setAttribute('x1', l.point1.x);
-        //     line.setAttribute('y1', l.point1.y);
-        //     line.setAttribute('x2', l.point2.x);
-        //     line.setAttribute('y2', l.point2.y);
-        //     line.style.stroke = 'green';
-        //     line.style.strokeWidth = '3px';
-        //     absSvg.appendChild(line);
-        // }
     }
-
-    // /**
-    //  * 
-    //  * @param {Point} point 
-    //  * @returns {Point}
-    //  */
-    // _getAbsolutePoint(point) {
-    //     const rotated = rotateVectorClockwise(point.x, point.y, -this.rotation);
-    //     return new Point(this.center.x + rotated.x, this.center.y + rotated.y);
-    // }
 }
 
 class ThinTile extends Tile {
@@ -572,32 +498,3 @@ class ThickTile extends Tile {
     }
 }
 
-
-// const thin1 = new ThinTile(new Point(200, 100), 0);
-// const thin2 = new ThinTile(new Point(600, 100), 0);
-// thin1.availableConnections[0].getTile()
-// new ThickTile(new Point(200, 300), 0);
-
-
-
-
-// // const tile2 = new ThinTile(new Point(500, 300), 0);
-// // const tile1 = new ThinTile(new Point(500, 200), 0);
-// // const tile2 = new ThickTile(new Point(500, 500), 0);
-
-// // let temp = thick1;
-// // for (let i = 0; i < 4; i++) {
-// //     temp = temp.availableConnections[3].getTile();
-// // }
-// // temp = thick1;
-// // for (let i = 0; i < 4; i++) {
-// //     temp = temp.availableConnections[5].getTile();
-// // }
-
-
-
-// const tile1 = new ThinTile(new Point(500, 200), 50);
-// const t2 = tile1.availableConnections[0].getTile();
-// // const t3 = tile1.availableConnections[3].getTile();
-// // const t5 = tile1.availableConnections[4].getTile();
-// // const t6 = tile1.availableConnections[5].getTile();

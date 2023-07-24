@@ -1,7 +1,5 @@
 'use strict';
 
-
-
 const THIN_REL_POINTS = [
     new Point(0, -THIN_SMALL_HALF_DIAGONAL_SIZE),
     new Point(THIN_BIG_HALF_DIAGONAL_SIZE, 0),
@@ -21,41 +19,6 @@ const LINES_POINTS = [
     [2, 3]
 ];
 
-
-/**
- * 
- * @param {Tile} tile 
- * @param {Point} point
- * @returns {Point} 
- */
-function getAbsolutePoint(tile, point) {
-    const rotated = rotateVectorClockwise(point.x, point.y, -tile.rotation);
-    return new Point(tile.center.x + rotated.x, tile.center.y + rotated.y);
-}
-
-/**
- * @param {Tile} srcTile 
- * @returns {Tile}
- */
-function generateAvailableConnectedTile(srcTile, src, dest) {
-    if (src.type !== srcTile.type) throw new Error('Tile and conn types are not same');
-
-    const points1 = LINES_POINTS[src.line]
-        .map(i => srcTile.type === 'thin' ? THIN_REL_POINTS[i] : THICK_REL_POINTS[i])
-        .map(x => getAbsolutePoint(srcTile, x));
-    const points2 = LINES_POINTS[dest.line]
-        .map(i => dest.type === 'thin' ? THIN_REL_POINTS[i] : THICK_REL_POINTS[i])
-        .reverse();
-    const res = calculateCoordinatesAndRotationToOverlayLines(
-        points1[0],
-        points1[1],
-        points2[0],
-        points2[1],
-    );
-    return dest.type === 'thin' ? 
-        new ThinTile(new Point(res.x, res.y), res.rotation) :
-        new ThickTile(new Point(res.x, res.y), res.rotation);
-}
 
 // No reverse. src/dest are imaginary
 const AVAILABLE_CONNECTIONS = [
@@ -94,6 +57,101 @@ const AVAILABLE_CONNECTIONS = [
 ];
 
 /**
+ * Points should match!
+ * @param {Point} line1Start Static line
+ * @param {Point} line1End Static line
+ * @param {Point} line2Start 
+ * @param {Point} line2End 
+ * @returns 
+ */
+function calculateCoordinatesAndRotationToOverlayLines(line1Start, line1End, line2Start, line2End) {
+    const vector1 = {
+        x: line1End.x - line1Start.x,
+        y: line1End.y - line1Start.y,
+    };
+    const vector2 = {
+        x: line2End.x - line2Start.x,
+        y: line2End.y - line2Start.y,
+    };
+
+    const angleArad = Math.atan2(vector1.y, vector1.x);
+    const angleBrad = Math.atan2(vector2.y, vector2.x);
+    const rotationRad = angleArad - angleBrad;
+
+    const basicX = line1Start.x - line2Start.x; // Center's shift in abs
+    const basicY = line1Start.y - line2Start.y; // Center's shift in abs
+
+    const centerShifted = rotatePointAroundPointBySinAndCos({ x: basicX, y: basicY }, line1Start, Math.sin(rotationRad), Math.cos(rotationRad));
+
+    return {
+        x: centerShifted.x,
+        y: centerShifted.y,
+        rotation: radToDeg(rotationRad),
+    };
+}
+
+function rotatePointAroundPoint(pointToRotate, staticPoint, angleDeg) {
+    const ox = pointToRotate.x - staticPoint.x;
+    const oy = pointToRotate.y - staticPoint.y;
+
+    const rotated = rotateVectorClockwise(ox, oy, angleDeg);
+
+    return {
+        x: rotated.x + staticPoint.x,
+        y: rotated.y + staticPoint.y,
+    }
+}
+function rotatePointAroundPointBySinAndCos(pointToRotate, staticPoint, sin, cos) {
+    const ox = pointToRotate.x - staticPoint.x;
+    const oy = pointToRotate.y - staticPoint.y;
+
+    const rotated = rotateVectorClockwiseBySinAndCos(ox, oy, sin, cos);
+
+    return {
+        x: rotated.x + staticPoint.x,
+        y: rotated.y + staticPoint.y,
+    }
+}
+
+
+/**
+ * 
+ * @param {Tile} tile 
+ * @param {Point} point
+ * @returns {Point} 
+ */
+function getAbsolutePoint(tile, point) {
+    const rotated = rotateVectorClockwise(point.x, point.y, -tile.rotation);
+    return new Point(tile.center.x + rotated.x, tile.center.y + rotated.y);
+}
+
+
+/**
+ * Main fu=unctuin here
+ * @param {Tile} srcTile 
+ * @returns {Tile}
+ */
+function generateAvailableConnectedTile(srcTile, src, dest) {
+    if (src.type !== srcTile.type) throw new Error('Tile and conn types are not same');
+
+    const points1 = LINES_POINTS[src.line]
+        .map(i => srcTile.type === 'thin' ? THIN_REL_POINTS[i] : THICK_REL_POINTS[i])
+        .map(x => getAbsolutePoint(srcTile, x));
+    const points2 = LINES_POINTS[dest.line]
+        .map(i => dest.type === 'thin' ? THIN_REL_POINTS[i] : THICK_REL_POINTS[i])
+        .reverse();
+    const res = calculateCoordinatesAndRotationToOverlayLines(
+        points1[0],
+        points1[1],
+        points2[0],
+        points2[1],
+    );
+    return dest.type === 'thin' ? 
+        new ThinTile(new Point(res.x, res.y), res.rotation) :
+        new ThickTile(new Point(res.x, res.y), res.rotation);
+}
+
+/**
  * 
  * @param {Tile} tile 
  * @returns {Array}
@@ -113,7 +171,7 @@ function getAvailableConnectionsForTile(tile) {
 
 
 
-const tile1 = new ThinTile(new Point(500, 200), 0);
+const tile1 = new ThickTile(new Point(500, 200), 50);
 const availableTiles = getAvailableConnectionsForTile(tile1);
 console.log(availableTiles);
 
