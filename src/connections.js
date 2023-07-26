@@ -171,15 +171,50 @@ function getAvailableConnectionsForTile(tile) {
 
 
 
-const tile1 = new ThickTile(new Point(500, 200), 50);
-const availableTiles = getAvailableConnectionsForTile(tile1);
-console.log(availableTiles);
+const tile1 = new ThickTile(new Point(200, 200), 36);
+// const availableTiles = getAvailableConnectionsForTile(tile1);
+// console.log(availableTiles);
 
-let index = 0;
-let tempTile = availableTiles[0].getTile();
+let tempTile1 = getAvailableConnectionsForTile(tile1).find(x => 
+    x.src.type === 'thick' && 
+    x.dest.type === 'thick' && 
+    x.src.line === 2 && 
+    x.dest.line === 1
+).getTile();
 
-function nextTile() {
-    tempTile.root.remove();
-    tempTile = availableTiles[++index].getTile();
-    console.log(index);
-}
+tempTile1 = getAvailableConnectionsForTile(tempTile1).find(x => 
+    x.src.type === 'thick' && 
+    x.dest.type === 'thick' && 
+    x.src.line === 3 && 
+    x.dest.line === 0
+).getTile();
+
+tempTile1 = getAvailableConnectionsForTile(tempTile1).find(x => 
+    x.src.type === 'thick' && 
+    x.dest.type === 'thick' && 
+    x.src.line === 2 && 
+    x.dest.line === 1
+).getTile();
+
+tempTile1 = getAvailableConnectionsForTile(tempTile1).find(x => 
+    x.src.type === 'thick' && 
+    x.dest.type === 'thick' && 
+    x.src.line === 3 && 
+    x.dest.line === 0
+).getTile();
+
+
+
+// tempTile1 = getAvailableConnectionsForTile(tempTile1).find(x => 
+//     x.src.type === 'thick' && 
+//     x.dest.type === 'thick' && 
+//     x.src.line === 2 && 
+//     x.dest.line === 1
+// ).getTile();
+
+// tempTile1 = getAvailableConnectionsForTile(tempTile1).find(x => 
+//     x.src.type === 'thick' && 
+//     x.dest.type === 'thick' && 
+//     x.src.line === 3 && 
+//     x.dest.line === 0
+// ).getTile();

@@ -6,7 +6,7 @@ window.tilesContainer = document.getElementById('main');
 // rotation is clockwise (??)
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
-const TILE_SIZE = 200;
+const TILE_SIZE = 500;
 const PATTERN_SMALL_RADIUS = 50;
 const STROKE_HALF = 1;
 const INTERSECTION_MARGIN = 5;
