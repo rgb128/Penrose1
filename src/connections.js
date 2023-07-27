@@ -171,50 +171,62 @@ function getAvailableConnectionsForTile(tile) {
 
 
 
-const tile1 = new ThickTile(new Point(200, 200), 36);
+/** @type {Tile[]} */
+const tiles = [ new ThickTile(new Point(500, 200), -36) ];
 // const availableTiles = getAvailableConnectionsForTile(tile1);
 // console.log(availableTiles);
-
-let tempTile1 = getAvailableConnectionsForTile(tile1).find(x => 
+tiles.push(getAvailableConnectionsForTile(tiles.slice(-1)[0]).find(x => 
     x.src.type === 'thick' && 
     x.dest.type === 'thick' && 
-    x.src.line === 2 && 
-    x.dest.line === 1
-).getTile();
+    x.src.line === 3
+).getTile());
 
-tempTile1 = getAvailableConnectionsForTile(tempTile1).find(x => 
+/** @type {Tile[]} */
+const sideTiles = [];
+
+sideTiles.push(getAvailableConnectionsForTile(tiles[0]).find(x => 
     x.src.type === 'thick' && 
-    x.dest.type === 'thick' && 
-    x.src.line === 3 && 
-    x.dest.line === 0
-).getTile();
+    x.dest.type === 'thin' && 
+    x.src.line === 2
+).getTile());
 
-tempTile1 = getAvailableConnectionsForTile(tempTile1).find(x => 
+/** @type {Tile[]} */
+const tiles2 = [];
+
+tiles2.push(getAvailableConnectionsForTile(tiles[1]).find(x => 
     x.src.type === 'thick' && 
+    x.dest.type === 'thin' && 
+    x.src.line === 2
+).getTile());
+tiles2.push(getAvailableConnectionsForTile(tiles2[0]).find(x => 
+    x.src.type === 'thin' && 
+    x.dest.type === 'thin' && 
+    x.src.line === 1
+).getTile());
+tiles2.push(getAvailableConnectionsForTile(tiles2[0]).find(x => 
+    x.src.type === 'thin' && 
     x.dest.type === 'thick' && 
-    x.src.line === 2 && 
-    x.dest.line === 1
-).getTile();
-
-tempTile1 = getAvailableConnectionsForTile(tempTile1).find(x => 
-    x.src.type === 'thick' && 
-    x.dest.type === 'thick' && 
-    x.src.line === 3 && 
-    x.dest.line === 0
-).getTile();
+    x.src.line === 0
+).getTile());
 
 
+// /** @type {Tile[]} */
+// const sideTilesLeft = [];
 
-// tempTile1 = getAvailableConnectionsForTile(tempTile1).find(x => 
+// sideTilesLeft.push(getAvailableConnectionsForTile(tiles[1]).find(x => 
 //     x.src.type === 'thick' && 
-//     x.dest.type === 'thick' && 
-//     x.src.line === 2 && 
-//     x.dest.line === 1
-// ).getTile();
-
-// tempTile1 = getAvailableConnectionsForTile(tempTile1).find(x => 
+//     x.dest.type === 'thin' && 
+//     x.src.line === 3
+// ).getTile());
+// sideTilesLeft.push(getAvailableConnectionsForTile(tiles[2]).find(x => 
 //     x.src.type === 'thick' && 
+//     x.dest.type === 'thin' && 
+//     x.src.line === 0
+// ).getTile());
+// sideTilesLeft.push(getAvailableConnectionsForTile(sideTilesLeft[0]).find(x => 
+//     x.src.type === 'thin' && 
 //     x.dest.type === 'thick' && 
-//     x.src.line === 3 && 
-//     x.dest.line === 0
-// ).getTile();
+//     x.src.line === 2
+// ).getTile());
+
+
