@@ -13,5 +13,6 @@ function line_intersect(x1, y1, x2, y2, x3, y3, x4, y4)
         y: y1 + ua * (y2 - y1),
         seg1: ua >= 0 && ua <= 1,
         seg2: ub >= 0 && ub <= 1,
+        intersect: ua >= 0 && ua <= 1 && ub >= 0 && ub <= 1,
     };
 }

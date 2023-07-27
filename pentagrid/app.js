@@ -77,3 +77,39 @@ generateFamilyOfLines(
     200, 
     1500
 );
+
+
+const checkedPairs = [];
+function linesWereChecked(line1, line2) {
+    return !!checkedPairs.find(x => (x[0] === line1 && x[1] === line2) || (x[0] === line2 && x[1] === line1));
+}
+
+function checkIntersections() {
+    //todo refactor somehow
+    for (const line1 of allLines) {
+        for (const line2 of allLines) {
+            if (
+                line1 === line2 ||
+                linesWereChecked(line1, line2)
+            ) {
+                continue;
+            }
+            const intersection = line_intersect(line1.x1, line1.y1, line1.x2, line1.y2, line2.x1, line2.y1, line2.x2, line2.y2);
+            if (!intersection?.intersect) continue;
+            checkedPairs.push([line1, line2]);
+
+            const color = `hsla(${map(Math.random(), 0, 1, 0, 360)}, 100%, 50%, .5)`;
+            const circle = document.createElementNS(SVG_NS, 'circle');
+            circle.setAttribute('cx', intersection.x);
+            circle.setAttribute('cy', intersection.y);
+            circle.setAttribute('r', '10');
+            circle.style.fill = color;
+            circle.style.strokeWidth = '0';
+            absSvg.appendChild(circle);
+        }
+    }
+}
+checkIntersections();   
+
+
+
