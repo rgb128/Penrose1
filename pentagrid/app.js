@@ -48,6 +48,7 @@ function generateFamilyOfLines(shifts, familySize, familyWidth, lineLength) {
                         (shifts[i][1] * MULTIPLIER_1),
                     ], 
                     angle,
+                    lineFamily: i,
                     lineNumber,
                 });
             }
@@ -84,18 +85,58 @@ function linesWereChecked(line1, line2) {
     return !!checkedPairs.find(x => (x[0] === line1 && x[1] === line2) || (x[0] === line2 && x[1] === line1));
 }
 
+function findSectionOnLineFamily(lineFamily, x, y) {
+    // section is line's LOWER
+    const lines = allLines
+    .filter(l => l.lineFamily === lineFamily)
+    .map(l => {
+        const func = (_x) => {
+            return (_x - l.x1) * (l.y2 - l.y1) / (l.x2 - l.x1) + l.y1;
+        };
+        return {
+            ...l,
+            isAbovePoint: func(x) > y,
+        }
+    })
+    .sort((a, b) => a.lineNumber - b.lineNumber);
+
+    if (lines[0].isAbovePoint) {
+        return lines[0].lineNumber - 1;
+    }
+    
+    for (let i = 0; i < lines.length; i++) {
+        if (lines[i].isAbovePoint) {
+            return lines[i].lineNumber - 1;
+        }
+    }
+
+    return lines[lines.length - 1].lineNumber;
+}
+
+function drawAllLines(vertexes) {
+    for (let i = 0; i < vertexes.length; i++) {
+        for(let j = i + 1; j < vertexes.length; j++) {
+            const v1 = vertexes[i];
+            const v2 = vertexes[j];
+            drawLine(v1.x, v1.y, v2.x, v2.y, 'black', 5);
+        }
+    }
+}
+
 function checkIntersections() {
     //todo refactor somehow
-    for (const line1 of allLines) {
-        for (const line2 of allLines) {
-            if (
-                line1 === line2 ||
-                linesWereChecked(line1, line2)
-            ) {
-                continue;
-            }
+    for (let i1 = 0; i1 < allLines.length; i1++) {
+        const line1 = allLines[i1];
+        for (let i2 = i1 + 1; i2 < allLines.length; i2++) {
+            const line2 = allLines[i2];
+            // if (
+            //     line1 === line2 ||
+            //     linesWereChecked(line1, line2)
+            // ) {
+            //     continue;
+            // }
             const intersection = line_intersect(line1.x1, line1.y1, line1.x2, line1.y2, line2.x1, line2.y1, line2.x2, line2.y2);
-            if (!intersection?.intersect) continue;
+            if (!(intersection?.intersect)) continue;
             checkedPairs.push([line1, line2]);
 
             const color = `hsla(${map(Math.random(), 0, 1, 0, 360)}, 100%, 50%, .5)`;
@@ -106,6 +147,57 @@ function checkIntersections() {
             circle.style.fill = color;
             circle.style.strokeWidth = '0';
             absSvg.appendChild(circle);
+
+            circle.data = {
+                line1,
+                line2,
+            };
+
+            circle.onclick = e => {
+                console.log(line1, line2);
+                const defaultK = [0, 1, 2, 3, 4].map(x => findSectionOnLineFamily(x, intersection.x, intersection.y));
+
+                const k1 = [...defaultK];
+                const k2 = [...defaultK];
+                const k3 = [...defaultK];
+                const k4 = [...defaultK];
+
+                k1[line1.lineFamily] = line1.lineNumber + 1;
+                k2[line1.lineFamily] = line1.lineNumber + 1;
+                k3[line1.lineFamily] = line1.lineNumber;
+                k4[line1.lineFamily] = line1.lineNumber;
+
+                k1[line2.lineFamily] = line2.lineNumber;
+                k2[line2.lineFamily] = line2.lineNumber + 1;
+                k3[line2.lineFamily] = line2.lineNumber + 1;
+                k4[line2.lineFamily] = line2.lineNumber;
+
+                const vertex1X = mathSum(0, 4, j => k1[j] * Math.cos(2 * Math.PI * j / 5)) * MULTIPLIER_1;
+                const vertex1Y = mathSum(0, 4, j => k1[j] * Math.sin(2 * Math.PI * j / 5)) * MULTIPLIER_1;
+
+                const vertex2X = mathSum(0, 4, j => k2[j] * Math.cos(2 * Math.PI * j / 5)) * MULTIPLIER_1;
+                const vertex2Y = mathSum(0, 4, j => k2[j] * Math.sin(2 * Math.PI * j / 5)) * MULTIPLIER_1;
+                
+                const vertex3X = mathSum(0, 4, j => k3[j] * Math.cos(2 * Math.PI * j / 5)) * MULTIPLIER_1;
+                const vertex3Y = mathSum(0, 4, j => k3[j] * Math.sin(2 * Math.PI * j / 5)) * MULTIPLIER_1;
+                
+                const vertex4X = mathSum(0, 4, j => k4[j] * Math.cos(2 * Math.PI * j / 5)) * MULTIPLIER_1;
+                const vertex4Y = mathSum(0, 4, j => k4[j] * Math.sin(2 * Math.PI * j / 5)) * MULTIPLIER_1;
+                
+                drawAllLines([
+                    { x: vertex1X, y: vertex1Y },
+                    { x: vertex2X, y: vertex2Y },
+                    { x: vertex3X, y: vertex3Y },
+                    { x: vertex4X, y: vertex4Y },
+                ]);
+            }
+
+            if (
+                (line1.lineFamily === 0 && line1.lineNumber === 0) ||
+                (line2.lineFamily === 0 && line2.lineNumber === 0)
+            ) {
+                circle.onclick();
+            }
         }
     }
 }

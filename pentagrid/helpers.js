@@ -10,6 +10,20 @@ function map(num, frombottom, fromtop, tobottom, totop) {
     return a;
 }
 
+/**
+ * 
+ * @param {number} iFrom Including 
+ * @param {number} iTo Including
+ * @param {*} func 
+ */
+function mathSum(iFrom, iTo, func) {
+    let sum = 0;
+    for (let i = iFrom; i <= iTo; i++) {
+        sum += func(i);
+    }
+    return sum;
+}
+
 function degToRad(deg) {
     return deg * Math.PI / 180;
 }
@@ -53,14 +67,14 @@ function rotatePointAroundPointBySinAndCos(pointToRotate, staticPoint, sin, cos)
     }
 }
 
-function drawLine(x1, y1, x2, y2, color = 'green') {
+function drawLine(x1, y1, x2, y2, color = 'green', strokeWidth = 1) {
     const line = document.createElementNS(SVG_NS, 'line');
     line.setAttribute('x1', x1);
     line.setAttribute('y1', y1);
     line.setAttribute('x2', x2);
     line.setAttribute('y2', y2);
     line.style.stroke = color;
-    line.style.strokeWidth = '1px';
+    line.style.strokeWidth = strokeWidth;
     absSvg.appendChild(line);
 }
 
