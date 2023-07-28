@@ -171,30 +171,34 @@ function checkIntersections() {
             };
 
             circle.onclick = e => {
-                console.log(line1, line2);
-                const defaultK = [0, 1, 2, 3, 4].map(x => findSectionOnLineFamily(x, intersection.x, intersection.y));
+                // console.log(line1, line2);
+                const defaultK = [0, 1, 2, 3, 4].map(a => findSectionOnLineFamily(a, intersection.x, intersection.y));
 
                 const k1 = [...defaultK];
                 const k2 = [...defaultK];
                 const k3 = [...defaultK];
                 const k4 = [...defaultK];
 
-                k1[line1.lineFamily] = line1.lineNumber + 1;
-                k2[line1.lineFamily] = line1.lineNumber + 1;
-                k3[line1.lineFamily] = line1.lineNumber;
-                k4[line1.lineFamily] = line1.lineNumber;
+                k1[line1.lineFamily] = line1.lineNumber;
+                k2[line1.lineFamily] = line1.lineNumber;
+                k3[line1.lineFamily] = line1.lineNumber - 1;
+                k4[line1.lineFamily] = line1.lineNumber - 1;
 
                 k1[line2.lineFamily] = line2.lineNumber;
-                k2[line2.lineFamily] = line2.lineNumber + 1;
-                k3[line2.lineFamily] = line2.lineNumber + 1;
-                k4[line2.lineFamily] = line2.lineNumber;
+                k2[line2.lineFamily] = line2.lineNumber - 1;
+                k3[line2.lineFamily] = line2.lineNumber;
+                k4[line2.lineFamily] = line2.lineNumber - 1;
 
                 // console.log('line1.lineFamily', line1.lineFamily);
                 // console.log('line1.lineNumber', line1.lineNumber);
                 // console.log('line2.lineFamily', line2.lineFamily);
                 // console.log('line2.lineNumber', line2.lineNumber);
 
-                // console.log(k1, k2, k4, k4);
+                console.log(line1.lineFamily, line2.lineFamily, k1.join(' '), k2.join(' '), k3.join(' '), k4.join(' '));
+                // console.log(k1.join(''));
+                // console.log(k1.join(''));
+                // console.log(k1.join(''));
+                // console.log(k1.join(''));
 
                 // const vertex1X = mathSum(0, 4, j => k1[j] * Math.cos(2 * Math.PI * j / 5)) * MULTIPLIER_1;
                 // const vertex1Y = mathSum(0, 4, j => k1[j] * Math.sin(2 * Math.PI * j / 5)) * MULTIPLIER_1;
@@ -228,12 +232,12 @@ function checkIntersections() {
                     { x: vertex4X, y: vertex4Y },
                 ]);
             }
-
-            // if (
-            //     (line1.lineFamily === 0 && line1.lineNumber === 0)
-            // ) {
-            //     circle.onclick();
-            // }
+            // circle.onclick();
+            if (
+                (line1.lineFamily === 0 && line1.lineNumber === 0)
+            ) {
+                circle.onclick();
+            }
         }
     }
 }
@@ -246,7 +250,7 @@ const mouseCircle = document.createElementNS(SVG_NS, 'circle');
 mouseCircle.setAttribute('r', '20');
 mouseCircle.style.fill = 'red';
 mouseCircle.style.strokeWidth = '0';
-absSvg.appendChild(mouseCircle);
+// absSvg.appendChild(mouseCircle);
 
 
 document.onmousemove = e => {
@@ -254,6 +258,6 @@ document.onmousemove = e => {
     const y = e.y - document.documentElement.clientHeight / 2;
     mouseCircle.setAttribute('cx', x);
     mouseCircle.setAttribute('cy', y);
-    console.log([0, 1, 2, 3, 4].map(a => findSectionOnLineFamily(a, x, y)));
+    // console.log([0, 1, 2, 3, 4].map(a => findSectionOnLineFamily(a, x, y)));
 };
 
