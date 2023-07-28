@@ -4,6 +4,9 @@ const absSvg = document.getElementById('absSvgOrigin');
 window.tilesContainer = document.getElementById('main');
 
 const allLines = [];
+const allRhomuses = [];
+
+const ANGLE_SHIFT = 90;
 
 const colors = [
     'green',
@@ -18,7 +21,7 @@ const MULTIPLIER_1 = 100; // it's basically, 1 unit
 
 function generateFamilyOfLines(shifts, familySize, familyWidth, lineLength) {
     for (let i = 0; i < shifts.length; i++) {
-        const angle = (360 / shifts.length * i + 90) % 360;
+        const angle = 360 / shifts.length * i + ANGLE_SHIFT;
         for (let il = 0; il < (familySize / 2); il++) {
             function drawLineWithY(y, lineNumber) {
                 const x1src = -lineLength / 2;
@@ -78,6 +81,7 @@ const LINES_DIST = 200;
 generateFamilyOfLines(
     shifts, 
     9, 
+    // 3, 
     LINES_DIST, 
     1500
 );
@@ -92,7 +96,7 @@ function findSectionOnLineFamily(lineFamily, x, y) {
 
     x -= shifts[lineFamily][0];
     y -= shifts[lineFamily][1];
-    const rotated = rotateVectorClockwise(x, y, -lineFamily*(360 / 5) - 90);
+    const rotated = rotateVectorClockwise(x, y, -lineFamily*(360 / 5) - ANGLE_SHIFT);
     const res = Math.floor(rotated.y / LINES_DIST);
     return res;
 }
@@ -120,7 +124,8 @@ function checkIntersections() {
             const circle = document.createElementNS(SVG_NS, 'circle');
             circle.setAttribute('cx', intersection.x);
             circle.setAttribute('cy', intersection.y);
-            circle.setAttribute('r', '10');
+            // circle.setAttribute('r', '10');
+            circle.setAttribute('r', '3');
             circle.style.fill = color;
             circle.style.strokeWidth = '0';
             absSvg.appendChild(circle);
@@ -130,7 +135,7 @@ function checkIntersections() {
                 line2,
             };
 
-            circle.onclick = e => {
+            const generateRhombus = () => {
                 const defaultK = [0, 1, 2, 3, 4].map(a => findSectionOnLineFamily(a, intersection.x, intersection.y));
 
                 const k1 = [...defaultK];
@@ -149,16 +154,16 @@ function checkIntersections() {
                 k4[line2.lineFamily] = line2.lineNumber - 1;
                 
                 const vertex1X = mathSum(0, 4, j => k1[j] * Math.cos(2 * Math.PI * j / 5)) * MULTIPLIER_1;
-                const vertex1Y = mathSum(0, 4, j => k1[j] * Math.sin(2 * Math.PI * j / 5)) * MULTIPLIER_1;
+                const vertex1Y = -mathSum(0, 4, j => k1[j] * Math.sin(2 * Math.PI * j / 5)) * MULTIPLIER_1;
 
                 const vertex2X = mathSum(0, 4, j => k2[j] * Math.cos(2 * Math.PI * j / 5)) * MULTIPLIER_1;
-                const vertex2Y = mathSum(0, 4, j => k2[j] * Math.sin(2 * Math.PI * j / 5)) * MULTIPLIER_1;
+                const vertex2Y = -mathSum(0, 4, j => k2[j] * Math.sin(2 * Math.PI * j / 5)) * MULTIPLIER_1;
                 
                 const vertex3X = mathSum(0, 4, j => k3[j] * Math.cos(2 * Math.PI * j / 5)) * MULTIPLIER_1;
-                const vertex3Y = mathSum(0, 4, j => k3[j] * Math.sin(2 * Math.PI * j / 5)) * MULTIPLIER_1;
+                const vertex3Y = -mathSum(0, 4, j => k3[j] * Math.sin(2 * Math.PI * j / 5)) * MULTIPLIER_1;
                 
                 const vertex4X = mathSum(0, 4, j => k4[j] * Math.cos(2 * Math.PI * j / 5)) * MULTIPLIER_1;
-                const vertex4Y = mathSum(0, 4, j => k4[j] * Math.sin(2 * Math.PI * j / 5)) * MULTIPLIER_1;
+                const vertex4Y = -mathSum(0, 4, j => k4[j] * Math.sin(2 * Math.PI * j / 5)) * MULTIPLIER_1;
 
                 const points = [
                     { x: vertex1X, y: vertex1Y },
@@ -177,14 +182,40 @@ function checkIntersections() {
                 polygon.style.stroke = 'black';
                 polygon.style.strokeWidth = 3;
                 absSvg.appendChild(polygon);
+                polygon.data = {
+                    points,
+                    realPoints: [...points],
+                    k1,
+                    k2,
+                    k3,
+                    k4,
+                    line1family: line1.lineFamily,
+                    line1number: line1.lineNumber,
+                    line2family: line2.lineFamily,
+                    line2number: line2.lineNumber,
+                    intersection,
+                    intersectionPoint: {
+                        x: intersection.x,
+                        y: intersection.y,
+                    },
+                };
+                allRhomuses.push(polygon);
             }
-            circle.onclick();
+            generateRhombus();
+            // circle.onclick = generateRhombus;
         }
     }
 }
 checkIntersections();   
 
 
+document.getElementById('slider1').oninput = e => {
+    const value = +document.getElementById('slider1').value;
+    for (const rhombus of allRhomuses) {
+        rhombus.data.realPoints = rhombus.data.points.map(a => multiplyPointByScalarRelativelyToPoint(rhombus.data.intersectionPoint, a, value));
+        rhombus.setAttribute('points', rhombus.data.realPoints.map(a => `${a.x},${a.y}`).join(' '));
+    }
+}
 
 
 // const mouseCircle = document.createElementNS(SVG_NS, 'circle');

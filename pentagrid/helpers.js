@@ -85,3 +85,12 @@ function pow2(x) {
 function lengthOfLineSegment(point1, point2) {
     return Math.sqrt(pow2(point1.x - point2.x) + pow2(point1.y - point2.y));
 }
+
+function multiplyPointByScalarRelativelyToPoint(originPoint, point, scalar) {
+    const x = (point.x - originPoint.x) * scalar;
+    const y = (point.y - originPoint.y) * scalar;
+    return {
+        x: originPoint.x + x,
+        y: originPoint.y + y,
+    };
+}

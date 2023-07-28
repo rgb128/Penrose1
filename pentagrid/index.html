@@ -8,14 +8,26 @@
 </head>
 <body>
     <div id="main">
-        <svg id="absSvg" style="background-color: transparent; overflow: visible; position: absolute; z-index: 999; display: none;"></svg>
+        <svg id="absSvg" style="background-color: transparent; overflow: visible; position: absolute; display: none;"></svg>
         <svg 
             id="absSvgOrigin"
-            style="background-color: transparent; overflow: visible; position: absolute; z-index: 999; top: 50vh; left: 50vw;"
+            style="background-color: transparent; overflow: visible; position: absolute; top: 50vh; left: 50vw;"
         >
             <!---->
         </svg>
     </div>
+    <div style="position: fixed; top: 0px; left: 0px; width: 200px; background: white;">
+        <input 
+                type="range" 
+                min="0" 
+                max="1" 
+                step=".01" 
+                value="1" 
+                id="slider1" 
+                style="width: 200px;"
+            />
+    </div>
+    
     
     <script src="helpers.js"></script>
     <script src="tiles-intersection.js"></script>
