@@ -225,12 +225,18 @@ function checkIntersections() {
                 const vertex4X = mathSum(0, 4, j => k4[j] * Math.cos(2 * Math.PI * j / 5)) * MULTIPLIER_1;
                 const vertex4Y = mathSum(0, 4, j => k4[j] * Math.sin(2 * Math.PI * j / 5)) * MULTIPLIER_1;
                 
-                drawAllLines([
-                    { x: vertex1X, y: vertex1Y },
-                    { x: vertex2X, y: vertex2Y },
-                    { x: vertex3X, y: vertex3Y },
-                    { x: vertex4X, y: vertex4Y },
-                ]);
+                // drawAllLines([
+                //     { x: vertex1X, y: vertex1Y },
+                //     { x: vertex2X, y: vertex2Y },
+                //     { x: vertex3X, y: vertex3Y },
+                //     { x: vertex4X, y: vertex4Y },
+                // ]);
+                drawLine(vertex1X, vertex1Y, vertex2X, vertex2Y, 'black', 3); // Side
+                // drawLine(vertex2X, vertex2Y, vertex3X, vertex3Y, 'green', 5); // Long diagonal in thin, short diagonal in thick
+                drawLine(vertex3X, vertex3Y, vertex4X, vertex4Y, 'black', 3); // Side
+                drawLine(vertex1X, vertex1Y, vertex3X, vertex3Y, 'black', 3); // Side, parallel to line
+                // drawLine(vertex1X, vertex1Y, vertex4X, vertex4Y, 'green', 5); // Long diagonal in thick, short diagonal in thin
+                drawLine(vertex2X, vertex2Y, vertex4X, vertex4Y, 'black', 3); // Side, parallel to line
             }
             // circle.onclick();
             if (
