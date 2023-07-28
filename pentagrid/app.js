@@ -16,7 +16,7 @@ const colors = [
     'gray',
 ];
 
-const MULTIPLIER_1 = 100; // it's basically, 1 unit
+const MULTIPLIER_1 = 50; // it's basically, 1 unit (and size of a side of a rhombus)
 
 
 function generateFamilyOfLines(shifts, familySize, familyWidth, lineLength) {
@@ -67,23 +67,30 @@ function generateFamilyOfLines(shifts, familySize, familyWidth, lineLength) {
 
 function generateShifts(count) {
     const lines = [];
-    for (let i = 0; i < count; i++) {
-        const x = map(Math.random(), 0, 1, -1, 1);
+    let xSum = 0;
+    let ySum = 0;
+    for (let i = 0; i < count - 1; i++) {
+        // const x = map(Math.random(), 0, 1, -1, 1);
+        // const y = map(Math.random(), 0, 1, -1, 1);
+        const x = 0;
         const y = map(Math.random(), 0, 1, -1, 1);
+        xSum += x;
+        ySum += y;
         lines.push([x * MULTIPLIER_1, y * MULTIPLIER_1]);
     }
+    lines.push([-xSum * MULTIPLIER_1, -ySum * MULTIPLIER_1]);
     return lines;
 }
 
 const shifts = generateShifts(5);
-const LINES_DIST = 200;
+const LINES_DIST = 100; // ??
 
 generateFamilyOfLines(
     shifts, 
     9, 
     // 3, 
     LINES_DIST, 
-    1500
+    10000
 );
 
 
@@ -200,6 +207,7 @@ function checkIntersections() {
                     },
                 };
                 allRhomuses.push(polygon);
+                // console.log(lengthOfLineSegment(points[0], points[1]));
             }
             generateRhombus();
             // circle.onclick = generateRhombus;

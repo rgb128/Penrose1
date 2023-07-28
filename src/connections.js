@@ -168,46 +168,56 @@ function getAvailableConnectionsForTile(tile) {
 }
 
 
-
-
-
-/** @type {Tile[]} */
-const tiles = [ new ThickTile(new Point(500, 200), -36) ];
-// const availableTiles = getAvailableConnectionsForTile(tile1);
-// console.log(availableTiles);
+const tiles = [ new ThinTile(new Point(500, 200), -36) ];
 tiles.push(getAvailableConnectionsForTile(tiles.slice(-1)[0]).find(x => 
-    x.src.type === 'thick' && 
-    x.dest.type === 'thick' && 
-    x.src.line === 3
-).getTile());
-
-/** @type {Tile[]} */
-const sideTiles = [];
-
-sideTiles.push(getAvailableConnectionsForTile(tiles[0]).find(x => 
-    x.src.type === 'thick' && 
-    x.dest.type === 'thin' && 
-    x.src.line === 2
-).getTile());
-
-/** @type {Tile[]} */
-const tiles2 = [];
-
-tiles2.push(getAvailableConnectionsForTile(tiles[1]).find(x => 
-    x.src.type === 'thick' && 
-    x.dest.type === 'thin' && 
-    x.src.line === 2
-).getTile());
-tiles2.push(getAvailableConnectionsForTile(tiles2[0]).find(x => 
     x.src.type === 'thin' && 
     x.dest.type === 'thin' && 
     x.src.line === 1
 ).getTile());
-tiles2.push(getAvailableConnectionsForTile(tiles2[0]).find(x => 
+tiles.push(getAvailableConnectionsForTile(tiles.slice(-1)[0]).find(x => 
     x.src.type === 'thin' && 
-    x.dest.type === 'thick' && 
-    x.src.line === 0
+    x.dest.type === 'thin' && 
+    x.src.line === 3
 ).getTile());
+
+
+// /** @type {Tile[]} */
+// const tiles = [ new ThickTile(new Point(500, 200), -36) ];
+// // const availableTiles = getAvailableConnectionsForTile(tile1);
+// // console.log(availableTiles);
+// tiles.push(getAvailableConnectionsForTile(tiles.slice(-1)[0]).find(x => 
+//     x.src.type === 'thick' && 
+//     x.dest.type === 'thick' && 
+//     x.src.line === 3
+// ).getTile());
+
+// /** @type {Tile[]} */
+// const sideTiles = [];
+
+// sideTiles.push(getAvailableConnectionsForTile(tiles[0]).find(x => 
+//     x.src.type === 'thick' && 
+//     x.dest.type === 'thin' && 
+//     x.src.line === 2
+// ).getTile());
+
+// /** @type {Tile[]} */
+// const tiles2 = [];
+
+// tiles2.push(getAvailableConnectionsForTile(tiles[1]).find(x => 
+//     x.src.type === 'thick' && 
+//     x.dest.type === 'thin' && 
+//     x.src.line === 2
+// ).getTile());
+// tiles2.push(getAvailableConnectionsForTile(tiles2[0]).find(x => 
+//     x.src.type === 'thin' && 
+//     x.dest.type === 'thin' && 
+//     x.src.line === 1
+// ).getTile());
+// tiles2.push(getAvailableConnectionsForTile(tiles2[0]).find(x => 
+//     x.src.type === 'thin' && 
+//     x.dest.type === 'thick' && 
+//     x.src.line === 0
+// ).getTile());
 
 
 // /** @type {Tile[]} */
