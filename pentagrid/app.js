@@ -83,14 +83,14 @@ function generateShifts(count) {
 }
 
 const shifts = generateShifts(5);
-const LINES_DIST = 100; // ??
+const LINES_DIST = MULTIPLIER_1 * 2.5; // ??
 
 generateFamilyOfLines(
     shifts, 
     9, 
     // 3, 
     LINES_DIST, 
-    10000
+    10000,
 );
 
 
