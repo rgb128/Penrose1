@@ -13,7 +13,7 @@ const colors = [
     'gray',
 ];
 
-const MULTIPLIER_1 = 1; // it's basically, 1 unit
+const MULTIPLIER_1 = 100; // it's basically, 1 unit
 
 
 function generateFamilyOfLines(shifts, familySize, familyWidth, lineLength) {
@@ -73,13 +73,13 @@ function generateShifts(count) {
 }
 
 const shifts = generateShifts(5);
-const LINES_DIST = 1;
+const LINES_DIST = 200;
 
 generateFamilyOfLines(
     shifts, 
     3, 
     LINES_DIST, 
-    10
+    1500
 );
 
 
@@ -95,6 +95,39 @@ function findSectionOnLineFamily(lineFamily, x, y) {
     const rotated = rotateVectorClockwise(x, y, -lineFamily*72); //todo refactor
     const res = Math.floor(rotated.y / LINES_DIST);
     return res;
+
+    // section is line's LOWER
+    const lines = allLines
+    .filter(l => l.lineFamily === lineFamily)
+    .map(l => {
+        function func (_x) {
+            return (_x - l.x1) * (l.y2 - l.y1) / (l.x2 - l.x1) + l.y1;
+        };
+        return {
+            ...l,
+            isPointAboveLine: (func(x) > y),
+            isPointAboveLineSmart: (l.angle < 180) ? (func(x) > y) : (func(x) < y),
+            // isPointAboveLineSmart: (l.angle < 180) ^ (func(x) < y),
+            // isPointAboveLineSmart: (l.angle < 180) !== (func(x) > y),
+        }
+    })
+    .sort((a, b) => a.lineNumber - b.lineNumber);
+    // console.log('findSectionOnLineFamily', lineFamily, x, y, lines)
+
+
+    console.log(lineFamily, lines.map(a => `${a.lineNumber}: ${a.isPointAboveLineSmart}`).join(' '));
+
+    if (lines[0].isPointAboveLineSmart) {
+        return lines[0].lineNumber - 1;
+    }
+    
+    for (let i = 0; i < lines.length; i++) {
+        if (lines[i].isPointAboveLineSmart) {
+            return lines[i].lineNumber - 1;
+        }
+    }
+
+    return lines[lines.length - 1].lineNumber;
 }
 
 function drawAllLines(vertexes) {
@@ -102,7 +135,7 @@ function drawAllLines(vertexes) {
         for(let j = i + 1; j < vertexes.length; j++) {
             const v1 = vertexes[i];
             const v2 = vertexes[j];
-            drawLine(v1.x, v1.y, v2.x, v2.y, 'black', .1);
+            drawLine(v1.x, v1.y, v2.x, v2.y, 'black', 5);
         }
     }
 }
@@ -127,7 +160,7 @@ function checkIntersections() {
             const circle = document.createElementNS(SVG_NS, 'circle');
             circle.setAttribute('cx', intersection.x);
             circle.setAttribute('cy', intersection.y);
-            circle.setAttribute('r', '.1');
+            circle.setAttribute('r', '10');
             circle.style.fill = color;
             circle.style.strokeWidth = '0';
             absSvg.appendChild(circle);
@@ -196,11 +229,11 @@ function checkIntersections() {
                 ]);
             }
 
-            if (
-                (line1.lineFamily === 0 && line1.lineNumber === 0)
-            ) {
-                circle.onclick();
-            }
+            // if (
+            //     (line1.lineFamily === 0 && line1.lineNumber === 0)
+            // ) {
+            //     circle.onclick();
+            // }
         }
     }
 }
@@ -213,7 +246,7 @@ const mouseCircle = document.createElementNS(SVG_NS, 'circle');
 mouseCircle.setAttribute('r', '20');
 mouseCircle.style.fill = 'red';
 mouseCircle.style.strokeWidth = '0';
-// absSvg.appendChild(mouseCircle);
+absSvg.appendChild(mouseCircle);
 
 
 document.onmousemove = e => {
@@ -221,6 +254,6 @@ document.onmousemove = e => {
     const y = e.y - document.documentElement.clientHeight / 2;
     mouseCircle.setAttribute('cx', x);
     mouseCircle.setAttribute('cy', y);
-    // console * MULTIPLIER_1 + intersection.x0, 1, 2, 3, 4].map(a => findSectionOnLineFamily(a, x, y)));
+    console.log([0, 1, 2, 3, 4].map(a => findSectionOnLineFamily(a, x, y)));
 };
 

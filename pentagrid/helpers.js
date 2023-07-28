@@ -67,7 +67,7 @@ function rotatePointAroundPointBySinAndCos(pointToRotate, staticPoint, sin, cos)
     }
 }
 
-function drawLine(x1, y1, x2, y2, color = 'green', strokeWidth = .05) {
+function drawLine(x1, y1, x2, y2, color = 'green', strokeWidth = 1) {
     const line = document.createElementNS(SVG_NS, 'line');
     line.setAttribute('x1', x1);
     line.setAttribute('y1', y1);
