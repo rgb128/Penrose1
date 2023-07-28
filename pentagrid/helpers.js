@@ -78,3 +78,10 @@ function drawLine(x1, y1, x2, y2, color = 'green', strokeWidth = 1) {
     absSvg.appendChild(line);
 }
 
+function pow2(x) {
+    return x * x;
+}
+
+function lengthOfLineSegment(point1, point2) {
+    return Math.sqrt(pow2(point1.x - point2.x) + pow2(point1.y - point2.y));
+}

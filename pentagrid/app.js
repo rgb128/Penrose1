@@ -18,7 +18,7 @@ const MULTIPLIER_1 = 100; // it's basically, 1 unit
 
 function generateFamilyOfLines(shifts, familySize, familyWidth, lineLength) {
     for (let i = 0; i < shifts.length; i++) {
-        const angle = 360 / shifts.length * i;
+        const angle = (360 / shifts.length * i + 90) % 360;
         for (let il = 0; il < (familySize / 2); il++) {
             function drawLineWithY(y, lineNumber) {
                 const x1src = -lineLength / 2;
@@ -77,7 +77,7 @@ const LINES_DIST = 200;
 
 generateFamilyOfLines(
     shifts, 
-    3, 
+    9, 
     LINES_DIST, 
     1500
 );
@@ -92,42 +92,9 @@ function findSectionOnLineFamily(lineFamily, x, y) {
 
     x -= shifts[lineFamily][0];
     y -= shifts[lineFamily][1];
-    const rotated = rotateVectorClockwise(x, y, -lineFamily*72); //todo refactor
+    const rotated = rotateVectorClockwise(x, y, -lineFamily*(360 / 5) - 90);
     const res = Math.floor(rotated.y / LINES_DIST);
     return res;
-
-    // section is line's LOWER
-    const lines = allLines
-    .filter(l => l.lineFamily === lineFamily)
-    .map(l => {
-        function func (_x) {
-            return (_x - l.x1) * (l.y2 - l.y1) / (l.x2 - l.x1) + l.y1;
-        };
-        return {
-            ...l,
-            isPointAboveLine: (func(x) > y),
-            isPointAboveLineSmart: (l.angle < 180) ? (func(x) > y) : (func(x) < y),
-            // isPointAboveLineSmart: (l.angle < 180) ^ (func(x) < y),
-            // isPointAboveLineSmart: (l.angle < 180) !== (func(x) > y),
-        }
-    })
-    .sort((a, b) => a.lineNumber - b.lineNumber);
-    // console.log('findSectionOnLineFamily', lineFamily, x, y, lines)
-
-
-    console.log(lineFamily, lines.map(a => `${a.lineNumber}: ${a.isPointAboveLineSmart}`).join(' '));
-
-    if (lines[0].isPointAboveLineSmart) {
-        return lines[0].lineNumber - 1;
-    }
-    
-    for (let i = 0; i < lines.length; i++) {
-        if (lines[i].isPointAboveLineSmart) {
-            return lines[i].lineNumber - 1;
-        }
-    }
-
-    return lines[lines.length - 1].lineNumber;
 }
 
 function drawAllLines(vertexes) {
@@ -141,17 +108,10 @@ function drawAllLines(vertexes) {
 }
 
 function checkIntersections() {
-    //todo refactor somehow
     for (let i1 = 0; i1 < allLines.length; i1++) {
         const line1 = allLines[i1];
         for (let i2 = i1 + 1; i2 < allLines.length; i2++) {
             const line2 = allLines[i2];
-            // if (
-            //     line1 === line2 ||
-            //     linesWereChecked(line1, line2)
-            // ) {
-            //     continue;
-            // }
             const intersection = line_intersect(line1.x1, line1.y1, line1.x2, line1.y2, line2.x1, line2.y1, line2.x2, line2.y2);
             if (!(intersection?.intersect)) continue;
             checkedPairs.push([line1, line2]);
@@ -171,7 +131,6 @@ function checkIntersections() {
             };
 
             circle.onclick = e => {
-                // console.log(line1, line2);
                 const defaultK = [0, 1, 2, 3, 4].map(a => findSectionOnLineFamily(a, intersection.x, intersection.y));
 
                 const k1 = [...defaultK];
@@ -179,39 +138,15 @@ function checkIntersections() {
                 const k3 = [...defaultK];
                 const k4 = [...defaultK];
 
-                k1[line1.lineFamily] = line1.lineNumber;
-                k2[line1.lineFamily] = line1.lineNumber;
-                k3[line1.lineFamily] = line1.lineNumber - 1;
-                k4[line1.lineFamily] = line1.lineNumber - 1;
+                k1[line1.lineFamily] = line1.lineNumber - 1;
+                k2[line1.lineFamily] = line1.lineNumber - 1;
+                k3[line1.lineFamily] = line1.lineNumber;
+                k4[line1.lineFamily] = line1.lineNumber;
 
-                k1[line2.lineFamily] = line2.lineNumber;
-                k2[line2.lineFamily] = line2.lineNumber - 1;
+                k1[line2.lineFamily] = line2.lineNumber - 1;
+                k2[line2.lineFamily] = line2.lineNumber;
                 k3[line2.lineFamily] = line2.lineNumber;
                 k4[line2.lineFamily] = line2.lineNumber - 1;
-
-                // console.log('line1.lineFamily', line1.lineFamily);
-                // console.log('line1.lineNumber', line1.lineNumber);
-                // console.log('line2.lineFamily', line2.lineFamily);
-                // console.log('line2.lineNumber', line2.lineNumber);
-
-                console.log(line1.lineFamily, line2.lineFamily, k1.join(' '), k2.join(' '), k3.join(' '), k4.join(' '));
-                // console.log(k1.join(''));
-                // console.log(k1.join(''));
-                // console.log(k1.join(''));
-                // console.log(k1.join(''));
-
-                // const vertex1X = mathSum(0, 4, j => k1[j] * Math.cos(2 * Math.PI * j / 5)) * MULTIPLIER_1;
-                // const vertex1Y = mathSum(0, 4, j => k1[j] * Math.sin(2 * Math.PI * j / 5)) * MULTIPLIER_1;
-
-                // const vertex2X = mathSum(0, 4, j => k2[j] * Math.cos(2 * Math.PI * j / 5)) * MULTIPLIER_1;
-                // const vertex2Y = mathSum(0, 4, j => k2[j] * Math.sin(2 * Math.PI * j / 5)) * MULTIPLIER_1;
-                
-                // const vertex3X = mathSum(0, 4, j => k3[j] * Math.cos(2 * Math.PI * j / 5)) * MULTIPLIER_1;
-                // const vertex3Y = mathSum(0, 4, j => k3[j] * Math.sin(2 * Math.PI * j / 5)) * MULTIPLIER_1;
-                
-                // const vertex4X = mathSum(0, 4, j => k4[j] * Math.cos(2 * Math.PI * j / 5)) * MULTIPLIER_1;
-                // const vertex4Y = mathSum(0, 4, j => k4[j] * Math.sin(2 * Math.PI * j / 5)) * MULTIPLIER_1;
-
                 
                 const vertex1X = mathSum(0, 4, j => k1[j] * Math.cos(2 * Math.PI * j / 5)) * MULTIPLIER_1;
                 const vertex1Y = mathSum(0, 4, j => k1[j] * Math.sin(2 * Math.PI * j / 5)) * MULTIPLIER_1;
@@ -224,26 +159,26 @@ function checkIntersections() {
                 
                 const vertex4X = mathSum(0, 4, j => k4[j] * Math.cos(2 * Math.PI * j / 5)) * MULTIPLIER_1;
                 const vertex4Y = mathSum(0, 4, j => k4[j] * Math.sin(2 * Math.PI * j / 5)) * MULTIPLIER_1;
-                
-                // drawAllLines([
-                //     { x: vertex1X, y: vertex1Y },
-                //     { x: vertex2X, y: vertex2Y },
-                //     { x: vertex3X, y: vertex3Y },
-                //     { x: vertex4X, y: vertex4Y },
-                // ]);
-                drawLine(vertex1X, vertex1Y, vertex2X, vertex2Y, 'black', 3); // Side
-                // drawLine(vertex2X, vertex2Y, vertex3X, vertex3Y, 'green', 5); // Long diagonal in thin, short diagonal in thick
-                drawLine(vertex3X, vertex3Y, vertex4X, vertex4Y, 'black', 3); // Side
-                drawLine(vertex1X, vertex1Y, vertex3X, vertex3Y, 'black', 3); // Side, parallel to line
-                // drawLine(vertex1X, vertex1Y, vertex4X, vertex4Y, 'green', 5); // Long diagonal in thick, short diagonal in thin
-                drawLine(vertex2X, vertex2Y, vertex4X, vertex4Y, 'black', 3); // Side, parallel to line
+
+                const points = [
+                    { x: vertex1X, y: vertex1Y },
+                    { x: vertex2X, y: vertex2Y },
+                    { x: vertex3X, y: vertex3Y },
+                    { x: vertex4X, y: vertex4Y },
+                ];
+
+                // drawLine(points[0].x, points[0].y, points[2].x, points[2].y, 'red', 3); // Short diagonal in thin, long in thick
+                // drawLine(points[1].x, points[1].y, points[3].x, points[3].y, 'green', 3); // Long diagonal in thin, short in thick
+                const isRhombusThin = lengthOfLineSegment(points[0], points[2]) < lengthOfLineSegment(points[1], points[3]);
+
+                const polygon = document.createElementNS(SVG_NS, 'polygon');
+                polygon.setAttribute('points', points.map(a => `${a.x},${a.y}`).join(' '));
+                polygon.style.fill = isRhombusThin ? 'rgba(255, 0, 0, .3)' : 'rgba(0, 0, 255, .3)';
+                polygon.style.stroke = 'black';
+                polygon.style.strokeWidth = 3;
+                absSvg.appendChild(polygon);
             }
-            // circle.onclick();
-            if (
-                (line1.lineFamily === 0 && line1.lineNumber === 0)
-            ) {
-                circle.onclick();
-            }
+            circle.onclick();
         }
     }
 }
@@ -252,18 +187,18 @@ checkIntersections();
 
 
 
-const mouseCircle = document.createElementNS(SVG_NS, 'circle');
-mouseCircle.setAttribute('r', '20');
-mouseCircle.style.fill = 'red';
-mouseCircle.style.strokeWidth = '0';
-// absSvg.appendChild(mouseCircle);
+// const mouseCircle = document.createElementNS(SVG_NS, 'circle');
+// mouseCircle.setAttribute('r', '20');
+// mouseCircle.style.fill = 'red';
+// mouseCircle.style.strokeWidth = '0';
+// // absSvg.appendChild(mouseCircle);
 
 
-document.onmousemove = e => {
-    const x = e.x - document.documentElement.clientWidth / 2;
-    const y = e.y - document.documentElement.clientHeight / 2;
-    mouseCircle.setAttribute('cx', x);
-    mouseCircle.setAttribute('cy', y);
-    // console.log([0, 1, 2, 3, 4].map(a => findSectionOnLineFamily(a, x, y)));
-};
+// document.onmousemove = e => {
+//     const x = e.x - document.documentElement.clientWidth / 2;
+//     const y = e.y - document.documentElement.clientHeight / 2;
+//     mouseCircle.setAttribute('cx', x);
+//     mouseCircle.setAttribute('cy', y);
+//     // console.log([0, 1, 2, 3, 4].map(a => findSectionOnLineFamily(a, x, y)));
+// };
 
