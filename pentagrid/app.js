@@ -13,7 +13,7 @@ const colors = [
     'gray',
 ];
 
-const MULTIPLIER_1 = 100;
+const MULTIPLIER_1 = 1; // it's basically, 1 unit
 
 
 function generateFamilyOfLines(shifts, familySize, familyWidth, lineLength) {
@@ -26,10 +26,10 @@ function generateFamilyOfLines(shifts, familySize, familyWidth, lineLength) {
                 const rotated1 = rotateVectorClockwise(x1src, y, angle);
                 const rotated2 = rotateVectorClockwise(x2src, y, angle);
                 
-                const x1 = rotated1.x + shifts[i][0] * MULTIPLIER_1;
-                const y1 = rotated1.y + shifts[i][1] * MULTIPLIER_1;
-                const x2 = rotated2.x + shifts[i][0] * MULTIPLIER_1;
-                const y2 = rotated2.y + shifts[i][1] * MULTIPLIER_1;
+                const x1 = rotated1.x + shifts[i][0];
+                const y1 = rotated1.y + shifts[i][1];
+                const x2 = rotated2.x + shifts[i][0];
+                const y2 = rotated2.y + shifts[i][1];
                 
                 drawLine(
                     x1,
@@ -44,8 +44,8 @@ function generateFamilyOfLines(shifts, familySize, familyWidth, lineLength) {
                     x2, 
                     y2, 
                     shift: [
-                        (shifts[i][0] * MULTIPLIER_1), 
-                        (shifts[i][1] * MULTIPLIER_1),
+                        (shifts[i][0]), 
+                        (shifts[i][1]),
                     ], 
                     angle,
                     lineFamily: i,
@@ -67,16 +67,19 @@ function generateShifts(count) {
     for (let i = 0; i < count; i++) {
         const x = map(Math.random(), 0, 1, -1, 1);
         const y = map(Math.random(), 0, 1, -1, 1);
-        lines.push([x, y]);
+        lines.push([x * MULTIPLIER_1, y * MULTIPLIER_1]);
     }
     return lines;
 }
 
+const shifts = generateShifts(5);
+const LINES_DIST = 1;
+
 generateFamilyOfLines(
-    generateShifts(5), 
-    5, 
-    200, 
-    1500
+    shifts, 
+    3, 
+    LINES_DIST, 
+    10
 );
 
 
@@ -86,31 +89,12 @@ function linesWereChecked(line1, line2) {
 }
 
 function findSectionOnLineFamily(lineFamily, x, y) {
-    // section is line's LOWER
-    const lines = allLines
-    .filter(l => l.lineFamily === lineFamily)
-    .map(l => {
-        const func = (_x) => {
-            return (_x - l.x1) * (l.y2 - l.y1) / (l.x2 - l.x1) + l.y1;
-        };
-        return {
-            ...l,
-            isAbovePoint: func(x) > y,
-        }
-    })
-    .sort((a, b) => a.lineNumber - b.lineNumber);
 
-    if (lines[0].isAbovePoint) {
-        return lines[0].lineNumber - 1;
-    }
-    
-    for (let i = 0; i < lines.length; i++) {
-        if (lines[i].isAbovePoint) {
-            return lines[i].lineNumber - 1;
-        }
-    }
-
-    return lines[lines.length - 1].lineNumber;
+    x -= shifts[lineFamily][0];
+    y -= shifts[lineFamily][1];
+    const rotated = rotateVectorClockwise(x, y, -lineFamily*72); //todo refactor
+    const res = Math.floor(rotated.y / LINES_DIST);
+    return res;
 }
 
 function drawAllLines(vertexes) {
@@ -118,7 +102,7 @@ function drawAllLines(vertexes) {
         for(let j = i + 1; j < vertexes.length; j++) {
             const v1 = vertexes[i];
             const v2 = vertexes[j];
-            drawLine(v1.x, v1.y, v2.x, v2.y, 'black', 5);
+            drawLine(v1.x, v1.y, v2.x, v2.y, 'black', .1);
         }
     }
 }
@@ -143,7 +127,7 @@ function checkIntersections() {
             const circle = document.createElementNS(SVG_NS, 'circle');
             circle.setAttribute('cx', intersection.x);
             circle.setAttribute('cy', intersection.y);
-            circle.setAttribute('r', '10');
+            circle.setAttribute('r', '.1');
             circle.style.fill = color;
             circle.style.strokeWidth = '0';
             absSvg.appendChild(circle);
@@ -172,6 +156,26 @@ function checkIntersections() {
                 k3[line2.lineFamily] = line2.lineNumber + 1;
                 k4[line2.lineFamily] = line2.lineNumber;
 
+                // console.log('line1.lineFamily', line1.lineFamily);
+                // console.log('line1.lineNumber', line1.lineNumber);
+                // console.log('line2.lineFamily', line2.lineFamily);
+                // console.log('line2.lineNumber', line2.lineNumber);
+
+                // console.log(k1, k2, k4, k4);
+
+                // const vertex1X = mathSum(0, 4, j => k1[j] * Math.cos(2 * Math.PI * j / 5)) * MULTIPLIER_1;
+                // const vertex1Y = mathSum(0, 4, j => k1[j] * Math.sin(2 * Math.PI * j / 5)) * MULTIPLIER_1;
+
+                // const vertex2X = mathSum(0, 4, j => k2[j] * Math.cos(2 * Math.PI * j / 5)) * MULTIPLIER_1;
+                // const vertex2Y = mathSum(0, 4, j => k2[j] * Math.sin(2 * Math.PI * j / 5)) * MULTIPLIER_1;
+                
+                // const vertex3X = mathSum(0, 4, j => k3[j] * Math.cos(2 * Math.PI * j / 5)) * MULTIPLIER_1;
+                // const vertex3Y = mathSum(0, 4, j => k3[j] * Math.sin(2 * Math.PI * j / 5)) * MULTIPLIER_1;
+                
+                // const vertex4X = mathSum(0, 4, j => k4[j] * Math.cos(2 * Math.PI * j / 5)) * MULTIPLIER_1;
+                // const vertex4Y = mathSum(0, 4, j => k4[j] * Math.sin(2 * Math.PI * j / 5)) * MULTIPLIER_1;
+
+                
                 const vertex1X = mathSum(0, 4, j => k1[j] * Math.cos(2 * Math.PI * j / 5)) * MULTIPLIER_1;
                 const vertex1Y = mathSum(0, 4, j => k1[j] * Math.sin(2 * Math.PI * j / 5)) * MULTIPLIER_1;
 
@@ -193,8 +197,7 @@ function checkIntersections() {
             }
 
             if (
-                (line1.lineFamily === 0 && line1.lineNumber === 0) ||
-                (line2.lineFamily === 0 && line2.lineNumber === 0)
+                (line1.lineFamily === 0 && line1.lineNumber === 0)
             ) {
                 circle.onclick();
             }
@@ -204,4 +207,20 @@ function checkIntersections() {
 checkIntersections();   
 
 
+
+
+const mouseCircle = document.createElementNS(SVG_NS, 'circle');
+mouseCircle.setAttribute('r', '20');
+mouseCircle.style.fill = 'red';
+mouseCircle.style.strokeWidth = '0';
+// absSvg.appendChild(mouseCircle);
+
+
+document.onmousemove = e => {
+    const x = e.x - document.documentElement.clientWidth / 2;
+    const y = e.y - document.documentElement.clientHeight / 2;
+    mouseCircle.setAttribute('cx', x);
+    mouseCircle.setAttribute('cy', y);
+    // console * MULTIPLIER_1 + intersection.x0, 1, 2, 3, 4].map(a => findSectionOnLineFamily(a, x, y)));
+};
 
