@@ -17,8 +17,8 @@ const colors = [
     'gray',
 ];
 
-const THIN_RHOMBUS_FILL = 'black';
-const THICK_RHOMBUS_FILL = 'white';
+const THIN_RHOMBUS_FILL = 'rgba(255, 0, 0, .3)';
+const THICK_RHOMBUS_FILL = 'rgba(0, 0, 255, .3)';
 
 const MULTIPLIER_1 = 50; // it's basically, 1 unit (and size of a side of a rhombus)
 
@@ -183,6 +183,21 @@ function checkIntersections() {
                 // drawLine(points[1].x, points[1].y, points[3].x, points[3].y, 'green', 3); // Long diagonal in thin, short in thick
                 const isRhombusThin = lengthOfLineSegment(points[0], points[2]) < lengthOfLineSegment(points[1], points[3]);
 
+                const drawCircle = () => {
+                    const ratio = .8;
+                    const center = multiplyPointByScalarRelativelyToPoint(points[0], points[2], ratio);
+                    
+                    const circle = document.createElementNS(SVG_NS, 'circle');
+                    circle.setAttribute('cx', center.x);
+                    circle.setAttribute('cy', center.y);
+                    circle.setAttribute('r', '3');
+                    circle.style.fill = 'black';
+                    circle.style.strokeWidth = '0';
+                    absSvgTiles.appendChild(circle);
+                    circle.data = { ...center }
+                    return circle;
+                };
+
                 const polygon = document.createElementNS(SVG_NS, 'polygon');
                 polygon.setAttribute('points', points.map(a => `${a.x},${a.y}`).join(' '));
                 polygon.style.fill = isRhombusThin ? THIN_RHOMBUS_FILL : THICK_RHOMBUS_FILL;
@@ -205,8 +220,10 @@ function checkIntersections() {
                         x: intersection.x,
                         y: intersection.y,
                     },
+                    circle: drawCircle(),
                 };
                 allRhomuses.push(polygon);
+                
             }
             generateRhombus();
         }
@@ -221,12 +238,15 @@ document.getElementById('slider1').oninput = e => {
     for (const rhombus of allRhomuses) {
         rhombus.data.realPoints = rhombus.data.points.map(a => multiplyPointByScalarRelativelyToPoint(rhombus.data.intersectionPoint, a, value));
         rhombus.setAttribute('points', rhombus.data.realPoints.map(a => `${a.x},${a.y}`).join(' '));
+        const circleCenter = multiplyPointByScalarRelativelyToPoint(rhombus.data.intersectionPoint, rhombus.data.circle.data, value);
+        rhombus.data.circle.setAttribute('cx', circleCenter.x);
+        rhombus.data.circle.setAttribute('cy', circleCenter.y);
     }
 }
 
 document.getElementById('slider1').value = window.localStorage['slider1'] || 1;
 document.getElementById('slider1').oninput();
 
-setTimeout(() => {
-    window.location.reload();
-}, 500);
+// setTimeout(() => {
+//     window.location.reload();
+// }, 500);
