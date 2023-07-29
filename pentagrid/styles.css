@@ -42,3 +42,7 @@ svg > polygon {
     stroke-linejoin: round;
 }
 
+svg > text.vertex-text {
+    font-size: 5px;
+}
+

@@ -89,7 +89,7 @@ const LINES_DIST = MULTIPLIER_1 * 2.5; // ??
 
 generateFamilyOfLines(
     shifts, 
-    17, 
+    5, 
     LINES_DIST, 
     10000,
 );
@@ -182,20 +182,26 @@ function checkIntersections() {
                 // drawLine(points[0].x, points[0].y, points[2].x, points[2].y, 'red', 3); // Short diagonal in thin, long in thick
                 // drawLine(points[1].x, points[1].y, points[3].x, points[3].y, 'green', 3); // Long diagonal in thin, short in thick
                 const isRhombusThin = lengthOfLineSegment(points[0], points[2]) < lengthOfLineSegment(points[1], points[3]);
-
+                const centerPoint = { x: (vertex1X + vertex2X + vertex3X + vertex4X) / 4, y: (vertex1Y + vertex2Y + vertex3Y + vertex4Y) / 4 };
                 const drawCircle = () => {
-                    const ratio = .8;
-                    const center = multiplyPointByScalarRelativelyToPoint(points[0], points[2], ratio);
-                    
                     const circle = document.createElementNS(SVG_NS, 'circle');
-                    circle.setAttribute('cx', center.x);
-                    circle.setAttribute('cy', center.y);
+                    circle.setAttribute('cx', centerPoint.x);
+                    circle.setAttribute('cy', centerPoint.y);
                     circle.setAttribute('r', '3');
                     circle.style.fill = 'black';
                     circle.style.strokeWidth = '0';
                     absSvgTiles.appendChild(circle);
-                    circle.data = { ...center }
+                    circle.data = { ...centerPoint }
                     return circle;
+                };
+
+                const drawText = (x, y, text) => {
+                    const element = document.createElementNS(SVG_NS, 'text');
+                    element.setAttribute('x', x);
+                    element.setAttribute('y', y);
+                    element.innerHTML = text;
+                    element.classList.add('vertex-text');
+                    absSvgTiles.appendChild(element);
                 };
 
                 const polygon = document.createElementNS(SVG_NS, 'polygon');
@@ -224,6 +230,10 @@ function checkIntersections() {
                 };
                 allRhomuses.push(polygon);
                 
+                drawText((vertex1X + centerPoint.x) / 2, (vertex1Y + centerPoint.y) / 2, '1');
+                drawText((vertex2X + centerPoint.x) / 2, (vertex2Y + centerPoint.y) / 2, '2');
+                drawText((vertex3X + centerPoint.x) / 2, (vertex3Y + centerPoint.y) / 2, '3');
+                drawText((vertex4X + centerPoint.x) / 2, (vertex4Y + centerPoint.y) / 2, '4');
             }
             generateRhombus();
         }
