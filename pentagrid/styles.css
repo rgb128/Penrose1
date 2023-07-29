@@ -36,3 +36,9 @@ svg.tile > path.path2 {
     stroke-width: 10;
     fill: none;
 }
+
+svg > polygon {
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+

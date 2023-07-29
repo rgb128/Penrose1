@@ -26,13 +26,20 @@ function generateFamilyOfLines(shifts, familySize, familyWidth, lineLength) {
             function drawLineWithY(y, lineNumber) {
                 const x1src = -lineLength / 2;
                 const x2src = lineLength / 2;
-                const rotated1 = rotateVectorClockwise(x1src, y, angle);
-                const rotated2 = rotateVectorClockwise(x2src, y, angle);
+                // const rotated1 = rotateVectorClockwise(x1src, y, angle);
+                // const rotated2 = rotateVectorClockwise(x2src, y, angle);
                 
-                const x1 = rotated1.x + shifts[i][0];
-                const y1 = rotated1.y + shifts[i][1];
-                const x2 = rotated2.x + shifts[i][0];
-                const y2 = rotated2.y + shifts[i][1];
+                // const x1 = rotated1.x + shifts[i][0];
+                // const y1 = rotated1.y + shifts[i][1];
+                // const x2 = rotated2.x + shifts[i][0];
+                // const y2 = rotated2.y + shifts[i][1];
+                const rotated1 = rotateVectorClockwise(x1src + shifts[i][0], y + shifts[i][1], angle);
+                const rotated2 = rotateVectorClockwise(x2src + shifts[i][0], y + shifts[i][1], angle);
+                
+                const x1 = rotated1.x;
+                const y1 = rotated1.y;
+                const x2 = rotated2.x;
+                const y2 = rotated2.y;
                 
                 drawLine(
                     x1,
@@ -66,19 +73,28 @@ function generateFamilyOfLines(shifts, familySize, familyWidth, lineLength) {
 }
 
 function generateShifts(count) {
-    const lines = [];
+    // return [
+    //     [-0.1, 0],
+    //     [-0.2, 0],
+    //     [-0.3, 0],
+    //     [-0.4, 0],
+    //     [1, 0],
+    // ].map(x => x.map(y => y * MULTIPLIER_1));
+    const lines = [ [0, 0] ];
     let xSum = 0;
     let ySum = 0;
-    for (let i = 0; i < count - 1; i++) {
+    for (let i = 0; i < count - 2; i++) {
         // const x = map(Math.random(), 0, 1, -1, 1);
         // const y = map(Math.random(), 0, 1, -1, 1);
         const x = 0;
-        const y = map(Math.random(), 0, 1, -1, 1);
+        const y = map(Math.random(), 0, 1, -MULTIPLIER_1, MULTIPLIER_1);
         xSum += x;
         ySum += y;
-        lines.push([x * MULTIPLIER_1, y * MULTIPLIER_1]);
+        // lines.push([x * MULTIPLIER_1, y * MULTIPLIER_1]);
+        lines.push([x, y]);
     }
-    lines.push([-xSum * MULTIPLIER_1, -ySum * MULTIPLIER_1]);
+    // lines.push([-xSum * MULTIPLIER_1, -ySum * MULTIPLIER_1]);
+    lines.push([-xSum, -ySum]);
     return lines;
 }
 
@@ -88,7 +104,6 @@ const LINES_DIST = MULTIPLIER_1 * 2.5; // ??
 generateFamilyOfLines(
     shifts, 
     9, 
-    // 3, 
     LINES_DIST, 
     10000,
 );
@@ -101,10 +116,10 @@ function linesWereChecked(line1, line2) {
 
 function findSectionOnLineFamily(lineFamily, x, y) {
 
-    x -= shifts[lineFamily][0];
-    y -= shifts[lineFamily][1];
+    // x -= shifts[lineFamily][0];
+    // y -= shifts[lineFamily][1];
     const rotated = rotateVectorClockwise(x, y, -lineFamily*(360 / 5) - ANGLE_SHIFT);
-    const res = Math.floor(rotated.y / LINES_DIST);
+    const res = Math.floor((rotated.y - shifts[lineFamily][1]) / LINES_DIST);
     return res;
 }
 
@@ -178,6 +193,8 @@ function checkIntersections() {
                     { x: vertex3X, y: vertex3Y },
                     { x: vertex4X, y: vertex4Y },
                 ];
+
+                // drawAllLines(points);
 
                 // drawLine(points[0].x, points[0].y, points[2].x, points[2].y, 'red', 3); // Short diagonal in thin, long in thick
                 // drawLine(points[1].x, points[1].y, points[3].x, points[3].y, 'green', 3); // Long diagonal in thin, short in thick
