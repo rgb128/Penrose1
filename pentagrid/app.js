@@ -1,6 +1,7 @@
 'use strict';
 
-const absSvg = document.getElementById('absSvgOrigin');
+const absSvgLines = document.getElementById('absSvgOriginLines');
+const absSvgTiles = document.getElementById('absSvgOriginTiles');
 window.tilesContainer = document.getElementById('main');
 
 const allLines = [];
@@ -16,6 +17,9 @@ const colors = [
     'gray',
 ];
 
+const THIN_RHOMBUS_FILL = 'black';
+const THICK_RHOMBUS_FILL = 'white';
+
 const MULTIPLIER_1 = 50; // it's basically, 1 unit (and size of a side of a rhombus)
 
 
@@ -26,13 +30,6 @@ function generateFamilyOfLines(shifts, familySize, familyWidth, lineLength) {
             function drawLineWithY(y, lineNumber) {
                 const x1src = -lineLength / 2;
                 const x2src = lineLength / 2;
-                // const rotated1 = rotateVectorClockwise(x1src, y, angle);
-                // const rotated2 = rotateVectorClockwise(x2src, y, angle);
-                
-                // const x1 = rotated1.x + shifts[i][0];
-                // const y1 = rotated1.y + shifts[i][1];
-                // const x2 = rotated2.x + shifts[i][0];
-                // const y2 = rotated2.y + shifts[i][1];
                 const rotated1 = rotateVectorClockwise(x1src + shifts[i][0], y + shifts[i][1], angle);
                 const rotated2 = rotateVectorClockwise(x2src + shifts[i][0], y + shifts[i][1], angle);
                 
@@ -73,27 +70,16 @@ function generateFamilyOfLines(shifts, familySize, familyWidth, lineLength) {
 }
 
 function generateShifts(count) {
-    // return [
-    //     [-0.1, 0],
-    //     [-0.2, 0],
-    //     [-0.3, 0],
-    //     [-0.4, 0],
-    //     [1, 0],
-    // ].map(x => x.map(y => y * MULTIPLIER_1));
     const lines = [ [0, 0] ];
     let xSum = 0;
     let ySum = 0;
     for (let i = 0; i < count - 2; i++) {
-        // const x = map(Math.random(), 0, 1, -1, 1);
-        // const y = map(Math.random(), 0, 1, -1, 1);
         const x = 0;
         const y = map(Math.random(), 0, 1, -MULTIPLIER_1, MULTIPLIER_1);
         xSum += x;
         ySum += y;
-        // lines.push([x * MULTIPLIER_1, y * MULTIPLIER_1]);
         lines.push([x, y]);
     }
-    // lines.push([-xSum * MULTIPLIER_1, -ySum * MULTIPLIER_1]);
     lines.push([-xSum, -ySum]);
     return lines;
 }
@@ -103,7 +89,7 @@ const LINES_DIST = MULTIPLIER_1 * 2.5; // ??
 
 generateFamilyOfLines(
     shifts, 
-    9, 
+    17, 
     LINES_DIST, 
     10000,
 );
@@ -116,8 +102,6 @@ function linesWereChecked(line1, line2) {
 
 function findSectionOnLineFamily(lineFamily, x, y) {
 
-    // x -= shifts[lineFamily][0];
-    // y -= shifts[lineFamily][1];
     const rotated = rotateVectorClockwise(x, y, -lineFamily*(360 / 5) - ANGLE_SHIFT);
     const res = Math.floor((rotated.y - shifts[lineFamily][1]) / LINES_DIST);
     return res;
@@ -146,11 +130,10 @@ function checkIntersections() {
             const circle = document.createElementNS(SVG_NS, 'circle');
             circle.setAttribute('cx', intersection.x);
             circle.setAttribute('cy', intersection.y);
-            // circle.setAttribute('r', '10');
             circle.setAttribute('r', '3');
             circle.style.fill = color;
             circle.style.strokeWidth = '0';
-            absSvg.appendChild(circle);
+            absSvgLines.appendChild(circle);
 
             circle.data = {
                 line1,
@@ -202,10 +185,10 @@ function checkIntersections() {
 
                 const polygon = document.createElementNS(SVG_NS, 'polygon');
                 polygon.setAttribute('points', points.map(a => `${a.x},${a.y}`).join(' '));
-                polygon.style.fill = isRhombusThin ? 'rgba(255, 0, 0, .3)' : 'rgba(0, 0, 255, .3)';
+                polygon.style.fill = isRhombusThin ? THIN_RHOMBUS_FILL : THICK_RHOMBUS_FILL;
                 polygon.style.stroke = 'black';
                 polygon.style.strokeWidth = 3;
-                absSvg.appendChild(polygon);
+                absSvgTiles.appendChild(polygon);
                 polygon.data = {
                     points,
                     realPoints: [...points],
@@ -224,10 +207,8 @@ function checkIntersections() {
                     },
                 };
                 allRhomuses.push(polygon);
-                // console.log(lengthOfLineSegment(points[0], points[1]));
             }
             generateRhombus();
-            // circle.onclick = generateRhombus;
         }
     }
 }
@@ -236,25 +217,16 @@ checkIntersections();
 
 document.getElementById('slider1').oninput = e => {
     const value = +document.getElementById('slider1').value;
+    window.localStorage['slider1'] = value;
     for (const rhombus of allRhomuses) {
         rhombus.data.realPoints = rhombus.data.points.map(a => multiplyPointByScalarRelativelyToPoint(rhombus.data.intersectionPoint, a, value));
         rhombus.setAttribute('points', rhombus.data.realPoints.map(a => `${a.x},${a.y}`).join(' '));
     }
 }
 
+document.getElementById('slider1').value = window.localStorage['slider1'] || 1;
+document.getElementById('slider1').oninput();
 
-// const mouseCircle = document.createElementNS(SVG_NS, 'circle');
-// mouseCircle.setAttribute('r', '20');
-// mouseCircle.style.fill = 'red';
-// mouseCircle.style.strokeWidth = '0';
-// // absSvg.appendChild(mouseCircle);
-
-
-// document.onmousemove = e => {
-//     const x = e.x - document.documentElement.clientWidth / 2;
-//     const y = e.y - document.documentElement.clientHeight / 2;
-//     mouseCircle.setAttribute('cx', x);
-//     mouseCircle.setAttribute('cy', y);
-//     // console.log([0, 1, 2, 3, 4].map(a => findSectionOnLineFamily(a, x, y)));
-// };
-
+setTimeout(() => {
+    window.location.reload();
+}, 500);
