@@ -183,14 +183,14 @@ function checkIntersections() {
                 // drawLine(points[1].x, points[1].y, points[3].x, points[3].y, 'green', 3); // Long diagonal in thin, short in thick
                 const isRhombusThin = lengthOfLineSegment(points[0], points[2]) < lengthOfLineSegment(points[1], points[3]);
                 const centerPoint = { x: (vertex1X + vertex2X + vertex3X + vertex4X) / 4, y: (vertex1Y + vertex2Y + vertex3Y + vertex4Y) / 4 };
-                const drawCircle = () => {
+                const drawCircle = (display = true) => {
                     const circle = document.createElementNS(SVG_NS, 'circle');
                     circle.setAttribute('cx', centerPoint.x);
                     circle.setAttribute('cy', centerPoint.y);
                     circle.setAttribute('r', '3');
                     circle.style.fill = 'black';
                     circle.style.strokeWidth = '0';
-                    absSvgTiles.appendChild(circle);
+                    display && absSvgTiles.appendChild(circle);
                     circle.data = { ...centerPoint }
                     return circle;
                 };
@@ -226,14 +226,15 @@ function checkIntersections() {
                         x: intersection.x,
                         y: intersection.y,
                     },
-                    circle: drawCircle(),
+                    circle: drawCircle(false),
                 };
                 allRhomuses.push(polygon);
                 
-                drawText((vertex1X + centerPoint.x) / 2, (vertex1Y + centerPoint.y) / 2, '1');
-                drawText((vertex2X + centerPoint.x) / 2, (vertex2Y + centerPoint.y) / 2, '2');
-                drawText((vertex3X + centerPoint.x) / 2, (vertex3Y + centerPoint.y) / 2, '3');
-                drawText((vertex4X + centerPoint.x) / 2, (vertex4Y + centerPoint.y) / 2, '4');
+                // drawText((vertex1X + centerPoint.x) / 2, (vertex1Y + centerPoint.y) / 2, '1');
+                // drawText((vertex2X + centerPoint.x) / 2, (vertex2Y + centerPoint.y) / 2, '2');
+                // drawText((vertex3X + centerPoint.x) / 2, (vertex3Y + centerPoint.y) / 2, '3');
+                // drawText((vertex4X + centerPoint.x) / 2, (vertex4Y + centerPoint.y) / 2, '4');
+                drawText(centerPoint.x, centerPoint.y, `f${line1.lineFamily} n${line1.lineNumber} / f${line2.lineFamily} n${line2.lineNumber}`);
             }
             generateRhombus();
         }

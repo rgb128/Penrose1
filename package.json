@@ -1,5 +1,5 @@
 {
-    "name": "typescript-hot-reload",
+    "name": "penrose1",
     "version": "1.0.0",
     "scripts": {
         "build": "webpack --mode production",
