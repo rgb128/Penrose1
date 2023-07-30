@@ -1,7 +1,19 @@
 @import './file2.scss';
 
+* {
+    margin: 0px;
+    padding: 0px;
+    box-sizing: border-box;
+}
+
+canvas#main {
+    position: fixed;
+    border: 1px solid black;
+}
+
+
 body {
     div {
-        color: red;
+        // color: red;
     }
 }
