@@ -1,0 +1,25 @@
+# Use the official Node.js LTS (Long Term Support) image
+FROM node:lts
+
+# Set the working directory inside the container
+WORKDIR /app
+
+# Copy the package.json and package-lock.json to the working directory
+COPY package*.json ./
+
+# Install dependencies
+# RUN npm install
+# RUN npm install sass-loader sass css-loader mini-css-extract-plugin html-webpack-plugin --save-dev
+RUN npm install --save-dev
+
+# Copy the TypeScript source code to the container
+COPY . .
+
+# Build the TypeScript files and SCSS into JavaScript and CSS using Webpack
+RUN npm run build
+
+# Expose the development server port (change this port if needed)
+EXPOSE 8080
+
+# Start the development server
+CMD ["npm", "start"]
