@@ -16,10 +16,11 @@ RUN npm install
 COPY . .
 
 # Build the TypeScript files and SCSS into JavaScript and CSS using Webpack
-RUN npm run build
+# RUN npm run build
 
 # Expose the development server port (change this port if needed)
 EXPOSE 8080
 
 # Start the development server
-CMD ["npm", "start"]
+# CMD ["npm", "start"]
+CMD ["npm", "run", "start"]

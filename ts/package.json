@@ -2,8 +2,8 @@
     "name": "typescript-hot-reload",
     "version": "1.0.0",
     "scripts": {
-      "build": "webpack --mode production",
-      "start": "webpack serve --mode development --open"
+        "build": "webpack --mode production",
+        "start": "webpack-dev-server --mode development"
     },
     "devDependencies": {
         "ts-loader": "^9.2.6",

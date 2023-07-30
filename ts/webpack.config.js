@@ -4,7 +4,6 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
   entry: ['./src/ts/main.ts', './src/scss/main.scss'],
-  mode: 'development',
   output: {
     path: path.resolve(__dirname, 'dist'),
     filename: 'bundle.js',
@@ -30,10 +29,12 @@ module.exports = {
     extensions: ['.tsx', '.ts', '.js'],
   },
   devServer: {
-    static: path.join(__dirname, 'dist'),
-    compress: true,
-    port: 8080,
+    static: {
+      directory: path.join(__dirname, 'dist'),
+    },
     hot: true,
+    port: 8080,
+    host: '0.0.0.0', // Allow access from outside the Docker container
   },
   plugins: [
     new MiniCssExtractPlugin({
