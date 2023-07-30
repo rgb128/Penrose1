@@ -6,7 +6,7 @@ module.exports = {
   entry: './src/ts/main.ts',
   output: {
     path: path.resolve(__dirname, 'dist'),
-    filename: 'src/bundle.js',
+    filename: 'bundle.js',
   },
   module: {
     rules: [
@@ -29,13 +29,13 @@ module.exports = {
     extensions: ['.tsx', '.ts', '.js'],
   },
   devServer: {
-    contentBase: path.join(__dirname, 'dist'),
+    static: path.join(__dirname, 'dist'),
     compress: true,
     port: 8080,
   },
   plugins: [
     new MiniCssExtractPlugin({
-      filename: 'src/styles.css',
+      filename: 'styles.css',
     }),
     new HtmlWebpackPlugin({
       template: './src/index.html',

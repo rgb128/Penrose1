@@ -8,9 +8,9 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install dependencies
-# RUN npm install
+RUN npm install
 # RUN npm install sass-loader sass css-loader mini-css-extract-plugin html-webpack-plugin --save-dev
-RUN npm install --save-dev
+# RUN npm install --save-dev
 
 # Copy the TypeScript source code to the container
 COPY . .
