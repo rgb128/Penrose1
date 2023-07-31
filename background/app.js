@@ -17,8 +17,8 @@ const SHIFT_MULT = 1;
 const LINES_DIST = 2.5;
 let canvasWidth = 1000;
 let canvasHeight = 1000;
-const THIN_FILL = 'red';
-const THICK_FILL = 'blue';
+const THIN_FILL = 'black';
+const THICK_FILL = 'white';
 const FILL_STOCK = 3;
 
 function convertPoint(x, y) {
@@ -159,7 +159,7 @@ function generateRhonbusFromPoint(point) {
     context.lineTo(pixelPoints[2].x, pixelPoints[2].y);
     context.lineTo(pixelPoints[3].x, pixelPoints[3].y);
     context.lineTo(pixelPoints[0].x, pixelPoints[0].y);
-    context.stroke();
+    // context.stroke();
 
     const isRhombusThin = lengthOfLineSegment(points[0], points[2]) < lengthOfLineSegment(points[1], points[3]);
     if (isRhombusThin) context.fillStyle = THIN_FILL;
@@ -178,13 +178,13 @@ function fillRect(minX, maxX, minY, maxY) {
     .map(generateRhonbusFromPoint);
 }
 
-// fillRect({ x: -1, y: -1 }, { x: 1, y: 1 });
-fillRect(0, 10, 0, 10);
+// fillRect(0, 10, 0, 10);
+fillRect(-10, 10, -10, 10);
 
 
 
 
-context.fillStyle = 'black';
-const point1 = convertPoint(0, 0);
-context.fillRect(point1.x - 5, point1.y - 5, 10, 10);
+// context.fillStyle = 'black';
+// const point1 = convertPoint(0, 0);
+// context.fillRect(point1.x - 5, point1.y - 5, 10, 10);
 
