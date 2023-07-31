@@ -12,9 +12,10 @@ class Point {
     }
 }
 
-const ONE = 50;
+const ONE = 100;
 const SHIFT_MULT = 1;
 const LINES_DIST = 1;
+const ANGLE_SHIFT = 0;
 
 function generateShifts(count) {
     const lines = [ [0, 0] ];
@@ -36,10 +37,10 @@ const shifts = generateShifts(5);
 
 function getIntersectionPoint(line1Family, line1Number, line2Family, line2Number) {
     //y=kx+b. b is shift
-    const k1 = Math.tan(degToRad(line1Family * 360 / 5));
-    const k2 = Math.tan(degToRad(line2Family * 360 / 5));
-    const b1 = shifts[line1Family][1] + line1Number * LINES_DIST / Math.cos(degToRad(line1Family * 360 / 5));
-    const b2 = shifts[line2Family][1] + line2Number * LINES_DIST / Math.cos(degToRad(line2Family * 360 / 5));
+    const k1 = Math.tan(degToRad(line1Family * 360 / 5 - ANGLE_SHIFT));
+    const k2 = Math.tan(degToRad(line2Family * 360 / 5 - ANGLE_SHIFT));
+    const b1 = shifts[line1Family][1] + line1Number * LINES_DIST / Math.cos(degToRad(line1Family * 360 / 5 - ANGLE_SHIFT));
+    const b2 = shifts[line2Family][1] + line2Number * LINES_DIST / Math.cos(degToRad(line2Family * 360 / 5 - ANGLE_SHIFT));
 
     const x = (b2 - b1) / (k1 - k2);
     const y = k1 * x + b1;
@@ -52,7 +53,7 @@ function getIntersectionPoint(line1Family, line1Number, line2Family, line2Number
 }
 
 function findSectionOnLineFamily(lineFamily, x, y) {
-    const float = (y - Math.tan(degToRad(lineFamily * 360 / 5)) * x - shifts[lineFamily][1]) * Math.cos(degToRad(lineFamily * 360 / 5)) / LINES_DIST;
+    const float = (y - Math.tan(degToRad(lineFamily * 360 / 5 - ANGLE_SHIFT)) * x - shifts[lineFamily][1]) * Math.cos(degToRad(lineFamily * 360 / 5 - ANGLE_SHIFT)) / LINES_DIST;
 
     return Math.floor(float);
 }
@@ -110,66 +111,78 @@ function getAllIntersectionPoints(start, end) {
 //     context.fillRect(a.x * ONE, a.y * ONE, 3, 3);
 // });
 
-const rhombuses = getAllIntersectionPoints({ x: 0, y: 0 }, { x: 10, y: 10 }).map(point => {
-    // point.x += 10;
-    // point.y += 10;
-    // console.log(point);
+let mult = 1;
+
+
+const main = () => {
+    context.clearRect(0, 0, 1000, 1000);
+    const rhombuses = getAllIntersectionPoints({ x: 0, y: 0 }, { x: 10, y: 10 }).map(point => {
+        // point.x += 10;
+        // point.y += 10;
+        // console.log(point);
+        
+        const generateRhombus = () => {
+            const defaultK = [0, 1, 2, 3, 4].map(a => findSectionOnLineFamily(a, point.x, point.y));
     
-    const generateRhombus = () => {
-        const defaultK = [0, 1, 2, 3, 4].map(a => findSectionOnLineFamily(a, point.x, point.y));
+            const k1 = [...defaultK];
+            const k2 = [...defaultK];
+            const k3 = [...defaultK];
+            const k4 = [...defaultK];
+    
+            k1[point.line1Family] = point.line1Number - 1;
+            k2[point.line1Family] = point.line1Number - 1;
+            k3[point.line1Family] = point.line1Number;
+            k4[point.line1Family] = point.line1Number;
+    
+            k1[point.line2Family] = point.line2Number - 1;
+            k2[point.line2Family] = point.line2Number;
+            k3[point.line2Family] = point.line2Number;
+            k4[point.line2Family] = point.line2Number - 1;
+            
+            const vertex1X = mathSum(0, 4, j => k1[j] * Math.cos(2 * Math.PI * j / 5));
+            const vertex1Y = mathSum(0, 4, j => k1[j] * Math.sin(2 * Math.PI * j / 5));
+    
+            const vertex2X = mathSum(0, 4, j => k2[j] * Math.cos(2 * Math.PI * j / 5));
+            const vertex2Y = mathSum(0, 4, j => k2[j] * Math.sin(2 * Math.PI * j / 5));
+            
+            const vertex3X = mathSum(0, 4, j => k3[j] * Math.cos(2 * Math.PI * j / 5));
+            const vertex3Y = mathSum(0, 4, j => k3[j] * Math.sin(2 * Math.PI * j / 5));
+            
+            const vertex4X = mathSum(0, 4, j => k4[j] * Math.cos(2 * Math.PI * j / 5));
+            const vertex4Y = mathSum(0, 4, j => k4[j] * Math.sin(2 * Math.PI * j / 5));
+    
+            const points = [
+                { x: vertex1X, y: vertex1Y },
+                { x: vertex2X, y: vertex2Y },
+                { x: vertex3X, y: vertex3Y },
+                { x: vertex4X, y: vertex4Y },
+            ];
+    
+            const points2 = points.map(p => multiplyPointByScalarRelativelyToPoint(point, p, mult));
+    
+            context.beginPath();
+            context.moveTo(points2[0].x * ONE, points2[0].y * -ONE);
+            context.lineTo(points2[1].x * ONE, points2[1].y * -ONE);
+            context.lineTo(points2[2].x * ONE, points2[2].y * -ONE);
+            context.lineTo(points2[3].x * ONE, points2[3].y * -ONE);
+            context.lineTo(points2[0].x * ONE, points2[0].y * -ONE);
+            context.stroke();
+    
+            const isRhombusThin = lengthOfLineSegment(points[0], points[2]) < lengthOfLineSegment(points[1], points[3]);
+            if (isRhombusThin) context.fillStyle = 'red';
+            else context.fillStyle = 'blue';
+    
+            context.fill();
+        }
+        generateRhombus();
+        // context.fillRect(point.x * ONE, point.y * ONE, 3, 3);
+        // context.fillRect(point.x, point.y, 1, 1);
+        return 0;
+    });
+}
 
-        const k1 = [...defaultK];
-        const k2 = [...defaultK];
-        const k3 = [...defaultK];
-        const k4 = [...defaultK];
 
-        k1[point.line1Family] = point.line1Number - 1;
-        k2[point.line1Family] = point.line1Number - 1;
-        k3[point.line1Family] = point.line1Number;
-        k4[point.line1Family] = point.line1Number;
 
-        k1[point.line2Family] = point.line2Number - 1;
-        k2[point.line2Family] = point.line2Number;
-        k3[point.line2Family] = point.line2Number;
-        k4[point.line2Family] = point.line2Number - 1;
-        
-        const vertex1X = mathSum(0, 4, j => k1[j] * Math.cos(2 * Math.PI * j / 5)) * ONE;
-        const vertex1Y = -mathSum(0, 4, j => k1[j] * Math.sin(2 * Math.PI * j / 5)) * ONE;
-
-        const vertex2X = mathSum(0, 4, j => k2[j] * Math.cos(2 * Math.PI * j / 5)) * ONE;
-        const vertex2Y = -mathSum(0, 4, j => k2[j] * Math.sin(2 * Math.PI * j / 5)) * ONE;
-        
-        const vertex3X = mathSum(0, 4, j => k3[j] * Math.cos(2 * Math.PI * j / 5)) * ONE;
-        const vertex3Y = -mathSum(0, 4, j => k3[j] * Math.sin(2 * Math.PI * j / 5)) * ONE;
-        
-        const vertex4X = mathSum(0, 4, j => k4[j] * Math.cos(2 * Math.PI * j / 5)) * ONE;
-        const vertex4Y = -mathSum(0, 4, j => k4[j] * Math.sin(2 * Math.PI * j / 5)) * ONE;
-
-        const points = [
-            { x: vertex1X, y: vertex1Y },
-            { x: vertex2X, y: vertex2Y },
-            { x: vertex3X, y: vertex3Y },
-            { x: vertex4X, y: vertex4Y },
-        ];
-
-        context.beginPath();
-        context.moveTo(points[0].x, points[0].y);
-        context.lineTo(points[1].x, points[1].y);
-        context.lineTo(points[2].x, points[2].y);
-        context.lineTo(points[3].x, points[3].y);
-        context.lineTo(points[0].x, points[0].y);
-        context.stroke();
-
-        const isRhombusThin = lengthOfLineSegment(points[0], points[2]) < lengthOfLineSegment(points[1], points[3]);
-        if (isRhombusThin) context.fillStyle = 'red';
-        else context.fillStyle = 'blue';
-
-        context.fill();
-    }
-    generateRhombus();
-    // context.fillRect(point.x * ONE, point.y * ONE, 3, 3);
-    // context.fillRect(point.x, point.y, 1, 1);
-});
 
 // context.fillStyle = 'black';
 // for(let lf = 0; lf <= 4; lf ++) {
@@ -210,5 +223,16 @@ const rhombuses = getAllIntersectionPoints({ x: 0, y: 0 }, { x: 10, y: 10 }).map
 // }
 
 // const lf = 3;
+
+
+document.getElementById('slider1').oninput = e => {
+    const value = +document.getElementById('slider1').value;
+    window.localStorage['slider1'] = value;
+    mult = value;
+    main();
+}
+
+document.getElementById('slider1').value = window.localStorage['slider1'] || 1;
+document.getElementById('slider1').oninput();
 
 
