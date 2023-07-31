@@ -15,7 +15,6 @@ class Point {
 const ONE = 100;
 const SHIFT_MULT = 1;
 const LINES_DIST = 1;
-const ANGLE_SHIFT = 0;
 
 function generateShifts(count) {
     const lines = [ [0, 0] ];
@@ -37,10 +36,12 @@ const shifts = generateShifts(5);
 
 function getIntersectionPoint(line1Family, line1Number, line2Family, line2Number) {
     //y=kx+b. b is shift
-    const k1 = Math.tan(degToRad(line1Family * 360 / 5 - ANGLE_SHIFT));
-    const k2 = Math.tan(degToRad(line2Family * 360 / 5 - ANGLE_SHIFT));
-    const b1 = shifts[line1Family][1] + line1Number * LINES_DIST / Math.cos(degToRad(line1Family * 360 / 5 - ANGLE_SHIFT));
-    const b2 = shifts[line2Family][1] + line2Number * LINES_DIST / Math.cos(degToRad(line2Family * 360 / 5 - ANGLE_SHIFT));
+    const k1 = Math.tan(degToRad(line1Family * 360 / 5));
+    const k2 = Math.tan(degToRad(line2Family * 360 / 5));
+    // const b1 = shifts[line1Family][1] + line1Number * LINES_DIST / Math.cos(degToRad(line1Family * 360 / 5));
+    // const b2 = shifts[line2Family][1] + line2Number * LINES_DIST / Math.cos(degToRad(line2Family * 360 / 5));
+    const b1 = (shifts[line1Family][1] + line1Number) * LINES_DIST / Math.cos(degToRad(line1Family * 360 / 5));
+    const b2 = (shifts[line2Family][1] + line2Number) * LINES_DIST / Math.cos(degToRad(line2Family * 360 / 5));
 
     const x = (b2 - b1) / (k1 - k2);
     const y = k1 * x + b1;
@@ -53,7 +54,8 @@ function getIntersectionPoint(line1Family, line1Number, line2Family, line2Number
 }
 
 function findSectionOnLineFamily(lineFamily, x, y) {
-    const float = (y - Math.tan(degToRad(lineFamily * 360 / 5 - ANGLE_SHIFT)) * x - shifts[lineFamily][1]) * Math.cos(degToRad(lineFamily * 360 / 5 - ANGLE_SHIFT)) / LINES_DIST;
+    // const float = (y - Math.tan(degToRad(lineFamily * 360 / 5)) * x + shifts[lineFamily][1]) * Math.cos(degToRad(lineFamily * 360 / 5)) / LINES_DIST;
+    const float = (y - Math.tan(degToRad(lineFamily * 360 / 5)) * x) * Math.cos(degToRad(lineFamily * 360 / 5)) / LINES_DIST - shifts[lineFamily][1];
 
     return Math.floor(float);
 }
@@ -116,7 +118,7 @@ let mult = 1;
 
 const main = () => {
     context.clearRect(0, 0, 1000, 1000);
-    const rhombuses = getAllIntersectionPoints({ x: 0, y: 0 }, { x: 10, y: 10 }).map(point => {
+    const rhombuses = getAllIntersectionPoints({ x: -10, y: -10 }, { x: 10, y: 10 }).map(point => {
         // point.x += 10;
         // point.y += 10;
         // console.log(point);
@@ -139,17 +141,17 @@ const main = () => {
             k3[point.line2Family] = point.line2Number;
             k4[point.line2Family] = point.line2Number - 1;
             
-            const vertex1X = mathSum(0, 4, j => k1[j] * Math.cos(2 * Math.PI * j / 5));
-            const vertex1Y = mathSum(0, 4, j => k1[j] * Math.sin(2 * Math.PI * j / 5));
+            const vertex1X = mathSum(0, 4, j => k1[j] * Math.cos(2 * Math.PI * j / 5)) + 10;
+            const vertex1Y = mathSum(0, 4, j => k1[j] * Math.sin(2 * Math.PI * j / 5)) - 10;
     
-            const vertex2X = mathSum(0, 4, j => k2[j] * Math.cos(2 * Math.PI * j / 5));
-            const vertex2Y = mathSum(0, 4, j => k2[j] * Math.sin(2 * Math.PI * j / 5));
+            const vertex2X = mathSum(0, 4, j => k2[j] * Math.cos(2 * Math.PI * j / 5)) + 10;
+            const vertex2Y = mathSum(0, 4, j => k2[j] * Math.sin(2 * Math.PI * j / 5)) - 10;
             
-            const vertex3X = mathSum(0, 4, j => k3[j] * Math.cos(2 * Math.PI * j / 5));
-            const vertex3Y = mathSum(0, 4, j => k3[j] * Math.sin(2 * Math.PI * j / 5));
+            const vertex3X = mathSum(0, 4, j => k3[j] * Math.cos(2 * Math.PI * j / 5)) + 10;
+            const vertex3Y = mathSum(0, 4, j => k3[j] * Math.sin(2 * Math.PI * j / 5)) - 10;
             
-            const vertex4X = mathSum(0, 4, j => k4[j] * Math.cos(2 * Math.PI * j / 5));
-            const vertex4Y = mathSum(0, 4, j => k4[j] * Math.sin(2 * Math.PI * j / 5));
+            const vertex4X = mathSum(0, 4, j => k4[j] * Math.cos(2 * Math.PI * j / 5)) + 10;
+            const vertex4Y = mathSum(0, 4, j => k4[j] * Math.sin(2 * Math.PI * j / 5)) - 10;
     
             const points = [
                 { x: vertex1X, y: vertex1Y },
