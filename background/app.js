@@ -12,7 +12,7 @@ class Point {
     }
 }
 
-const ONE = 100;
+const ONE = 50;
 const SHIFT_MULT = 1;
 const LINES_DIST = 2.5;
 
@@ -130,17 +130,17 @@ const main = () => {
             k3[point.line2Family] = point.line2Number;
             k4[point.line2Family] = point.line2Number - 1;
             
-            const vertex1X = mathSum(0, 4, j => k1[j] * -Math.sin(2 * Math.PI * j / 5));
-            const vertex1Y = mathSum(0, 4, j => k1[j] * Math.cos(2 * Math.PI * j / 5));
+            const vertex1X = mathSum(0, 4, j => k1[j] * -Math.sin(2 * Math.PI * j / 5)) + 10;
+            const vertex1Y = mathSum(0, 4, j => k1[j] * Math.cos(2 * Math.PI * j / 5)) - 10;
     
-            const vertex2X = mathSum(0, 4, j => k2[j] * -Math.sin(2 * Math.PI * j / 5));
-            const vertex2Y = mathSum(0, 4, j => k2[j] * Math.cos(2 * Math.PI * j / 5));
+            const vertex2X = mathSum(0, 4, j => k2[j] * -Math.sin(2 * Math.PI * j / 5)) + 10;
+            const vertex2Y = mathSum(0, 4, j => k2[j] * Math.cos(2 * Math.PI * j / 5)) - 10;
             
-            const vertex3X = mathSum(0, 4, j => k3[j] * -Math.sin(2 * Math.PI * j / 5));
-            const vertex3Y = mathSum(0, 4, j => k3[j] * Math.cos(2 * Math.PI * j / 5));
+            const vertex3X = mathSum(0, 4, j => k3[j] * -Math.sin(2 * Math.PI * j / 5)) + 10;
+            const vertex3Y = mathSum(0, 4, j => k3[j] * Math.cos(2 * Math.PI * j / 5)) - 10;
             
-            const vertex4X = mathSum(0, 4, j => k4[j] * -Math.sin(2 * Math.PI * j / 5));
-            const vertex4Y = mathSum(0, 4, j => k4[j] * Math.cos(2 * Math.PI * j / 5));
+            const vertex4X = mathSum(0, 4, j => k4[j] * -Math.sin(2 * Math.PI * j / 5)) + 10;
+            const vertex4Y = mathSum(0, 4, j => k4[j] * Math.cos(2 * Math.PI * j / 5)) - 10;
     
             const points = [
                 { x: vertex1X, y: vertex1Y },
@@ -148,8 +148,13 @@ const main = () => {
                 { x: vertex3X, y: vertex3Y },
                 { x: vertex4X, y: vertex4Y },
             ];
+
+            const point2 = {
+                x: point.x + 10,
+                y: point.y - 10,
+            }
     
-            const points2 = points.map(p => multiplyPointByScalarRelativelyToPoint(point, p, mult));
+            const points2 = points.map(p => multiplyPointByScalarRelativelyToPoint(point2, p, mult));
     
             context.beginPath();
             context.moveTo(points2[0].x * ONE, points2[0].y * -ONE);
