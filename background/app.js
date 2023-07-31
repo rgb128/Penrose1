@@ -85,7 +85,7 @@ function generateSmartBackground(canvas, speed = 10, parallax = .5, thinColor, t
             sum += s;
             res.push(s);
         }
-        res.push(sum);
+        res.push(-sum);
         return res;
     }
 
