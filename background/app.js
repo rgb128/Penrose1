@@ -37,8 +37,8 @@ function getIntersectionPoint(line1Family, line1Number, line2Family, line2Number
     //y=kx+b. b is shift
     const k1 = Math.tan(degToRad(line1Family * 360 / 5));
     const k2 = Math.tan(degToRad(line2Family * 360 / 5));
-    const b1 = shifts[line1Family][1] + line1Number;
-    const b2 = shifts[line2Family][1] + line2Number;
+    const b1 = shifts[line1Family][1] + line1Number / Math.cos(degToRad(line1Family * 360 / 5));
+    const b2 = shifts[line2Family][1] + line2Number / Math.cos(degToRad(line2Family * 360 / 5));
 
     const x = (b2 - b1) / (k1 - k2);
     const y = k1 * x + b1;
@@ -51,11 +51,17 @@ function getIntersectionPoint(line1Family, line1Number, line2Family, line2Number
 }
 
 function findSectionOnLineFamily(lineFamily, x, y) {
-    // x -= shifts[lineFamily][0];
-    y -= shifts[lineFamily][1];
-    const rotated = rotateVector(x, y, -lineFamily*(360 / 5));
-    const res = Math.floor(rotated.y);
-    return res;
+    // // x -= shifts[lineFamily][0];
+    // y *= Math.cos(degToRad(lineFamily * 360 / 5));
+    // // y -= shifts[lineFamily][1];
+    // // const rotated = rotateVector(x, y, -lineFamily*(360 / 5 - 90));
+    // const rotated = rotateVector(x, y, -lineFamily*(360 / 5) - 90);
+    // // const res = Math.floor(rotated.y);
+    // const res = Math.floor(rotated.y - shifts[lineFamily][1]);
+
+    const float = (y - Math.tan(degToRad(lineFamily * 360 / 5)) * x - shifts[lineFamily][1]) * Math.cos(degToRad(lineFamily * 360 / 5));
+
+    return Math.floor(float);
 }
 
 function getIntersectionPoints(start, end, line1Family, line2Family) {
@@ -70,7 +76,6 @@ function getIntersectionPoints(start, end, line1Family, line2Family) {
     const goFromPoint = (l1N, l2N) => {
         if (points.find(a => a.line1Number === l1N && a.line2Number === l2N)) return;
         const point = getIntersectionPoint(line1Family, l1N, line2Family, l2N);
-        console.log(point);
         // console.log(point);
         if (point.x < start.x || point.x > end.x || point.y < start.y || point.y > end.y) return;
         points.push({
@@ -166,4 +171,45 @@ const rhombuses = getAllIntersectionPoints({ x: 0, y: 0 }, { x: 10, y: 10 }).map
     // context.fillRect(point.x * ONE, point.y * ONE, 3, 3);
     // context.fillRect(point.x, point.y, 1, 1);
 });
+
+
+// for(let lf = 0; lf <= 1; lf ++) {
+//     for (let ln = -10; ln <= 10; ln++) {
+//         const k1 = Math.tan(degToRad(lf * 360 / 5));
+//         const b1 = shifts[lf][1] + ln / Math.cos(degToRad(lf * 360 / 5));
+//         const func = x => k1*x + b1;
+//         for(let x = 0; x <= 10; x += .01) {
+//             const y = func(x);
+//             context.fillRect(x * ONE, y * ONE, 3, 3);
+//         }
+//     }
+// }
+
+// canvas.onmousemove = e => {
+//     const x = e.offsetX / ONE;
+//     const y = e.offsetY / ONE;
+//     console.log(findSectionOnLineFamily(0, x, y), findSectionOnLineFamily(1, x, y));
+// }
+
+// const m = -5;
+// for (let i = 0; i < 10; i+=.1) {
+//     for (let j = 0; j < 10; j+=.1) {
+//         if (findSectionOnLineFamily(1, i, j) === m - 1) {
+//             context.fillStyle = 'red';
+//             context.fillRect(i * ONE, j * ONE, 3, 3);
+//         }
+//         if (findSectionOnLineFamily(1, i, j) === m) {
+//             context.fillStyle = 'green';
+//             context.fillRect(i * ONE, j * ONE, 3, 3);
+//         }
+//         if (findSectionOnLineFamily(1, i, j) === m + 1) {
+//             context.fillStyle = 'blue';
+//             context.fillRect(i * ONE, j * ONE, 3, 3);
+//         }
+//     }
+    
+// }
+
+// const lf = 3;
+
 
