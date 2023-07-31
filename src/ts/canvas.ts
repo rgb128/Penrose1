@@ -3,7 +3,6 @@ export class Canvas {
 
     private readonly context: CanvasRenderingContext2D;
 
-    
     constructor(
         private readonly root: HTMLCanvasElement,
         private width: number,
@@ -11,16 +10,10 @@ export class Canvas {
         private top: number,
         private left: number,
     ) {
-        this.root.width = this.width;
-        this.root.height = this.height;
-        this.root.style.top = this.top + 'px';
-        this.root.style.left = this.left + 'px';
-        this.root.style.width = this.width + 'px';
-        this.root.style.height = this.height + 'px';
+        this.updateBindings();
         this.context = this.root.getContext('2d');
         this.context.strokeStyle = 'black';
         this.context.lineWidth = 2;
-
 
         this.root.onmousedown = e => {
             this.context.beginPath();
