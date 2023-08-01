@@ -9,7 +9,14 @@
  * @param {string} thickColor Color of thick rhombi
  * @param {number} one One unit in pixels. The bigger this value, the bigger rhombis (and smaller amount of them) you will have.
  */
-function generateSmartBackground(div, speed = 10, parallax = .5, thinColor = '#f99', thickColor = '#99f', one = 50) {
+function generateSmartBackground(div, params = {}) {
+    const speed = params.speed || 10;
+    const parallax = params.parallax === 0 ? 0 : (params.parallax || .5);
+    const thinColor = params.thinColor || '#f99';
+    const thickColor = params.thickColor || '#99f';
+    const one = params.one || 50;
+
+
     function generateShifts(count) {
         const res = [ 0 ];
         let sum = 0;
@@ -342,4 +349,11 @@ function generateSmartBackground(div, speed = 10, parallax = .5, thinColor = '#f
 }
 
 
-generateSmartBackground(document.getElementById('background'), 300, .5);
+generateSmartBackground(document.getElementById('background'), {
+    speed:  10, 
+    parallax:  .5,
+    thinColor:  'rgba(0, 0, 0, 0.1)',
+    thickColor:  'rgba(255, 255, 255, 0)',
+    one:  50,
+}
+);
