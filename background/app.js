@@ -1,6 +1,6 @@
 'use strict';
 
-const canvas = document.getElementById('canvas');
+// const canvas = document.getElementById('canvas');
 
 
 
@@ -11,40 +11,88 @@ const canvas = document.getElementById('canvas');
  * @param {number} speed (horizontal moving). Px/s
  * @param {number} parallax (vertical moving). Coefficient
  */
-function generateSmartBackground(canvas, speed = 10, parallax = .5, thinColor, thickColor) {
-    const context = canvas.getContext('2d');
+function generateSmartBackground(div, speed = 10, parallax = .5, thinColor, thickColor) {
+    function generateShifts(count) {
+        const res = [ 0 ];
+        let sum = 0;
+        for (let i = 0; i < count - 2; i++) {
+            const s = map(Math.random(), 0, 1, -SHIFT_MULT, SHIFT_MULT);
+            sum += s;
+            res.push(s);
+        }
+        res.push(-sum);
+        return res;
+    }
     
     const ONE = 50;
     const SHIFT_MULT = 1;
     const LINES_DIST = 2.5;
-    let canvasWidth = 1000;
-    let canvasHeight = 1000;
     const FILL_STOCK = 3;
+    const shifts = generateShifts(5);
 
-    const prepareCanvas = () => {
-        if (document.documentElement.clientHeight >= document.body.clientHeight) {
-            // No parallax
-            canvasHeight = document.documentElement.clientHeight;
-        } else {
-            canvasHeight = document.documentElement.clientHeight + (document.body.clientHeight - document.documentElement.clientHeight) * parallax;
-        }
-        canvasWidth = document.documentElement.clientWidth * 3;
-        canvas.style.height = canvasHeight + 'px';
-        canvas.style.width = canvasWidth + 'px';
-        canvas.height = canvasHeight;
-        canvas.width = canvasWidth;
-        canvas.style.top = '0px';
-        canvas.style.left = '0px';
-        canvas.style.position = 'fixed';
+    let width
+    let height;
+    const startedMillis = Date.now();
+    const getCurrentShift = () => {
+        const currentMillis = Date.now();
+        const millisDelta = currentMillis - startedMillis;
+        const px = speed * (millisDelta / 1000); // (px/sec) * (ms / (ms/s));
+        return px;
     }
-    prepareCanvas();
 
+    function prepareDiv() {
+        div.style.position = 'fixed';
+        div.style.top = '0px';
+        div.style.left = '0px';
+        window.addEventListener('resize', e => {
+            resizeDiv();
+        });
+    }
+    function resizeDiv() {
+        const screenHeight = document.documentElement.clientHeight;
+        const contentHeight = document.body.clientHeight;
+        const screenWidth = document.body.clientWidth;
+        if (screenHeight >= contentHeight) {
+            // No parallax
+            height = screenHeight;
+        } else {
+            height = screenHeight + (contentHeight - screenWidth) * parallax;
+        }
+        width = document.documentElement.clientWidth * 3;
+        div.style.width = width + 'px';
+        div.style.height = height + 'px';
 
-    function convertPoint(x, y) {
-        // Make normal center
-        // center is in left center point
-        x = map(x, 0, canvasWidth/ONE, 0, canvasWidth);
-        y = map(y, canvasHeight/ONE/2, -canvasHeight/ONE/2, 0, canvasHeight);
+        const imgShift = getCurrentShift();
+        const img = getImageForPx(imgShift, width, height);
+        img.data = {
+            width, 
+            height,
+            shift: imgShift,
+        }
+
+        div.innerHTML = '';
+        div.appendChild(img);
+
+    }
+    prepareDiv();
+    resizeDiv();
+
+    function createCanvas(width, height) {
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        canvas.style.width = width + 'px';
+        canvas.style.height = height + 'px';
+        return canvas;
+    }
+
+    /**
+     * All in PX
+     */
+    function convertPoint(x, y, canvasWidth, canvasHeight, canvasShiftX) {
+        // center is in left top point. X goest to left, Y goes down
+        x = map(x, canvasShiftX / ONE, (canvasShiftX + canvasWidth)/ONE, 0, canvasWidth);
+        y = map(y, 0, canvasHeight/ONE, 0, canvasHeight);
 
         return { x, y };
     }
@@ -77,19 +125,7 @@ function generateSmartBackground(canvas, speed = 10, parallax = .5, thinColor, t
         return Math.sqrt(pow2(point1.x - point2.x) + pow2(point1.y - point2.y));
     }
 
-    function generateShifts(count) {
-        const res = [ 0 ];
-        let sum = 0;
-        for (let i = 0; i < count - 2; i++) {
-            const s = map(Math.random(), 0, 1, -SHIFT_MULT, SHIFT_MULT);
-            sum += s;
-            res.push(s);
-        }
-        res.push(-sum);
-        return res;
-    }
 
-    const shifts = generateShifts(5);
 
     function getIntersectionPoint(line1Family, line1Number, line2Family, line2Number) {
         //y=kx+b. b is shift
@@ -156,7 +192,7 @@ function generateSmartBackground(canvas, speed = 10, parallax = .5, thinColor, t
         return result;
     }
 
-    function generateRhonbusFromPoint(point) {
+    function generateRhonbusFromPoint(point, context, canvasWidth, canvasHeight, canvasShiftX) {
         const defaultK = [0, 1, 2, 3, 4].map(a => findSectionOnLineFamily(a, point.x, point.y));
         
         const k1 = [...defaultK];
@@ -193,7 +229,7 @@ function generateSmartBackground(canvas, speed = 10, parallax = .5, thinColor, t
             { x: vertex4X, y: vertex4Y },
         ];
 
-        const pixelPoints = points.map(p => convertPoint(p.x, p.y));
+        const pixelPoints = points.map(p => convertPoint(p.x, p.y, canvasWidth, canvasHeight, canvasShiftX));
 
         context.beginPath();
         context.moveTo(pixelPoints[0].x, pixelPoints[0].y);
@@ -210,18 +246,43 @@ function generateSmartBackground(canvas, speed = 10, parallax = .5, thinColor, t
         context.fill();
     }
 
-    function fillRect(minX, maxX, minY, maxY) {
-        getAllIntersectionPoints(
+    function fillRect(minX, maxX, minY, maxY, canvas, width, height, canvasShiftX) {
+        const caanvasContext = canvas.getContext('2d');
+
+        const intersectionPoints = getAllIntersectionPoints(
             minX - FILL_STOCK,
             maxX + FILL_STOCK,
             minY - FILL_STOCK,
             maxY + FILL_STOCK,
-        )
-        .map(generateRhonbusFromPoint);
+        );
+
+        for (const point of intersectionPoints) {
+            generateRhonbusFromPoint(point, caanvasContext, width, height, canvasShiftX);
+        }
     }
 
-    fillRect(0, canvasWidth/ONE*3, -canvasHeight/ONE/2, canvasHeight/ONE/2);
+    function getImageForPx(xPx, width, height) {
+        const xUnitsStart = xPx / ONE;
+        const xUnitsEnd = (xPx + width) / ONE;
+        const yUnitsStart = 0;
+        const yUnitsEnd = height / ONE;
+
+        const canvas = createCanvas(width, height);
+        div.appendChild(canvas);
+        fillRect(xUnitsStart, xUnitsEnd, yUnitsStart, yUnitsEnd, canvas, width, height, xPx);
+        const img = document.createElement('img');
+        img.width = width;
+        img.height = height;
+        img.src = canvas.toDataURL('image/png');
+        canvas.remove();
+        return img;
+    }
+
+    div.appendChild(getImageForPx(0, 200, 1000));
+    div.appendChild(getImageForPx(200, 200, 1000));
+    div.appendChild(getImageForPx(400, 400, 1000));
+    div.appendChild(getImageForPx(800, 100, 1000));
 }
 
 
-generateSmartBackground(canvas, 0, 2, 'black', 'rgba(0, 0, 0, 0');
+generateSmartBackground(document.getElementById('background'), 0, 2, 'black', 'rgba(0, 0, 0, 0');

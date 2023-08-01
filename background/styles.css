@@ -4,11 +4,7 @@
     box-sizing: border-box;
 }
 
-#canvas {
-    /* position: fixed;
-    border: 1px solid black;
-    top: 10px;
-    left: 10px;
-    width: 1000px;
-    height: 1000px; */
+#text {
+    z-index: 2;
+    position: relative;
 }
