@@ -1,10 +1,5 @@
 'use strict';
 
-// const canvas = document.getElementById('canvas');
-
-
-
-
 /**
  * 
  * @param {HTMLCanvasElement} canvas 
@@ -31,10 +26,11 @@ function generateSmartBackground(div, speed = 10, parallax = .5, thinColor, thic
     const shifts = generateShifts(5);
 
     let width
+    let screenWidth;
     let height;
     const startedMillis = Date.now();
-    const getCurrentShift = () => {
-        const currentMillis = Date.now();
+    let lastMillis = startedMillis;
+    const getCurrentShift = (currentMillis) => {
         const millisDelta = currentMillis - startedMillis;
         const px = speed * (millisDelta / 1000); // (px/sec) * (ms / (ms/s));
         return px;
@@ -47,28 +43,36 @@ function generateSmartBackground(div, speed = 10, parallax = .5, thinColor, thic
         window.addEventListener('resize', e => {
             resizeDiv();
         });
+        document.addEventListener('scroll', e => {
+            div.style.top = (-document.documentElement.scrollTop * parallax) + 'px';
+        });
     }
     function resizeDiv() {
         const screenHeight = document.documentElement.clientHeight;
         const contentHeight = document.body.clientHeight;
-        const screenWidth = document.body.clientWidth;
+        screenWidth = document.body.clientWidth;
         if (screenHeight >= contentHeight) {
             // No parallax
             height = screenHeight;
         } else {
-            height = screenHeight + (contentHeight - screenWidth) * parallax;
+            height = screenHeight + (contentHeight - screenHeight) * parallax;
         }
-        width = document.documentElement.clientWidth * 3;
+        width = screenWidth * 2;
         div.style.width = width + 'px';
         div.style.height = height + 'px';
 
-        const imgShift = getCurrentShift();
+        const imgShift = getCurrentShift(Date.now());
         const img = getImageForPx(imgShift, width, height);
         img.data = {
             width, 
             height,
             shift: imgShift,
+            top: 0,
+            left: 0,
         }
+        img.style.position = 'absolute';
+        img.style.top = '0px';
+        img.style.left = '0px';
 
         div.innerHTML = '';
         div.appendChild(img);
@@ -76,6 +80,8 @@ function generateSmartBackground(div, speed = 10, parallax = .5, thinColor, thic
     }
     prepareDiv();
     resizeDiv();
+
+
 
     function createCanvas(width, height) {
         const canvas = document.createElement('canvas');
@@ -262,6 +268,7 @@ function generateSmartBackground(div, speed = 10, parallax = .5, thinColor, thic
     }
 
     function getImageForPx(xPx, width, height) {
+        console.log('newImage');
         const xUnitsStart = xPx / ONE;
         const xUnitsEnd = (xPx + width) / ONE;
         const yUnitsStart = 0;
@@ -278,11 +285,51 @@ function generateSmartBackground(div, speed = 10, parallax = .5, thinColor, thic
         return img;
     }
 
-    div.appendChild(getImageForPx(0, 200, 1000));
-    div.appendChild(getImageForPx(200, 200, 1000));
-    div.appendChild(getImageForPx(400, 400, 1000));
-    div.appendChild(getImageForPx(800, 100, 1000));
+    
+
+    function onAnimation() {
+        const currentMillis = Date.now();
+        const delta = currentMillis - lastMillis;
+        const deltaPx = speed * (delta / 1000);
+        lastMillis = currentMillis;
+
+        // Check an image to add
+        const lastImage = div.lastChild;
+        if (!lastImage || lastImage.data.left < 0) {
+            const imgShift = getCurrentShift(currentMillis);
+            const img = getImageForPx(imgShift, width, height);
+            img.data = {
+                width, 
+                height,
+                shift: imgShift,
+                top: 0,
+                left: (lastImage ? (lastImage.data.left + lastImage.data.width) : 0),
+            }
+            img.style.position = 'absolute';
+            img.style.top = '0px';
+            img.style.left = img.data.left + 'px';
+
+            div.appendChild(img);
+        }
+        
+        // Check an image to delete
+        const firstImage = div.firstChild;
+        if (firstImage.data.left + firstImage.data.width < 0) {
+            firstImage.remove();
+        }
+
+        // move all the images
+        for (const img of div.children) {
+            img.data.left -= deltaPx;
+            img.style.left = img.data.left + 'px';
+        }
+
+        console.log(!!firstImage, !!lastImage);
+        window.requestAnimationFrame(onAnimation);
+    }
+    window.requestAnimationFrame(onAnimation);
 }
 
 
-generateSmartBackground(document.getElementById('background'), 0, 2, 'black', 'rgba(0, 0, 0, 0');
+// generateSmartBackground(document.getElementById('background'), 0, 2, 'black', 'rgba(0, 0, 0, 0');
+generateSmartBackground(document.getElementById('background'), 300, .5, '#f99', '#99f');
