@@ -1,12 +1,15 @@
 'use strict';
 
 /**
- * 
- * @param {HTMLCanvasElement} canvas 
+ * Generates background with Penrose tiling. Should be called just once.
+ * @param {HTMLDivElement} div Background div
  * @param {number} speed (horizontal moving). Px/s
  * @param {number} parallax (vertical moving). Coefficient
+ * @param {string} thinColor Color of thin rhombi
+ * @param {string} thickColor Color of thick rhombi
+ * @param {number} one One unit in pixels. The bigger this value, the bigger rhombis (and smaller amount of them) you will have.
  */
-function generateSmartBackground(div, speed = 10, parallax = .5, thinColor, thickColor) {
+function generateSmartBackground(div, speed = 10, parallax = .5, thinColor = '#f99', thickColor = '#99f', one = 50) {
     function generateShifts(count) {
         const res = [ 0 ];
         let sum = 0;
@@ -19,13 +22,13 @@ function generateSmartBackground(div, speed = 10, parallax = .5, thinColor, thic
         return res;
     }
     
-    const ONE = 50;
+    const ONE = one;
     const SHIFT_MULT = 1;
     const LINES_DIST = 2.5;
     const FILL_STOCK = 3;
     const shifts = generateShifts(5);
 
-    let width
+    let width;
     let screenWidth;
     let height;
     const startedMillis = Date.now();
@@ -80,7 +83,6 @@ function generateSmartBackground(div, speed = 10, parallax = .5, thinColor, thic
     }
     prepareDiv();
     resizeDiv();
-
 
 
     function createCanvas(width, height) {
@@ -288,21 +290,29 @@ function generateSmartBackground(div, speed = 10, parallax = .5, thinColor, thic
         const delta = currentMillis - lastMillis;
         const deltaPx = speed * (delta / 1000);
         lastMillis = currentMillis;
+
+        let anyImageOnScreen = false;
         
         // move all the images
         for (const img of div.children) {
-            // if (!img.data) continue;
             img.data.left -= deltaPx;
             img.style.left = img.data.left + 'px';
+            
+            if (img.data.left < screenWidth && img.data.left + img.data.width > 0) {
+                anyImageOnScreen = true;
+            }
+        }
+
+        // Edge case. Can occur when user collapses page, makes it not in focus (that time requestAnimationFrame does not work).
+        if (!anyImageOnScreen) {
+            // No images at all.
+            console.log('No images');
+            resizeDiv();
+            return;
         }
 
         // Check an image to add
         const lastImage = div.lastChild;
-        if (!lastImage) {
-            // No images at all.
-            resizeDiv();
-            return;
-        }
         if (lastImage.data.left < 0) {
             const newLeft = lastImage.data.left + lastImage.data.width
             const imgShift = getCurrentShift(currentMillis) + newLeft;
@@ -332,4 +342,4 @@ function generateSmartBackground(div, speed = 10, parallax = .5, thinColor, thic
 }
 
 
-generateSmartBackground(document.getElementById('background'), 300, .5, '#f99', '#99f');
+generateSmartBackground(document.getElementById('background'), 300, .5);
