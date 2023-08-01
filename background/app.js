@@ -57,7 +57,7 @@ function generateSmartBackground(div, speed = 10, parallax = .5, thinColor, thic
         } else {
             height = screenHeight + (contentHeight - screenHeight) * parallax;
         }
-        width = screenWidth * 2;
+        width = screenWidth * 1.5;
         div.style.width = width + 'px';
         div.style.height = height + 'px';
 
@@ -252,7 +252,7 @@ function generateSmartBackground(div, speed = 10, parallax = .5, thinColor, thic
         context.fill();
     }
 
-    function fillRect(minX, maxX, minY, maxY, canvas, width, height, canvasShiftX) {
+    async function fillRect(minX, maxX, minY, maxY, canvas, width, height, canvasShiftX) {
         const caanvasContext = canvas.getContext('2d');
 
         const intersectionPoints = getAllIntersectionPoints(
@@ -275,35 +275,44 @@ function generateSmartBackground(div, speed = 10, parallax = .5, thinColor, thic
         const yUnitsEnd = height / ONE;
 
         const canvas = createCanvas(width, height);
-        div.appendChild(canvas);
+
         fillRect(xUnitsStart, xUnitsEnd, yUnitsStart, yUnitsEnd, canvas, width, height, xPx);
-        const img = document.createElement('img');
-        img.width = width;
-        img.height = height;
-        img.src = canvas.toDataURL('image/png');
-        canvas.remove();
-        return img;
+        return canvas;
     }
 
     
 
-    function onAnimation() {
+    async function onAnimation() {
+        window.requestAnimationFrame(onAnimation);
         const currentMillis = Date.now();
         const delta = currentMillis - lastMillis;
         const deltaPx = speed * (delta / 1000);
         lastMillis = currentMillis;
+        
+        // move all the images
+        for (const img of div.children) {
+            // if (!img.data) continue;
+            img.data.left -= deltaPx;
+            img.style.left = img.data.left + 'px';
+        }
 
         // Check an image to add
         const lastImage = div.lastChild;
-        if (!lastImage || lastImage.data.left < 0) {
-            const imgShift = getCurrentShift(currentMillis);
+        if (!lastImage) {
+            // No images at all.
+            resizeDiv();
+            return;
+        }
+        if (lastImage.data.left < 0) {
+            const newLeft = lastImage.data.left + lastImage.data.width
+            const imgShift = getCurrentShift(currentMillis) + newLeft;
             const img = getImageForPx(imgShift, width, height);
             img.data = {
                 width, 
                 height,
                 shift: imgShift,
                 top: 0,
-                left: (lastImage ? (lastImage.data.left + lastImage.data.width) : 0),
+                left: newLeft,
             }
             img.style.position = 'absolute';
             img.style.top = '0px';
@@ -318,18 +327,9 @@ function generateSmartBackground(div, speed = 10, parallax = .5, thinColor, thic
             firstImage.remove();
         }
 
-        // move all the images
-        for (const img of div.children) {
-            img.data.left -= deltaPx;
-            img.style.left = img.data.left + 'px';
-        }
-
-        console.log(!!firstImage, !!lastImage);
-        window.requestAnimationFrame(onAnimation);
     }
     window.requestAnimationFrame(onAnimation);
 }
 
 
-// generateSmartBackground(document.getElementById('background'), 0, 2, 'black', 'rgba(0, 0, 0, 0');
 generateSmartBackground(document.getElementById('background'), 300, .5, '#f99', '#99f');
