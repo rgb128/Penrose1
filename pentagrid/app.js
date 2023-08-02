@@ -20,7 +20,7 @@ const colors = [
 const THIN_RHOMBUS_FILL = 'rgba(255, 0, 0, .3)';
 const THICK_RHOMBUS_FILL = 'rgba(0, 0, 255, .3)';
 
-const MULTIPLIER_1 = 50; // it's basically, 1 unit (and size of a side of a rhombus)
+const MULTIPLIER_1 = 200; // it's basically, 1 unit (and size of a side of a rhombus)
 
 
 function generateFamilyOfLines(shifts, familySize, familyWidth, lineLength) {

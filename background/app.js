@@ -7,7 +7,7 @@
  * @param {number} parallax (vertical moving). Coefficient
  * @param {string} thinColor Color of thin rhombi
  * @param {string} thickColor Color of thick rhombi
- * @param {number} one One unit in pixels. The bigger this value, the bigger rhombis (and smaller amount of them) you will have.
+ * @param {number} one One unit in pixels. The bigger this value, the bigger rhombis (and smaller amount of them) you will have. This is side of a rhombus
  */
 function generateSmartBackground(div, params = {}) {
     const speed = params.speed || 10;
