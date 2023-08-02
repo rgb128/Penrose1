@@ -66,7 +66,7 @@ export class PenroseTiligGenerator {
         public readonly one = 50,
         shifts: number[] = null,
     ) {
-        shifts = shifts || this.generateShifts();
+        this.shifts = shifts || this.generateShifts();
     }
 
     public generate(

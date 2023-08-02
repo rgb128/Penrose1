@@ -1,4 +1,5 @@
 import { Point} from './point';
+import { map } from './helpers';
 
 export class CanvasnManager {
 
@@ -18,7 +19,7 @@ export class CanvasnManager {
         private pxHeight: number,
         private readonly smallCanvas: HTMLCanvasElement,
         private readonly bigCanvas: HTMLCanvasElement,
-        private readonly redraw: (one: number, minX: number, maxX: number, minY: number, maxY: number) => void,
+        private readonly redraw: (one: number, minX: number, maxX: number, minY: number, maxY: number, converter: (p: Point) => Point) => void,
         private centerUnits = new Point(0, 0),
     ) {
         smallCanvas.width = this.pxWidth;
@@ -39,6 +40,35 @@ export class CanvasnManager {
         this.draw();
     }
 
+    public convertUnitsToPx(point: Point): Point {
+        const halfWidthUnits = this.pxWidth / this.one / 2;
+        const halfHeightUnits = this.pxHeight / this.one / 2;
+
+        const x = map(
+            point.x, 
+            this.centerUnits.x - halfWidthUnits, 
+            this.centerUnits.x + halfWidthUnits,
+            0,
+            this.pxWidth
+        );
+        const y = map(
+            point.y, 
+            this.centerUnits.y - halfHeightUnits, 
+            this.centerUnits.y + halfHeightUnits,
+            0,
+            this.pxHeight
+        );
+
+        return new Point(x, y);
+    }
+
+    public getWidth(): number {
+        return this.pxWidth;
+    }
+    public getHeight(): number {
+        return this.pxHeight;
+    }
+
     private draw(): void {
         const halfWidthUnits = this.pxWidth / this.one / 2;
         const halfHeightUnits = this.pxHeight / this.one / 2;
@@ -48,6 +78,7 @@ export class CanvasnManager {
             this.centerUnits.x + halfWidthUnits,
             this.centerUnits.y - halfHeightUnits,
             this.centerUnits.y + halfHeightUnits,
+            p => { return this.convertUnitsToPx(p); },
         );
         this.moveToBig();
     }
@@ -59,6 +90,8 @@ export class CanvasnManager {
         this.smallCanvas.style.width = this.smallCanvas.width + 'px';
         this.smallCanvas.height = newHeight;
         this.smallCanvas.style.height = this.smallCanvas.height + 'px';
+        this.pxWidth = newWidth;
+        this.pxHeight = newHeight;
         this.draw();
         this.checkBigSize();
         this.moveToBig();
