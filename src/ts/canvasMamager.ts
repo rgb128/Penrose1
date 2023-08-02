@@ -71,6 +71,9 @@ export class CanvasnManager {
     public getHeight(): number {
         return this.pxHeight;
     }
+    public getOne(): number {
+        return this.one;
+    }
 
     private draw(): void {
         const halfWidthUnits = this.pxWidth / this.one / 2;
@@ -103,6 +106,12 @@ export class CanvasnManager {
 
         // this.bigContext.strokeRect(this.smallPositionOnBigPx.x, this.smallPositionOnBigPx.y, this.pxWidth, this.pxHeight);
         console.log(this.smallPositionOnBigPx.x, this.smallPositionOnBigPx.y, this.pxWidth, this.pxHeight, this.bigWidthPx, this.bigHeightPx);
+    }
+
+    public changeOne(newOne: number): void {
+        this.one = newOne;
+        this.draw();
+        this.moveToBig();
     }
 
     private moveToBig(): void {

@@ -3,7 +3,7 @@ import { mathSum, lengthOfLineSegment, HashTable, map } from './helpers';
 
 const LINES_DISTANCE = 2.5;
 const SHIFT_MULTIPLIER = 1;
-const FILL_STOCK = 3;
+const FILL_STOCK = 5;
 
 export class PenroseTilig {
     constructor(

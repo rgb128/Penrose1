@@ -42,3 +42,10 @@ document.getElementById('btn_pls_all').onclick = e => {
 document.getElementById('btn_min_all').onclick = e => {
     canvasMamager.resize(canvasMamager.getWidth() - 20, canvasMamager.getHeight() - 20);
 }
+
+document.getElementById('btn_one_pls').onclick = e => {
+    canvasMamager.changeOne(canvasMamager.getOne() + 10);
+}
+document.getElementById('btn_one_min').onclick = e => {
+    canvasMamager.changeOne(canvasMamager.getOne() - 10);
+}
