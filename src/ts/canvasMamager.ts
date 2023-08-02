@@ -121,8 +121,8 @@ export class CanvasnManager {
         const x = vector.x / this.one;
         const y = vector.y / this.one;
 
-        this.centerUnits.x -= x;
-        this.centerUnits.y -= y;
+        this.centerUnits.x += x;
+        this.centerUnits.y += y;
         this.smallPositionOnBigPx.x += vector.x;
         this.smallPositionOnBigPx.y += vector.y;
         this.checkBigSize();
