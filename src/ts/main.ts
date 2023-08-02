@@ -1,6 +1,7 @@
 import { CanvasnManager } from './canvasMamager';
 import { drawRhombus } from './drawer';
 import { PenroseTiligGenerator, PenroseRhombus, PenroseTilig } from './penrose';
+import { Point } from './point';
 
 const smallCanvas = document.getElementById('small') as HTMLCanvasElement;
 const smallContext = smallCanvas.getContext('2d');
@@ -48,4 +49,17 @@ document.getElementById('btn_one_pls').onclick = e => {
 }
 document.getElementById('btn_one_min').onclick = e => {
     canvasMamager.changeOne(canvasMamager.getOne() - 10);
+}
+
+document.getElementById('btn_move_top').onclick = e => {
+    canvasMamager.move(new Point(0, -10));
+}
+document.getElementById('btn_move_bottom').onclick = e => {
+    canvasMamager.move(new Point(0, 10));
+}
+document.getElementById('btn_move_left').onclick = e => {
+    canvasMamager.move(new Point(-10, 0));
+}
+document.getElementById('btn_move_right').onclick = e => {
+    canvasMamager.move(new Point(10, 0));
 }

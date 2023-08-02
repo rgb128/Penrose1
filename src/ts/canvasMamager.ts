@@ -74,6 +74,9 @@ export class CanvasnManager {
     public getOne(): number {
         return this.one;
     }
+    public getCenter(): Point {
+        return new Point(this.centerUnits.x * this.one, this.centerUnits.y * this.one);
+    }
 
     private draw(): void {
         const halfWidthUnits = this.pxWidth / this.one / 2;
@@ -110,6 +113,19 @@ export class CanvasnManager {
 
     public changeOne(newOne: number): void {
         this.one = newOne;
+        this.draw();
+        this.moveToBig();
+    }
+
+    public move(vector: Point): void {
+        const x = vector.x / this.one;
+        const y = vector.y / this.one;
+
+        this.centerUnits.x -= x;
+        this.centerUnits.y -= y;
+        this.smallPositionOnBigPx.x += vector.x;
+        this.smallPositionOnBigPx.y += vector.y;
+        this.checkBigSize();
         this.draw();
         this.moveToBig();
     }
