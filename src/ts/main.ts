@@ -11,8 +11,8 @@ const generator = new PenroseTiligGenerator(50);
 
 const canvasMamager = new CanvasnManager(
     50,
-    100,
-    100,
+    200,
+    200,
     smallCanvas,
     bigCanvas,
     (o, minX, maxX, minY, maxY, converter) => {
@@ -37,7 +37,7 @@ document.getElementById('btn_pls_y').onclick = e => {
     canvasMamager.resize(canvasMamager.getWidth(), canvasMamager.getHeight() + 10);
 }
 document.getElementById('btn_pls_all').onclick = e => {
-    canvasMamager.resize(canvasMamager.getWidth() + 20, canvasMamager.getHeight() - 20);
+    canvasMamager.resize(canvasMamager.getWidth() + 20, canvasMamager.getHeight() + 20);
 }
 document.getElementById('btn_min_all').onclick = e => {
     canvasMamager.resize(canvasMamager.getWidth() - 20, canvasMamager.getHeight() - 20);

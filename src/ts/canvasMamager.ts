@@ -30,6 +30,8 @@ export class CanvasnManager {
         this.bigContext = this.bigCanvas.getContext('2d');
         this.smallContext = this.smallCanvas.getContext('2d');
 
+        bigCanvas.width = this.pxWidth;
+        bigCanvas.height = this.pxHeight;
         this.bigWidthPx = this.pxWidth;
         this.bigHeightPx = this.pxHeight;
         this.bigCanvas.style.width = this.bigCanvas.width + 'px';
@@ -38,6 +40,7 @@ export class CanvasnManager {
         this.smallPositionOnBigPx = new Point(0, 0);
 
         this.draw();
+        this.moveToBig();
     }
 
     public convertUnitsToPx(point: Point): Point {
@@ -80,22 +83,26 @@ export class CanvasnManager {
             this.centerUnits.y + halfHeightUnits,
             p => { return this.convertUnitsToPx(p); },
         );
-        this.moveToBig();
+        // this.moveToBig();
     }
 
     public resize(newWidth, newHeight): void {
-        this.smallPositionOnBigPx.x -= (newWidth - this.smallCanvas.width) / 2;
-        this.smallPositionOnBigPx.y -= (newHeight - this.smallCanvas.height) / 2;
+        this.smallPositionOnBigPx.x -= (newWidth - this.pxWidth) / 2;
+        this.smallPositionOnBigPx.y -= (newHeight - this.pxHeight) / 2;
+        this.pxWidth = newWidth;
+        this.pxHeight = newHeight;
+        
         this.smallCanvas.width = newWidth;
         this.smallCanvas.style.width = this.smallCanvas.width + 'px';
         this.smallCanvas.height = newHeight;
         this.smallCanvas.style.height = this.smallCanvas.height + 'px';
-        this.pxWidth = newWidth;
-        this.pxHeight = newHeight;
-        this.draw();
+        
         this.checkBigSize();
+        this.draw();
         this.moveToBig();
 
+        // this.bigContext.strokeRect(this.smallPositionOnBigPx.x, this.smallPositionOnBigPx.y, this.pxWidth, this.pxHeight);
+        console.log(this.smallPositionOnBigPx.x, this.smallPositionOnBigPx.y, this.pxWidth, this.pxHeight, this.bigWidthPx, this.bigHeightPx);
     }
 
     private moveToBig(): void {
@@ -114,11 +121,12 @@ export class CanvasnManager {
 
         const bigImageData = this.bigContext.getImageData(0, 0, this.bigWidthPx, this.bigHeightPx);
 
+
         if (leftDelta > 0) {
             this.bigCanvas.width += leftDelta;
             this.bigCanvas.style.width = this.bigCanvas.width + 'px';
             this.bigWidthPx += leftDelta;
-            this.smallPositionOnBigPx.x = 0; // Same as `this.smallPositionOnBigPx.x -= leftDelta`
+            this.smallPositionOnBigPx.x = 0; // Same as `this.smallPositionOnBigPx.x += leftDelta`
         }
         if (rightDelta > 0) {
             // Move right.
@@ -133,13 +141,13 @@ export class CanvasnManager {
             this.bigHeightPx += topDelta;
             this.smallPositionOnBigPx.y = 0; // Same as `this.smallPositionOnBigPx.y -= topDelta`
         }
-        if (bottomDelta) {
+        if (bottomDelta > 0) {
             // Move bottom.
             this.bigCanvas.height += bottomDelta;
             this.bigCanvas.style.height = this.bigCanvas.height + 'px';
             this.bigHeightPx += bottomDelta;
         }
 
-        this.bigContext.putImageData(bigImageData, this.smallPositionOnBigPx.x, this.smallPositionOnBigPx.y);
+        this.bigContext.putImageData(bigImageData, Math.max(leftDelta, 0), Math.max(topDelta, 0));
     }
 }
