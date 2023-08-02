@@ -4,16 +4,16 @@ import { PenroseTiligGenerator, PenroseRhombus, PenroseTilig } from './penrose';
 import { Point } from './point';
 
 const smallCanvas = document.getElementById('small') as HTMLCanvasElement;
-const smallContext = smallCanvas.getContext('2d');
+const smallContext = smallCanvas.getContext('2d', { willReadFrequently: true });
 const bigCanvas = document.getElementById('big') as HTMLCanvasElement;
-const bigContext = bigCanvas.getContext('2d');
+const bigContext = bigCanvas.getContext('2d',{ willReadFrequently: true });
 
 const generator = new PenroseTiligGenerator(50);
 
-const canvasMamager = new CanvasnManager(
+const canvasManager = new CanvasnManager(
     50,
-    200,
-    200,
+    document.documentElement.clientWidth,
+    document.documentElement.clientHeight - 100,
     smallCanvas,
     bigCanvas,
     (o, minX, maxX, minY, maxY, converter) => {
@@ -24,42 +24,110 @@ const canvasMamager = new CanvasnManager(
     },
 );
 
-document.getElementById('btn_min_x').onclick = e => {
-    canvasMamager.resize(canvasMamager.getWidth() - 10, canvasMamager.getHeight());
+document.getElementById('oneInput').oninput = e => {
+    const value = +(document.getElementById('oneInput') as HTMLInputElement).value;
+    canvasManager.changeOne(value);
 }
 
-document.getElementById('btn_pls_x').onclick = e => {
-    canvasMamager.resize(canvasMamager.getWidth() + 10, canvasMamager.getHeight());
-}
-document.getElementById('btn_min_y').onclick = e => {
-    canvasMamager.resize(canvasMamager.getWidth(), canvasMamager.getHeight() - 10);
-}
-document.getElementById('btn_pls_y').onclick = e => {
-    canvasMamager.resize(canvasMamager.getWidth(), canvasMamager.getHeight() + 10);
-}
-document.getElementById('btn_pls_all').onclick = e => {
-    canvasMamager.resize(canvasMamager.getWidth() + 20, canvasMamager.getHeight() + 20);
-}
-document.getElementById('btn_min_all').onclick = e => {
-    canvasMamager.resize(canvasMamager.getWidth() - 20, canvasMamager.getHeight() - 20);
+window.onresize = e => {
+    canvasManager.resize(document.documentElement.clientWidth, document.documentElement.clientHeight - 100);
 }
 
-document.getElementById('btn_one_pls').onclick = e => {
-    canvasMamager.changeOne(canvasMamager.getOne() + 10);
+
+function setTouch() {
+    let x = 0;
+    let y = 0;
+
+    smallCanvas.ontouchstart =  e => {
+        x = e.touches[0].clientX;
+        y = e.touches[0].clientY;
+    }
+
+    smallCanvas.ontouchmove =  e => {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        e.stopPropagation();
+        
+        const deltaX = e.touches[0].clientX - x;
+        const deltaY = e.touches[0].clientY - y;
+        x = e.touches[0].clientX;
+        y = e.touches[0].clientY;
+
+        console.log(deltaX, deltaY);
+
+        canvasManager.move(new Point(-deltaX, -deltaY));
+    }
 }
-document.getElementById('btn_one_min').onclick = e => {
-    canvasMamager.changeOne(canvasMamager.getOne() - 10);
+setTouch();
+
+smallCanvas.onmousemove = e => {
+    if (!e.buttons) return;
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    e.stopPropagation();
+    const x = -e.movementX;
+    const y = -e.movementY;
+    canvasManager.move(new Point(x, y));
 }
 
-document.getElementById('btn_move_top').onclick = e => {
-    canvasMamager.move(new Point(0, -10));
+function downlaodCanvas(canvas: HTMLCanvasElement, filename = 'penrose.png'): void {
+    const myImageDataUrl = canvas.toDataURL('image/png').replace('image/png', 'image/octet-stream');
+    const link = document.createElement('a');
+    link.style.display = 'none';
+    link.href = myImageDataUrl;
+    link.download = filename;
+
+    link.click();
+
+    link.remove();
 }
-document.getElementById('btn_move_bottom').onclick = e => {
-    canvasMamager.move(new Point(0, 10));
+
+async function imageDataToBlob(imageData: ImageData): Promise<Blob> {
+    const w = imageData.width;
+    const h = imageData.height;
+    const canvas = document.createElement('canvas');
+    canvas.width = w;
+    canvas.height = h;
+    const ctx = canvas.getContext('2d');
+    ctx.putImageData(imageData, 0, 0);
+    // drawText(ctx);
+  
+    return new Promise((resolve) => {
+        canvas.toBlob(resolve); // implied image/png format
+    });
 }
-document.getElementById('btn_move_left').onclick = e => {
-    canvasMamager.move(new Point(-10, 0));
+async function copyCanvas(context: CanvasRenderingContext2D, width: number, height: number, button: HTMLElement) {
+    const innerText = button.innerText;
+    button.innerText = 'copying';
+    const blob = await imageDataToBlob(context.getImageData(0, 0, width, height));
+    try {
+        await navigator.clipboard.write([
+            new ClipboardItem({
+                'image/png': blob,
+            })
+        ]);
+        button.innerText = 'copied';
+    } catch (ex) {
+        console.error(ex);
+        button.innerText = 'failed';
+    }
+    setTimeout(() => {
+        button.innerText = innerText;
+    }, 2000);
+ }
+
+//todo draw 'RGB128 text': https://github.com/rgb128/plus/blob/master/js/helpers.js#L82
+
+document.getElementById('copySmall').onclick = async e => {
+    await copyCanvas(smallContext, canvasManager.getWidth(), canvasManager.getHeight(), document.getElementById('copySmall'));
 }
-document.getElementById('btn_move_right').onclick = e => {
-    canvasMamager.move(new Point(10, 0));
+document.getElementById('copyBig').onclick = async e => {
+    await copyCanvas(bigContext, canvasManager.getBigWidth(), canvasManager.getBigHeight(), document.getElementById('copyBig'));
 }
+document.getElementById('downloadSmall').onclick = e => {
+    downlaodCanvas(smallCanvas);
+}
+document.getElementById('downloadBig').onclick = e => {
+    downlaodCanvas(bigCanvas);
+}
+

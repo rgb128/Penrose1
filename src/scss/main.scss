@@ -7,7 +7,7 @@
 }
 
 canvas {
-    border: 5px solid black;
+    // border: 5px solid black;
 }
 
 
@@ -15,4 +15,18 @@ body {
     div {
         // color: red;
     }
+}
+
+canvas#small {
+    width: 100%;
+    height: calc(100vw - 100px);
+    display: block;
+    float: left;
+}
+canvas#big {
+    display: none;
+}
+
+#text {
+    text-align: justify;
 }

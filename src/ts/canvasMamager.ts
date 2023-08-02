@@ -1,6 +1,8 @@
 import { Point} from './point';
 import { map } from './helpers';
 
+//todo consistent names
+
 export class CanvasnManager {
 
     private readonly bigContext: CanvasRenderingContext2D;
@@ -27,8 +29,8 @@ export class CanvasnManager {
         this.smallCanvas.style.width = this.smallCanvas.width + 'px';
         this.smallCanvas.style.height = this.smallCanvas.height + 'px';
 
-        this.bigContext = this.bigCanvas.getContext('2d');
-        this.smallContext = this.smallCanvas.getContext('2d');
+        this.bigContext = this.bigCanvas.getContext('2d', { willReadFrequently: true });
+        this.smallContext = this.smallCanvas.getContext('2d', { willReadFrequently: true });
 
         bigCanvas.width = this.pxWidth;
         bigCanvas.height = this.pxHeight;
@@ -71,6 +73,12 @@ export class CanvasnManager {
     public getHeight(): number {
         return this.pxHeight;
     }
+    public getBigHeight(): number {
+        return this.bigHeightPx;
+    }
+    public getBigWidth(): number {
+        return this.bigWidthPx;
+    }
     public getOne(): number {
         return this.one;
     }
@@ -103,18 +111,22 @@ export class CanvasnManager {
         this.smallCanvas.height = newHeight;
         this.smallCanvas.style.height = this.smallCanvas.height + 'px';
         
-        this.checkBigSize();
         this.draw();
-        this.moveToBig();
-
-        // this.bigContext.strokeRect(this.smallPositionOnBigPx.x, this.smallPositionOnBigPx.y, this.pxWidth, this.pxHeight);
-        console.log(this.smallPositionOnBigPx.x, this.smallPositionOnBigPx.y, this.pxWidth, this.pxHeight, this.bigWidthPx, this.bigHeightPx);
+        
+        (async () => {
+            this.checkBigSize();
+            this.moveToBig();
+        })();
     }
 
     public changeOne(newOne: number): void {
         this.one = newOne;
+        
         this.draw();
-        this.moveToBig();
+        
+        (async () => {
+            this.moveToBig();
+        })();
     }
 
     public move(vector: Point): void {
@@ -125,9 +137,13 @@ export class CanvasnManager {
         this.centerUnits.y += y;
         this.smallPositionOnBigPx.x += vector.x;
         this.smallPositionOnBigPx.y += vector.y;
-        this.checkBigSize();
+        
         this.draw();
-        this.moveToBig();
+
+        (async () => {
+            this.checkBigSize();
+            this.moveToBig();
+        })();
     }
 
     private moveToBig(): void {
