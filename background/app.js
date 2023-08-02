@@ -142,70 +142,7 @@ function generateSmartBackground(div, params = {}) {
 
 
 
-    function getIntersectionPoint(line1Family, line1Number, line2Family, line2Number) {
-        //y=kx+b. b is shift
-        const k1 = Math.tan(line1Family * 2 * Math.PI / 5);
-        const k2 = Math.tan(line2Family * 2 * Math.PI / 5);
-        const b1 = (shifts[line1Family] + line1Number) * LINES_DIST / Math.cos(line1Family * 2 * Math.PI / 5);
-        const b2 = (shifts[line2Family] + line2Number) * LINES_DIST / Math.cos(line2Family * 2 * Math.PI / 5);
 
-        const x = (b2 - b1) / (k1 - k2);
-        const y = k1 * x + b1;
-        const y2 = k2 * x + b2;
-        if (Math.abs(y - y2) > .001) {
-            console.error('bad formula');
-        }
-
-        return { x, y };
-    }
-
-    function findSectionOnLineFamily(lineFamily, x, y) {
-        const float = (y - Math.tan(lineFamily * 2 * Math.PI / 5) * x) * Math.cos(lineFamily * 2 * Math.PI / 5) / LINES_DIST - shifts[lineFamily];
-
-        return Math.floor(float);
-    }
-
-    function getIntersectionPoints(minX, maxX, minY, maxY, line1Family, line2Family) {
-        const line1Number = findSectionOnLineFamily(line1Family, (minX + maxX) / 2, (minY + maxY) / 2);
-        const line2Number = findSectionOnLineFamily(line2Family, (minX + maxX) / 2, (minY + maxY) / 2);
-        const points = [];
-
-        const goFromPoint = (l1N, l2N) => {
-            if (points.find(a => a.line1Number === l1N && a.line2Number === l2N)) return;
-            const point = getIntersectionPoint(line1Family, l1N, line2Family, l2N);
-            if (point.x < minX || point.x > maxX || point.y < minY || point.y > maxY) return;
-            points.push({
-                ...point,
-                line1Family,
-                line2Family,
-                line1Number: l1N,
-                line2Number: l2N,
-            });
-            goFromPoint(l1N - 1, l2N);
-            goFromPoint(l1N + 1, l2N);
-            goFromPoint(l1N, l2N - 1);
-            goFromPoint(l1N, l2N + 1);
-        }
-
-        const max = 2;
-        for (let i = -max; i <= max; i++) {
-            for (let j = -max; j <= max; j++) {
-                goFromPoint(line1Number + i, line2Number + j);
-            }
-        }
-
-        return points;
-    }
-
-    function getAllIntersectionPoints(minX, maxX, minY, maxY) {
-        const result = [];
-        for(let i = 0; i < 5; i++) {
-            for(let j = i + 1; j < 5; j++) {
-                result.push(...getIntersectionPoints(minX, maxX, minY, maxY, i, j));
-            }
-        }
-        return result;
-    }
 
     function generateRhonbusFromPoint(point, context, canvasWidth, canvasHeight, canvasShiftX) {
         const defaultK = [0, 1, 2, 3, 4].map(a => findSectionOnLineFamily(a, point.x, point.y));
