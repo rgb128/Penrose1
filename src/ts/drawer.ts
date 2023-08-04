@@ -89,7 +89,7 @@ export function drawVertexPoint(
 
     // Kite / Deuce / Jack
 
-    if (point.type === 'deuce') {
+    if (point.type === 'kite') {
     // if (point.type === 'deuce') {
     // if (point.type === 'kite' || point.type === 'deuce') {
         for (const rhombus of point.rhombuses) {
