@@ -1,6 +1,6 @@
 import { CanvasnManager } from './canvasMamager';
 import { drawRhombus, drawIntersectionPoint, drawVertexPoint } from './drawer';
-import { PenroseTiligGenerator, PenroseRhombus, PenroseTiling } from './penrose';
+import { PenroseTiligGenerator, PenroseRhombus, PenroseTiling, fillTiling } from './penrose';
 import { Point } from './point';
 
 const smallCanvas = document.getElementById('small') as HTMLCanvasElement;
@@ -21,12 +21,10 @@ const canvasManager = new CanvasnManager(
         for (const rhombus of generated.rhombuses) {
             drawRhombus(rhombus, smallContext, converter, 'red', 'blue');
         }
-        // for (const intersection of generated.intersectionPoints) {
-        //     drawIntersectionPoint(intersection, smallContext, converter, 'black');
-        // }
-        // for (const vertex of Object.values(generated.vertexes)) {
-        //     drawVertexPoint(vertex, smallContext, converter, 'white');
-        // }
+        for (const vertex of Object.values(generated.vertexes)) {
+            drawVertexPoint(vertex, smallContext, converter, 'white');
+        }
+        fillTiling(generated);
         return generated;
     },
 );

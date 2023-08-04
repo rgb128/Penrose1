@@ -28,12 +28,34 @@ export function drawRhombus(
     canvasContext.fill();
 
     if (rhombus.isThin) {
-        
-        const firstPoint = getPointBetweenPoints(points[1], points[3], .2);
-        const secondPoint = getPointBetweenPoints(points[1], points[3], .8);
+        const firstPoint = getPointBetweenPoints(points[0], points[2], .2);
+        const thirdPoint = getPointBetweenPoints(points[0], points[2], .8);
+        const secondPoint = getPointBetweenPoints(points[1], points[3], .2);
+        const fourthPoint = getPointBetweenPoints(points[1], points[3], .8);
 
-        drawCircle(canvasContext, firstPoint.x, firstPoint.y, 3, 'green');
-        drawCircle(canvasContext, secondPoint.x, secondPoint.y, 3, 'yellow');
+        drawCircle(canvasContext, firstPoint.x, firstPoint.y, 3, 'darkgreen');
+        // drawCircle(canvasContext, secondPoint.x, secondPoint.y, 3, 'yellow');
+        drawCircle(canvasContext, thirdPoint.x, thirdPoint.y, 3, 'lime');
+        // drawCircle(canvasContext, fourthPoint.x, fourthPoint.y, 3, 'lightblue');
+
+    } else {
+        // const firstPoint = getPointBetweenPoints(points[0], points[2], .2);
+        // const secondPoint = getPointBetweenPoints(points[0], points[2], .8);
+
+        // drawCircle(canvasContext, firstPoint.x, firstPoint.y, 3, 'green');
+        // drawCircle(canvasContext, secondPoint.x, secondPoint.y, 3, 'yellow');
+
+        
+        const firstPoint = getPointBetweenPoints(points[0], points[2], .2);
+        const thirdPoint = getPointBetweenPoints(points[0], points[2], .8);
+        const secondPoint = getPointBetweenPoints(points[1], points[3], .2);
+        const fourthPoint = getPointBetweenPoints(points[1], points[3], .8);
+
+        drawCircle(canvasContext, firstPoint.x, firstPoint.y, 3, 'darkgreen');
+        // drawCircle(canvasContext, secondPoint.x, secondPoint.y, 3, 'yellow');
+        drawCircle(canvasContext, thirdPoint.x, thirdPoint.y, 3, 'lime');
+        // drawCircle(canvasContext, fourthPoint.x, fourthPoint.y, 3, 'lightblue');
+
     }
 
 
@@ -59,7 +81,7 @@ export function drawVertexPoint(
     color: string,
 ): void {
     const real = pointConverter(point);
-    drawCircle(canvasContext, real.x, real.y);
+    // drawCircle(canvasContext, real.x, real.y, 3, color);
 }
 
 function drawCircle(
@@ -81,7 +103,6 @@ function getPointBetweenPoints(point1: Point, point2: Point, closerToPoint1: num
 
     const x = point1.x + distX * closerToPoint1;
     const y = point1.y + distY * closerToPoint1;
-
 
     return new Point(x, y);
 }
