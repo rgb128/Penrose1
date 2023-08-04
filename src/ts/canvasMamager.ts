@@ -1,7 +1,6 @@
 import { Point} from './point';
 import { map } from './helpers';
-
-//todo consistent names
+import { PenroseTiling } from './penrose';
 
 export class CanvasnManager {
 
@@ -11,6 +10,7 @@ export class CanvasnManager {
     private bigWidthPx: number;
     private bigHeightPx: number;
     private smallPositionOnBigPx: Point; // top/left
+    private tilig: PenroseTiling;
 
     /**
      * @param centerUnits Center of screen in units (Small center units)
@@ -21,7 +21,7 @@ export class CanvasnManager {
         private pxHeight: number,
         private readonly smallCanvas: HTMLCanvasElement,
         private readonly bigCanvas: HTMLCanvasElement,
-        private readonly redraw: (one: number, minX: number, maxX: number, minY: number, maxY: number, converter: (p: Point) => Point) => void,
+        private readonly redraw: (one: number, minX: number, maxX: number, minY: number, maxY: number, converter: (p: Point) => Point) => PenroseTiling,
         private centerUnits = new Point(0, 0),
     ) {
         smallCanvas.width = this.pxWidth;
@@ -85,11 +85,14 @@ export class CanvasnManager {
     public getCenter(): Point {
         return new Point(this.centerUnits.x * this.one, this.centerUnits.y * this.one);
     }
+    public getTiling(): PenroseTiling {
+        return this.tilig;
+    }
 
     private draw(): void {
         const halfWidthUnits = this.pxWidth / this.one / 2;
         const halfHeightUnits = this.pxHeight / this.one / 2;
-        this.redraw(
+        this.tilig = this.redraw(
             this.one,
             this.centerUnits.x - halfWidthUnits,
             this.centerUnits.x + halfWidthUnits,

@@ -5,18 +5,21 @@ const LINES_DISTANCE = 2.5;
 const SHIFT_MULTIPLIER = 1;
 const FILL_STOCK = 5;
 
-export class PenroseTilig {
+export class PenroseTiling {
     constructor(
         public readonly vertexes: HashTable<PenroseVertexPoint>,
         public readonly rhombuses: PenroseRhombus[],
-        public readonly intersectionPoints: PenroseIntersectionPoint[],
     ) { }
 }
+
+export type PenroseVertexType = 'kite'|'deuce'|'jack'|'ace'|'king'|'queen'|'sun'|'star'|'uncomplete';
+// export type PenroseIntersectionType = 1|2|3|4;
 
 /** Rhombus vertex (a point between lines) */
 export class PenroseVertexPoint extends Point {
 
     public readonly hash: string;
+    public type: PenroseVertexType;
 
     constructor(
         public readonly lineNumbers: number[],
@@ -30,8 +33,12 @@ export class PenroseVertexPoint extends Point {
     }
 }
 
-/** Intersection of 2 lines (a rhombus) */
+/** Intersection of 2 lines (a rhombus). Line2Family > Line1Family lol. */
 export class PenroseIntersectionPoint extends Point {
+
+    /** [1-4]. 2 and 3 for Thin */
+    public readonly type: number;
+
     constructor(
         x: number,
         y: number,
@@ -41,6 +48,7 @@ export class PenroseIntersectionPoint extends Point {
         public readonly line2Number: number,
     ) {
         super(x, y);
+        this.type = (line2Family - line1Family) % 5; // Hoping line2Family - line1Family
     }
 }
 
@@ -53,7 +61,8 @@ export class PenroseRhombus {
         public readonly intersectionPoint: PenroseIntersectionPoint
     ) {
         if (points.length != 4) throw new Error('There should be penrose points.');
-        this.isThin = lengthOfLineSegment(points[0], points[2]) < lengthOfLineSegment(points[1], points[3]);
+        // this.isThin = lengthOfLineSegment(points[0], points[2]) < lengthOfLineSegment(points[1], points[3]);
+        this.isThin = intersectionPoint.type === 2 || intersectionPoint.type === 3;
     }
 }
 
@@ -74,7 +83,7 @@ export class PenroseTiligGenerator {
         maxX: number, 
         minY: number, 
         maxY: number
-    ): PenroseTilig {
+    ): PenroseTiling {
         const intersectionPoints = this.getAllIntersectionPoints(
             minX - FILL_STOCK,
             maxX + FILL_STOCK,
@@ -85,7 +94,8 @@ export class PenroseTiligGenerator {
         const vertexes: HashTable<PenroseVertexPoint> = {};
         const rhombuses = intersectionPoints.map(p => this.generateRhonbusFromPoint(p, vertexes));
 
-        return new PenroseTilig(vertexes, rhombuses, intersectionPoints)
+        // return new PenroseTiling(vertexes, rhombuses, intersectionPoints)
+        return new PenroseTiling(vertexes, rhombuses)
     }
 
     private generateShifts(count = 5): number[] {
@@ -227,3 +237,44 @@ export class PenroseTiligGenerator {
     }
 }
 
+
+/** FIlling all missing data on the tiling after generation. */
+export function fillTiling(tiling: PenroseTiling): void {
+    const getType = (thinCount: number, thickCount: number): PenroseVertexType => {
+        if (thickCount === 5 && thinCount === 0) {
+            return 'star'; // todo or sun
+        }
+        if (thickCount === 2 && thinCount === 1) {
+            return 'kite';
+        }
+        if (thickCount === 1 && thinCount === 2) {
+            return 'deuce';
+        }
+        if (thickCount === 3 && thinCount === 1) {
+            return 'jack';
+        }
+        if (thickCount === 3 && thinCount === 2) {
+            return 'ace';
+        }
+        if (thickCount === 4 && thinCount === 2) {
+            return 'king';
+        }
+        if (thickCount === 3 && thinCount === 4) {
+            return 'queen';
+        }
+
+        return 'uncomplete'
+    }
+
+    for (const vertex of Object.values(tiling.vertexes)) {
+        const thinCount = vertex.rhombuses.filter(x => x.isThin).length;
+        const thickCount = vertex.rhombuses.length - thinCount;
+        vertex.type = getType(thinCount, thickCount);
+        vertex.lineNumbers
+    }
+
+    for (const rhombus of tiling.rhombuses) {
+        const angle = (rhombus.intersectionPoint.line2Family - rhombus.intersectionPoint.line1Family) % 5;
+        // console.log(angle, rhombus.isThin);
+    }
+}
