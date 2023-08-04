@@ -17,14 +17,14 @@ const canvasManager = new CanvasnManager(
     smallCanvas,
     bigCanvas,
     (o, minX, maxX, minY, maxY, converter) => {
-        const generated = generator.generate(minX, maxX, minY, maxY)
-        for (const rhombus of generated.rhombuses) {
-            drawRhombus(rhombus, smallContext, converter, 'red', 'blue');
-        }
+        const generated = generator.generate(minX, maxX, minY, maxY);
+        fillTiling(generated);
+        // for (const rhombus of generated.rhombuses) {
+        //     drawRhombus(rhombus, smallContext, converter, 'red', 'blue');
+        // }
         for (const vertex of Object.values(generated.vertexes)) {
             drawVertexPoint(vertex, smallContext, converter, 'white');
         }
-        fillTiling(generated);
         return generated;
     },
 );

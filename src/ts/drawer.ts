@@ -1,5 +1,6 @@
 import { PenroseRhombus, PenroseIntersectionPoint, PenroseVertexPoint } from "./penrose";
 import { Point } from './point';
+import { HashTable } from "./helpers";
 
 export function drawRhombus(
     rhombus: PenroseRhombus, 
@@ -82,6 +83,22 @@ export function drawVertexPoint(
 ): void {
     const real = pointConverter(point);
     // drawCircle(canvasContext, real.x, real.y, 3, color);
+
+    const drawnRhombs: HashTable<boolean> = {};
+
+    console.log('drawVertexPoint', point.type);
+
+    if (point.type === "kite") {
+        for (const rhombus of point.rhombuses) {
+            console.log(rhombus.intersectionPoint.hash);
+            if (!drawnRhombs[rhombus.intersectionPoint.hash]) {
+                drawnRhombs[rhombus.intersectionPoint.hash] = true;
+                console.log('drawRhombus');
+                drawRhombus(rhombus, canvasContext, pointConverter, '', '');
+            }
+        }
+    }
+
 }
 
 function drawCircle(

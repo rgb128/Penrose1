@@ -39,6 +39,8 @@ export class PenroseIntersectionPoint extends Point {
     /** [1-4]. 2 and 3 for Thin */
     public readonly type: number;
 
+    public readonly hash: string;
+
     constructor(
         x: number,
         y: number,
@@ -49,6 +51,7 @@ export class PenroseIntersectionPoint extends Point {
     ) {
         super(x, y);
         this.type = (line2Family - line1Family) % 5; // Hoping line2Family - line1Family
+        this.hash = `${line1Family}_${line1Number}_${line2Family}_${line2Number}`;
     }
 }
 
