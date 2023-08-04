@@ -17,14 +17,26 @@ const canvasManager = new CanvasnManager(
     smallCanvas,
     bigCanvas,
     (o, minX, maxX, minY, maxY, converter) => {
+        smallContext.fillStyle = 'white';
+        smallContext.fillRect(0, 0, document.documentElement.clientWidth, document.documentElement.clientHeight - 100);
         const generated = generator.generate(minX, maxX, minY, maxY);
         fillTiling(generated);
         // for (const rhombus of generated.rhombuses) {
         //     drawRhombus(rhombus, smallContext, converter, 'red', 'blue');
         // }
+        const allTypes = {};
+        let sum = 0;
         for (const vertex of Object.values(generated.vertexes)) {
             drawVertexPoint(vertex, smallContext, converter, 'white');
+            allTypes[vertex.type] = (allTypes[vertex.type] || 0) + 1;
+            if (allTypes['uncomplete'] !== 0) sum++;
         }
+        allTypes['uncomplete'] = 0;
+
+        for(const type in allTypes) {
+            console.log(`${type}: ${allTypes[type]}/${sum} (${ (Math.round(allTypes[type] / sum * 100 * 100) / 100) }%)`);
+        }
+        
         return generated;
     },
 );

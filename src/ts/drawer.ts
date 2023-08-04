@@ -86,14 +86,15 @@ export function drawVertexPoint(
 
     const drawnRhombs: HashTable<boolean> = {};
 
-    console.log('drawVertexPoint', point.type);
 
-    if (point.type === "kite") {
+    // Kite / Deuce / Jack
+
+    if (point.type === 'deuce') {
+    // if (point.type === 'deuce') {
+    // if (point.type === 'kite' || point.type === 'deuce') {
         for (const rhombus of point.rhombuses) {
-            console.log(rhombus.intersectionPoint.hash);
             if (!drawnRhombs[rhombus.intersectionPoint.hash]) {
                 drawnRhombs[rhombus.intersectionPoint.hash] = true;
-                console.log('drawRhombus');
                 drawRhombus(rhombus, canvasContext, pointConverter, '', '');
             }
         }

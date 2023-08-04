@@ -18,7 +18,6 @@ const canvasManager = new CanvasnManager(
     smallCanvas,
     bigCanvas,
     (o, minX, maxX, minY, maxY, converter) => {
-        smallContext.clearRect(0, 0, document.documentElement.clientWidth, document.documentElement.clientHeight - 100);
         const generated = generator.generate(minX, maxX, minY, maxY)
         for (const rhombus of generated.rhombuses) {
             drawRhombus(rhombus, smallContext, converter, 'red', 'blue');
