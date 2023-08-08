@@ -1,7 +1,8 @@
 import { PenroseRhombus, PenroseIntersectionPoint, PenroseVertexPoint } from "./penrose";
 import { Point } from './point';
-import { HashTable } from "./helpers";
+import { HashTable, lengthOfLineSegment } from "./helpers";
 
+let converter;
 export function drawRhombus(
     rhombus: PenroseRhombus, 
     canvasContext: CanvasRenderingContext2D, 
@@ -9,6 +10,7 @@ export function drawRhombus(
     thinColor: string,
     thickColor: string,
 ): void {
+    converter = pointConverter;
     const points = rhombus.points.map(pointConverter);
 
     canvasContext.beginPath();
@@ -29,14 +31,17 @@ export function drawRhombus(
     canvasContext.fill();
 
     if (rhombus.isThin) {
+        const centerPoint = getPointBetweenPoints(points[0], points[2], .5);
         const firstPoint = getPointBetweenPoints(points[0], points[2], .2);
         const thirdPoint = getPointBetweenPoints(points[0], points[2], .8);
         const secondPoint = getPointBetweenPoints(points[1], points[3], .2);
         const fourthPoint = getPointBetweenPoints(points[1], points[3], .8);
 
+        drawCircle(canvasContext, centerPoint.x, centerPoint.y, 6, 'black');
         drawCircle(canvasContext, firstPoint.x, firstPoint.y, 3, 'darkgreen');
+        canvasPoints.push({ ...centerPoint, rhombus });
         // drawCircle(canvasContext, secondPoint.x, secondPoint.y, 3, 'yellow');
-        drawCircle(canvasContext, thirdPoint.x, thirdPoint.y, 3, 'lime');
+        // drawCircle(canvasContext, thirdPoint.x, thirdPoint.y, 3, 'lime');
         // drawCircle(canvasContext, fourthPoint.x, fourthPoint.y, 3, 'lightblue');
 
     } else {
@@ -58,8 +63,31 @@ export function drawRhombus(
         // drawCircle(canvasContext, fourthPoint.x, fourthPoint.y, 3, 'lightblue');
 
     }
+}
 
+const canvasPoints = [];
+const ctx = (document.getElementById('small') as HTMLCanvasElement).getContext('2d');
+document.getElementById('small').onclick = e => {
+    const point = canvasPoints.find(p => lengthOfLineSegment(p, new Point(e.offsetX, e.offsetY)) < 6);
+    if (!point) return;
 
+    const points = point.rhombus.points.map(converter);
+    // console.log(point.rhombus.intersectionPoint.line1Family, point.rhombus.intersectionPoint.line2Family, point.rhombus.intersectionPoint.line1Number, point.rhombus.intersectionPoint.line2Number);
+    console.log(point.rhombus.intersectionPoint.line1Number, point.rhombus.intersectionPoint.line2Number);
+    // console.log((point.rhombus.intersectionPoint.line1Number + point.rhombus.intersectionPoint.line2Number + 200) % 2);
+
+    // ctx.beginPath();
+    // ctx.moveTo(points[0].x, points[0].y);
+    // ctx.lineTo(points[1].x, points[1].y);
+    // ctx.lineTo(points[2].x, points[2].y);
+    // ctx.lineTo(points[3].x, points[3].y);
+    // ctx.lineTo(points[0].x, points[0].y);
+    // // canvasContext.fillStyle = rhombus.isThin ? thinColor : thickColor;
+
+    // const color = 'black';
+        
+    // ctx.fillStyle = color;
+    // ctx.fill();
 }
 
 export function drawIntersectionPoint(
@@ -93,13 +121,28 @@ export function drawVertexPoint(
     // if (point.type === 'deuce') {
     // if (point.type === 'kite' || point.type === 'deuce') {
         for (const rhombus of point.rhombuses) {
+            if (!rhombus.isThin) continue;
             if (!drawnRhombs[rhombus.intersectionPoint.hash]) {
                 drawnRhombs[rhombus.intersectionPoint.hash] = true;
-                drawRhombus(rhombus, canvasContext, pointConverter, '', '');
+                // drawRhombus(rhombus, canvasContext, pointConverter, '', '');
+                const indexOf = indexOfPoint(rhombus.points, point);
+                if (indexOf === 0 || indexOf === 2) {
+                    console.log(indexOfPoint(rhombus.points, point), rhombus.intersectionPoint.type);
+                    drawRhombus(rhombus, canvasContext, pointConverter, '', '');
+                }
             }
         }
     }
+}
 
+function indexOfPoint(arr, point) {
+    for (let i = 0; i < arr.length; i++) {
+        const p = arr[i];
+        if (lengthOfLineSegment(p, point) < .001) {
+            return i;
+        }
+    }
+    return -1;
 }
 
 function drawCircle(
