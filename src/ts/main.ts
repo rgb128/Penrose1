@@ -7,6 +7,14 @@ const smallCanvas = document.getElementById('small') as HTMLCanvasElement;
 const smallContext = smallCanvas.getContext('2d', { willReadFrequently: true });
 const bigCanvas = document.getElementById('big') as HTMLCanvasElement;
 const bigContext = bigCanvas.getContext('2d',{ willReadFrequently: true });
+const middleCanvas = document.getElementById('middle') as HTMLCanvasElement;
+const middleContext = middleCanvas.getContext('2d',{ willReadFrequently: true });
+const middleCanvasPosition = { 
+    top: -document.documentElement.clientWidth, 
+    left: (100 - document.documentElement.clientHeight),
+    x: 0,
+    y: 0,
+};
 
 const generator = new PenroseTiligGenerator(50);
 
@@ -15,28 +23,26 @@ const canvasManager = new CanvasnManager(
     document.documentElement.clientWidth,
     document.documentElement.clientHeight - 100,
     smallCanvas,
+    middleCanvas,
     bigCanvas,
     (one, minX, maxX, minY, maxY, converter) => {
-        const timeStart = window.performance.now();
         smallContext.fillStyle = 'white';
         smallContext.fillRect(0, 0, document.documentElement.clientWidth, document.documentElement.clientHeight - 100);
-        const timeClearCanvas = window.performance.now();
         const generated = generator.generate(minX, maxX, minY, maxY);
-        const timeGenerated = window.performance.now();
         fillTiling(generated);
-        const timeFill = window.performance.now();
         for (const vertex of Object.values(generated.vertexes)) {
             drawVertexPoint(one, vertex, smallContext, converter);
         }
-        const timeDrawn = window.performance.now();
-        
-        console.log(
-`All time: ${(Math.round((timeDrawn - timeStart) * 1000) / 1000)}ms. ` +
-`Clear canvas: ${(Math.round((timeClearCanvas - timeStart) * 1000) / 1000)}ms, ` +
-`Generate: ${(Math.round((timeGenerated - timeClearCanvas) * 1000) / 1000)}ms, ` +
-`Fill: ${(Math.round((timeFill - timeGenerated) * 1000) / 1000)}ms, ` +
-`Draw: ${(Math.round((timeDrawn - timeFill) * 1000) / 1000)}ms.`);
-        
+        return generated;
+    },
+    (one, minX, maxX, minY, maxY, converter) => {
+        middleContext.fillStyle = 'white';
+        middleContext.fillRect(0, 0, document.documentElement.clientWidth * 3, (document.documentElement.clientHeight - 100) * 3);
+        const generated = generator.generate(minX, maxX, minY, maxY);
+        fillTiling(generated);
+        for (const vertex of Object.values(generated.vertexes)) {
+            drawVertexPoint(one, vertex, middleContext, converter);
+        }
         return generated;
     },
 );
@@ -56,8 +62,11 @@ function setTouch() {
     let y = 0;
 
     smallCanvas.ontouchstart =  e => {
-        x = e.touches[0].clientX;
-        y = e.touches[0].clientY;
+        if (e.touches.length === 1) {
+            x = e.touches[0].clientX;
+            y = e.touches[0].clientY;
+        }
+        
     }
 
     smallCanvas.ontouchmove =  e => {
@@ -65,29 +74,52 @@ function setTouch() {
         e.stopImmediatePropagation();
         e.stopPropagation();
         
-        const deltaX = e.touches[0].clientX - x;
-        const deltaY = e.touches[0].clientY - y;
-        x = e.touches[0].clientX;
-        y = e.touches[0].clientY;
+        if (e.touches.length === 1) {
+            const deltaX = e.touches[0].clientX - x;
+            const deltaY = e.touches[0].clientY - y;
+            x = e.touches[0].clientX;
+            y = e.touches[0].clientY;
 
-        console.log(deltaX, deltaY);
+            console.log(deltaX, deltaY);
 
-        canvasManager.move(new Point(-deltaX, -deltaY));
+            canvasManager.move(new Point(-deltaX, -deltaY));
+        }
     }
 }
 setTouch();
 
-smallCanvas.onmousemove = e => {
+middleCanvas.onmousemove = async e => {
     if (!e.buttons) return;
     e.preventDefault();
     e.stopImmediatePropagation();
     e.stopPropagation();
+    
     const x = -e.movementX;
     const y = -e.movementY;
-    canvasManager.move(new Point(x, y));
+    middleCanvasPosition.left -= x;
+    middleCanvasPosition.top -= y;
+    middleCanvasPosition.x += x;
+    middleCanvasPosition.y += y;
+    middleCanvas.style.top = middleCanvasPosition.top + 'px';
+    middleCanvas.style.left = middleCanvasPosition.left + 'px';
+    
+    (async () => {
+        // canvasManager.move(new Point(x, y));
+    })();
 }
 
-function downlaodCanvas(canvas: HTMLCanvasElement, filename = 'penrose.png'): void {
+middleCanvas.onmouseup = async e => {
+    canvasManager.move(new Point(middleCanvasPosition.x, middleCanvasPosition.y));
+    canvasManager.drawMiddle();
+    middleCanvasPosition.x = 0;
+    middleCanvasPosition.y = 0;
+    middleCanvasPosition.left = -document.documentElement.clientWidth;
+    middleCanvasPosition.top = 100 - document.documentElement.clientHeight;
+    middleCanvas.style.top = middleCanvasPosition.top + 'px';
+    middleCanvas.style.left = middleCanvasPosition.left + 'px';
+}
+
+function downloadCanvas(canvas: HTMLCanvasElement, filename = 'penrose.png'): void {
     const myImageDataUrl = canvas.toDataURL('image/png').replace('image/png', 'image/octet-stream');
     const link = document.createElement('a');
     link.style.display = 'none';
@@ -142,9 +174,9 @@ document.getElementById('copyBig').onclick = async e => {
     await copyCanvas(bigContext, canvasManager.getBigWidth(), canvasManager.getBigHeight(), document.getElementById('copyBig'));
 }
 document.getElementById('downloadSmall').onclick = e => {
-    downlaodCanvas(smallCanvas);
+    downloadCanvas(smallCanvas);
 }
 document.getElementById('downloadBig').onclick = e => {
-    downlaodCanvas(bigCanvas);
+    downloadCanvas(bigCanvas);
 }
 

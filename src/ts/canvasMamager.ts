@@ -5,12 +5,13 @@ import { PenroseTiling } from './penrose';
 export class CanvasnManager {
 
     private readonly bigContext: CanvasRenderingContext2D;
+    private readonly middleContext: CanvasRenderingContext2D;
     private readonly smallContext: CanvasRenderingContext2D;
 
     private bigWidthPx: number;
     private bigHeightPx: number;
     private smallPositionOnBigPx: Point; // top/left
-    private tilig: PenroseTiling;
+    private tiling: PenroseTiling;
 
     /**
      * @param centerUnits Center of screen in units (Small center units)
@@ -20,8 +21,10 @@ export class CanvasnManager {
         private pxWidth: number,
         private pxHeight: number,
         private readonly smallCanvas: HTMLCanvasElement,
+        private readonly middleCanvas: HTMLCanvasElement,
         private readonly bigCanvas: HTMLCanvasElement,
         private readonly redraw: (one: number, minX: number, maxX: number, minY: number, maxY: number, converter: (p: Point) => Point) => PenroseTiling,
+        private readonly redrawMiddle: (one: number, minX: number, maxX: number, minY: number, maxY: number, converter: (p: Point) => Point) => PenroseTiling,
         private centerUnits = new Point(0, 0),
     ) {
         smallCanvas.width = this.pxWidth;
@@ -29,8 +32,9 @@ export class CanvasnManager {
         this.smallCanvas.style.width = this.smallCanvas.width + 'px';
         this.smallCanvas.style.height = this.smallCanvas.height + 'px';
 
-        this.bigContext = this.bigCanvas.getContext('2d', { willReadFrequently: true });
-        this.smallContext = this.smallCanvas.getContext('2d', { willReadFrequently: true });
+        this.bigContext =    this.bigCanvas.getContext('2d', { willReadFrequently: true });
+        this.middleContext = this.middleCanvas.getContext('2d', { willReadFrequently: true });
+        this.smallContext =  this.smallCanvas.getContext('2d', { willReadFrequently: true });
 
         bigCanvas.width = this.pxWidth;
         bigCanvas.height = this.pxHeight;
@@ -39,8 +43,14 @@ export class CanvasnManager {
         this.bigCanvas.style.width = this.bigCanvas.width + 'px';
         this.bigCanvas.style.height = this.bigCanvas.height + 'px';
 
+        middleCanvas.width = this.pxWidth * 3;
+        middleCanvas.height = this.pxHeight * 3;
+        this.middleCanvas.style.width = this.middleCanvas.width + 'px';
+        this.middleCanvas.style.height = this.middleCanvas.height + 'px';
+
         this.smallPositionOnBigPx = new Point(0, 0);
 
+        this.drawMiddle();
         this.draw();
         this.moveToBig();
     }
@@ -86,13 +96,26 @@ export class CanvasnManager {
         return new Point(this.centerUnits.x * this.one, this.centerUnits.y * this.one);
     }
     public getTiling(): PenroseTiling {
-        return this.tilig;
+        return this.tiling;
     }
 
+    public drawMiddle(): void {
+        const halfWidthUnits = this.pxWidth / this.one / 2;
+        const halfHeightUnits = this.pxHeight / this.one / 2;
+        this.tiling = this.redrawMiddle(
+            this.one,
+            this.centerUnits.x - halfWidthUnits * 6,
+            this.centerUnits.x + halfWidthUnits * 6,
+            this.centerUnits.y - halfHeightUnits * 6,
+            this.centerUnits.y + halfHeightUnits * 6,
+            p => { return this.convertUnitsToPx(p); },
+        );
+        // this.moveToBig();
+    }
     private draw(): void {
         const halfWidthUnits = this.pxWidth / this.one / 2;
         const halfHeightUnits = this.pxHeight / this.one / 2;
-        this.tilig = this.redraw(
+        this.tiling = this.redraw(
             this.one,
             this.centerUnits.x - halfWidthUnits,
             this.centerUnits.x + halfWidthUnits,
@@ -114,9 +137,15 @@ export class CanvasnManager {
         this.smallCanvas.height = newHeight;
         this.smallCanvas.style.height = this.smallCanvas.height + 'px';
         
-        this.draw();
+        this.middleCanvas.width = newWidth * 3;
+        this.middleCanvas.style.width = this.middleCanvas.width + 'px';
+        this.middleCanvas.height = newHeight * 3;
+        this.middleCanvas.style.height = this.middleCanvas.height + 'px';
+        
+        this.drawMiddle();
         
         (async () => {
+            this.draw();
             this.checkBigSize();
             this.moveToBig();
         })();

@@ -19,8 +19,8 @@ body {
 
 canvas#small {
     width: 100%;
-    height: calc(100vw - 100px);
-    display: block;
+    height: calc(100vh - 100px);
+    display: none;
     float: left;
 }
 canvas#big {
@@ -29,4 +29,21 @@ canvas#big {
 
 #text {
     text-align: justify;
+}
+
+#middleContainer {
+    width: 100%;
+    height: calc(100vh - 100px);
+    display: block;
+    float: left;
+    overflow: hidden;
+    position: relative;
+    
+    > canvas#middle {
+        position: absolute;
+        width: 300%;
+        height: calc((100vh - 100px) * 3);
+        top: calc(100px - 100vh);
+        left: -100%;
+    }
 }

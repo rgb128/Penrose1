@@ -87,17 +87,25 @@ export class PenroseTiligGenerator {
         minY: number, 
         maxY: number
     ): PenroseTiling {
+        const generateStart = window.performance.now();
         const intersectionPoints = this.getAllIntersectionPoints(
             minX - FILL_STOCK,
             maxX + FILL_STOCK,
             minY - FILL_STOCK,
             maxY + FILL_STOCK,
         );
+        const intersectionPointsGot = window.performance.now();
 
         const vertexes: HashTable<PenroseVertexPoint> = {};
-        const rhombuses = intersectionPoints.map(p => this.generateRhonbusFromPoint(p, vertexes));
+        const rhombuses = intersectionPoints.map(p => this.generateRhombusFromPoint(p, vertexes));
 
-        // return new PenroseTiling(vertexes, rhombuses, intersectionPoints)
+        const rhombusesPointsGot = window.performance.now();
+
+        // console.log(
+        //     `Generate: All time: ${(Math.round((rhombusesPointsGot - generateStart) * 1000) / 1000)}ms. ` +
+        //     `getAllIntersectionPoints: ${(Math.round((intersectionPointsGot - generateStart) * 1000) / 1000)}ms, ` +
+        //     `generateRhombusFromPoint: ${(Math.round((rhombusesPointsGot - intersectionPointsGot) * 1000) / 1000)}ms, `);
+        
         return new PenroseTiling(vertexes, rhombuses)
     }
 
@@ -197,7 +205,7 @@ export class PenroseTiligGenerator {
         return intersections;
     }
 
-    private generateRhonbusFromPoint(
+    private generateRhombusFromPoint(
         point: PenroseIntersectionPoint, 
         vertexes: HashTable<PenroseVertexPoint>,
     ): PenroseRhombus {
