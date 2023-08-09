@@ -32,7 +32,7 @@ function drawKite(
 ) {
 
     // angle = 0;
-    angle -= Math.PI / 2; // It's because we draw horisontally, but rhombs are calculated verticcally
+    angle -= Math.PI / 2; // It's because we draw horizontally, but rhombs are calculated vertically
     
     const addXAndYAndRotate = (origin: Point, x: number, y: number, angle: number): Point => {
         const rotated = rotateVector(new Point(x, y), angle);

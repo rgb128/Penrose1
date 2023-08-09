@@ -76,6 +76,27 @@ export class CanvasnManager {
 
         return new Point(x, y);
     }
+    public convertUnitsToPxForMiddle(point: Point): Point {
+        const halfWidthUnits = this.pxWidth / this.one / 2;
+        const halfHeightUnits = this.pxHeight / this.one / 2;
+
+        const x = map(
+            point.x,
+            this.centerUnits.x - halfWidthUnits,
+            this.centerUnits.x + halfWidthUnits,
+            0,
+            this.pxWidth
+        ) + this.pxWidth;
+        const y = map(
+            point.y,
+            this.centerUnits.y - halfHeightUnits,
+            this.centerUnits.y + halfHeightUnits,
+            0,
+            this.pxHeight
+        ) + this.pxHeight;
+
+        return new Point(x, y);
+    }
 
     public getWidth(): number {
         return this.pxWidth;
@@ -108,7 +129,7 @@ export class CanvasnManager {
             this.centerUnits.x + halfWidthUnits * 6,
             this.centerUnits.y - halfHeightUnits * 6,
             this.centerUnits.y + halfHeightUnits * 6,
-            p => { return this.convertUnitsToPx(p); },
+            p => { return this.convertUnitsToPxForMiddle(p); },
         );
         // this.moveToBig();
     }
@@ -141,6 +162,8 @@ export class CanvasnManager {
         this.middleCanvas.style.width = this.middleCanvas.width + 'px';
         this.middleCanvas.height = newHeight * 3;
         this.middleCanvas.style.height = this.middleCanvas.height + 'px';
+        this.middleCanvas.style.top = (-newHeight) + 'px';
+        this.middleCanvas.style.left = (-newWidth) + 'px';
         
         this.drawMiddle();
         
@@ -153,8 +176,9 @@ export class CanvasnManager {
 
     public changeOne(newOne: number): void {
         this.one = newOne;
-        
+
         this.draw();
+        this.drawMiddle();
         
         (async () => {
             this.moveToBig();
@@ -169,8 +193,9 @@ export class CanvasnManager {
         this.centerUnits.y += y;
         this.smallPositionOnBigPx.x += vector.x;
         this.smallPositionOnBigPx.y += vector.y;
-        
+
         this.draw();
+        this.drawMiddle();
 
         (async () => {
             this.checkBigSize();

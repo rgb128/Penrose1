@@ -9,9 +9,9 @@ const bigCanvas = document.getElementById('big') as HTMLCanvasElement;
 const bigContext = bigCanvas.getContext('2d',{ willReadFrequently: true });
 const middleCanvas = document.getElementById('middle') as HTMLCanvasElement;
 const middleContext = middleCanvas.getContext('2d',{ willReadFrequently: true });
-const middleCanvasPosition = { 
-    top: -document.documentElement.clientWidth, 
-    left: (100 - document.documentElement.clientHeight),
+const middleCanvasPosition = {
+    left: -document.documentElement.clientWidth,
+    top: (100 - document.documentElement.clientHeight),
     x: 0,
     y: 0,
 };
@@ -61,7 +61,7 @@ function setTouch() {
     let x = 0;
     let y = 0;
 
-    smallCanvas.ontouchstart =  e => {
+    middleCanvas.ontouchstart =  e => {
         if (e.touches.length === 1) {
             x = e.touches[0].clientX;
             y = e.touches[0].clientY;
@@ -69,7 +69,7 @@ function setTouch() {
         
     }
 
-    smallCanvas.ontouchmove =  e => {
+    middleCanvas.ontouchmove =  e => {
         e.preventDefault();
         e.stopImmediatePropagation();
         e.stopPropagation();
@@ -80,10 +80,27 @@ function setTouch() {
             x = e.touches[0].clientX;
             y = e.touches[0].clientY;
 
-            console.log(deltaX, deltaY);
-
-            canvasManager.move(new Point(-deltaX, -deltaY));
+            middleCanvasPosition.left += deltaX;
+            middleCanvasPosition.top += deltaY;
+            middleCanvasPosition.x -= deltaX;
+            middleCanvasPosition.y -= deltaY;
+            middleCanvas.style.top = middleCanvasPosition.top + 'px';
+            middleCanvas.style.left = middleCanvasPosition.left + 'px';
         }
+    }
+    
+    middleCanvas.ontouchend =  e => {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        e.stopPropagation();
+
+        canvasManager.move(new Point(middleCanvasPosition.x, middleCanvasPosition.y));
+        middleCanvasPosition.x = 0;
+        middleCanvasPosition.y = 0;
+        middleCanvasPosition.left = -document.documentElement.clientWidth;
+        middleCanvasPosition.top = 100 - document.documentElement.clientHeight;
+        middleCanvas.style.top = middleCanvasPosition.top + 'px';
+        middleCanvas.style.left = middleCanvasPosition.left + 'px';
     }
 }
 setTouch();
@@ -110,7 +127,6 @@ middleCanvas.onmousemove = async e => {
 
 middleCanvas.onmouseup = async e => {
     canvasManager.move(new Point(middleCanvasPosition.x, middleCanvasPosition.y));
-    canvasManager.drawMiddle();
     middleCanvasPosition.x = 0;
     middleCanvasPosition.y = 0;
     middleCanvasPosition.left = -document.documentElement.clientWidth;
