@@ -266,18 +266,12 @@ export function fillTiling(tiling: PenroseTiling): void {
             return 'queen';
         }
 
-        return 'uncomplete'
+        return 'uncomplete';
     }
 
     for (const vertex of Object.values(tiling.vertexes)) {
         const thinCount = vertex.rhombuses.filter(x => x.isThin).length;
         const thickCount = vertex.rhombuses.length - thinCount;
         vertex.type = getType(thinCount, thickCount);
-        vertex.lineNumbers
-    }
-
-    for (const rhombus of tiling.rhombuses) {
-        const angle = (rhombus.intersectionPoint.line2Family - rhombus.intersectionPoint.line1Family) % 5;
-        // console.log(angle, rhombus.isThin);
     }
 }
