@@ -2,80 +2,19 @@ import { PenroseRhombus, PenroseIntersectionPoint, PenroseVertexPoint } from "./
 import { Point } from './point';
 import {HashTable, lengthOfLineSegment, rotateVector, rotateVectorBySinAngCos} from "./helpers";
 
-
-//todo to be deleted
-let converter;
-export function drawRhombus(
-    rhombus: PenroseRhombus, 
-    canvasContext: CanvasRenderingContext2D, 
-    pointConverter: (p: Point) => Point,
-    thinColor: string,
-    thickColor: string,
-): void {
-    converter = pointConverter;
-    const points = rhombus.points.map(pointConverter);
-
-    canvasContext.beginPath();
-    canvasContext.moveTo(points[0].x, points[0].y);
-    canvasContext.lineTo(points[1].x, points[1].y);
-    canvasContext.lineTo(points[2].x, points[2].y);
-    canvasContext.lineTo(points[3].x, points[3].y);
-    canvasContext.lineTo(points[0].x, points[0].y);
-    // canvasContext.fillStyle = rhombus.isThin ? thinColor : thickColor;
-
-    const color = 
-        rhombus.intersectionPoint.type === 1 ? '#009' :
-        rhombus.intersectionPoint.type === 2 ? '#900' :
-        rhombus.intersectionPoint.type === 3 ? '#f55' :
-        rhombus.intersectionPoint.type === 4 ? '#55f' :
-        'black';
-    canvasContext.fillStyle = color;
-    canvasContext.fill();
-
-    if (rhombus.isThin) {
-        const centerPoint = getPointBetweenPoints(points[0], points[2], .5);
-        const firstPoint = getPointBetweenPoints(points[0], points[2], .2);
-        const thirdPoint = getPointBetweenPoints(points[0], points[2], .8);
-        const secondPoint = getPointBetweenPoints(points[1], points[3], .2);
-        const fourthPoint = getPointBetweenPoints(points[1], points[3], .8);
-
-        // drawCircle(canvasContext, centerPoint.x, centerPoint.y, 6, 'black');
-        drawCircle(canvasContext, firstPoint.x, firstPoint.y, 3, 'darkgreen');
-        canvasPoints.push({ ...centerPoint, rhombus });
-        // drawCircle(canvasContext, secondPoint.x, secondPoint.y, 3, 'yellow');
-        // drawCircle(canvasContext, thirdPoint.x, thirdPoint.y, 3, 'lime');
-        // drawCircle(canvasContext, fourthPoint.x, fourthPoint.y, 3, 'lightblue');
-
-    } else {
-        // const firstPoint = getPointBetweenPoints(points[0], points[2], .2);
-        // const secondPoint = getPointBetweenPoints(points[0], points[2], .8);
-
-        // drawCircle(canvasContext, firstPoint.x, firstPoint.y, 3, 'green');
-        // drawCircle(canvasContext, secondPoint.x, secondPoint.y, 3, 'yellow');
-
-        
-        const firstPoint = getPointBetweenPoints(points[0], points[2], .2);
-        const thirdPoint = getPointBetweenPoints(points[0], points[2], .8);
-        const secondPoint = getPointBetweenPoints(points[1], points[3], .2);
-        const fourthPoint = getPointBetweenPoints(points[1], points[3], .8);
-
-        drawCircle(canvasContext, firstPoint.x, firstPoint.y, 3, 'darkgreen');
-        // drawCircle(canvasContext, secondPoint.x, secondPoint.y, 3, 'yellow');
-        drawCircle(canvasContext, thirdPoint.x, thirdPoint.y, 3, 'lime');
-        // drawCircle(canvasContext, fourthPoint.x, fourthPoint.y, 3, 'lightblue');
-
-    }
-}
-
 /**
  * Draws all 3 rhombuses
  * @param angle Angle VERTEX -> CENTER OF THIN
  */
-function drawKite(ctx: CanvasRenderingContext2D, center: Point, angle: number, pointConverter: (p: Point) => Point) {
+function drawKite(
+    one: number,
+    ctx: CanvasRenderingContext2D, 
+    center: Point, 
+    angle: number, 
+    pointConverter: (p: Point) => Point
+) {
     const THIN_BIG_HALF_DIAGONAL = Math.cos(Math.PI / 10);
     const THIN_SMALL_HALF_DIAGONAL = Math.sin(Math.PI / 10);
-    const THICK_BIG_HALF_DIAGONAL = Math.cos(Math.PI / 5);
-    const THICK_SMALL_HALF_DIAGONAL = Math.sin(Math.PI / 5);
     const THIN_FILL = '#f55';
     const THICK_FILL = '#55f';
     const CIRCLE_WIDTH = 5;
@@ -108,7 +47,6 @@ function drawKite(ctx: CanvasRenderingContext2D, center: Point, angle: number, p
     const realRightTop =    pointConverter(addXAndYAndRotate(center, THIN_BIG_HALF_DIAGONAL, -THIN_SMALL_HALF_DIAGONAL, angle));
     const realRightBottom = pointConverter(addXAndYAndRotate(center, THIN_BIG_HALF_DIAGONAL, 1-THIN_SMALL_HALF_DIAGONAL, angle));
     // const realOne = Math.abs(pointConverter(new Point(1, 0)).x);
-    const realOne = 50;
     const circleMultiplier = .2;
     
     const drawThinRhombus = () => {
@@ -129,14 +67,14 @@ function drawKite(ctx: CanvasRenderingContext2D, center: Point, angle: number, p
         ctx.strokeStyle = SMALL_CIRCLE_COLOR;
         ctx.lineWidth = CIRCLE_WIDTH;
         ctx.beginPath();
-        ctx.arc(realTop.x, realTop.y, realOne * circleMultiplier, angle + Math.PI / 10, angle + Math.PI - Math.PI / 10, false);
+        ctx.arc(realTop.x, realTop.y, one * circleMultiplier, angle + Math.PI / 10, angle + Math.PI - Math.PI / 10, false);
         ctx.stroke();
 
         // Bottom arc ('big')
         ctx.strokeStyle = BIG_CIRCLE_COLOR;
         ctx.lineWidth = CIRCLE_WIDTH;
         ctx.beginPath();
-        ctx.arc(realCenter.x, realCenter.y, realOne * circleMultiplier, angle - Math.PI / 10, angle - Math.PI + Math.PI / 10, true);
+        ctx.arc(realCenter.x, realCenter.y, one * circleMultiplier, angle - Math.PI / 10, angle - Math.PI + Math.PI / 10, true);
         ctx.stroke();
     }
     drawThinRhombus();
@@ -158,14 +96,14 @@ function drawKite(ctx: CanvasRenderingContext2D, center: Point, angle: number, p
         ctx.strokeStyle = BIG_CIRCLE_COLOR;
         ctx.lineWidth = CIRCLE_WIDTH;
         ctx.beginPath();
-        ctx.arc(realLeftTop.x, realLeftTop.y, realOne * (1 - circleMultiplier), angle + Math.PI / 10, angle + Math.PI / 2, false);
+        ctx.arc(realLeftTop.x, realLeftTop.y, one * (1 - circleMultiplier), angle + Math.PI / 10, angle + Math.PI / 2, false);
         ctx.stroke();
 
         // Bottom arc ('small')
         ctx.strokeStyle = SMALL_CIRCLE_COLOR;
         ctx.lineWidth = CIRCLE_WIDTH;
         ctx.beginPath();
-        ctx.arc(realBottom.x, realBottom.y, realOne * circleMultiplier, angle - Math.PI / 2, angle - Math.PI / 2 - Math.PI / 5 * 2, true);
+        ctx.arc(realBottom.x, realBottom.y, one * circleMultiplier, angle - Math.PI / 2, angle - Math.PI / 2 - Math.PI / 5 * 2, true);
         ctx.stroke();
     }
     drawLeftThickRhombus();
@@ -188,14 +126,14 @@ function drawKite(ctx: CanvasRenderingContext2D, center: Point, angle: number, p
         ctx.strokeStyle = BIG_CIRCLE_COLOR;
         ctx.lineWidth = CIRCLE_WIDTH;
         ctx.beginPath();
-        ctx.arc(realRightTop.x, realRightTop.y, realOne * (1 - circleMultiplier), angle + Math.PI / 2, angle + Math.PI / 2 + Math.PI / 5 * 2, false);
+        ctx.arc(realRightTop.x, realRightTop.y, one * (1 - circleMultiplier), angle + Math.PI / 2, angle + Math.PI / 2 + Math.PI / 5 * 2, false);
         ctx.stroke();
 
         // Bottom arc ('small')
         ctx.strokeStyle = SMALL_CIRCLE_COLOR;
         ctx.lineWidth = CIRCLE_WIDTH;
         ctx.beginPath();
-        ctx.arc(realBottom.x, realBottom.y, realOne * circleMultiplier, angle - Math.PI / 2, angle - Math.PI / 10, false);
+        ctx.arc(realBottom.x, realBottom.y, one * circleMultiplier, angle - Math.PI / 2, angle - Math.PI / 10, false);
         ctx.stroke();
     }
     drawRightThickRhombus();
@@ -205,12 +143,15 @@ function drawKite(ctx: CanvasRenderingContext2D, center: Point, angle: number, p
  * It actually draws thick rhombus only
  * @param angle Angle VERTEX -> CENTER OF THICK
  */
-function drawDeuce(ctx: CanvasRenderingContext2D, center: Point, angle: number, pointConverter: (p: Point) => Point) {
-    const THIN_BIG_HALF_DIAGONAL = Math.cos(Math.PI / 10);
-    const THIN_SMALL_HALF_DIAGONAL = Math.sin(Math.PI / 10);
+function drawDeuce(
+    one: number,
+    ctx: CanvasRenderingContext2D, 
+    center: Point, 
+    angle: number, 
+    pointConverter: (p: Point) => Point
+) {
     const THICK_BIG_HALF_DIAGONAL = Math.cos(Math.PI / 5);
     const THICK_SMALL_HALF_DIAGONAL = Math.sin(Math.PI / 5);
-    const THIN_FILL = '#f55';
     const THICK_FILL = '#55f';
     const CIRCLE_WIDTH = 5;
     const SMALL_CIRCLE_COLOR = 'white';
@@ -218,7 +159,6 @@ function drawDeuce(ctx: CanvasRenderingContext2D, center: Point, angle: number, 
     const BORDER_COLOR = 'black';
     const BORDER_WIDTH = 1;
 
-    // angle = 0;
     angle -= Math.PI / 2; // It's because we draw horisontally, but rhombs are calculated verticcally
 
     const addXAndYAndRotate = (origin: Point, x: number, y: number, angle: number): Point => {
@@ -234,12 +174,10 @@ function drawDeuce(ctx: CanvasRenderingContext2D, center: Point, angle: number, 
         ctx.lineTo(point.x, point.y);
     }
 
-    const realCenter =      pointConverter(center); // Not real center, but intersection point. (and bottom)
-    const realTop =      pointConverter(addXAndYAndRotate(center, 0, -THICK_BIG_HALF_DIAGONAL * 2, angle));
-    const realLeft =     pointConverter(addXAndYAndRotate(center, -THICK_SMALL_HALF_DIAGONAL, -THICK_BIG_HALF_DIAGONAL, angle));
-    const realRight =     pointConverter(addXAndYAndRotate(center, THICK_SMALL_HALF_DIAGONAL, -THICK_BIG_HALF_DIAGONAL, angle));
-    // const realOne = Math.abs(pointConverter(new Point(1, 0)).x);
-    const realOne = 50;
+    const realCenter = pointConverter(center); // Not real center, but intersection point. (and bottom)
+    const realTop = pointConverter(addXAndYAndRotate(center, 0, -THICK_BIG_HALF_DIAGONAL * 2, angle));
+    const realLeft = pointConverter(addXAndYAndRotate(center, -THICK_SMALL_HALF_DIAGONAL, -THICK_BIG_HALF_DIAGONAL, angle));
+    const realRight = pointConverter(addXAndYAndRotate(center, THICK_SMALL_HALF_DIAGONAL, -THICK_BIG_HALF_DIAGONAL, angle));
     const circleMultiplier = .2;
 
     const drawThickRhombus = () => {
@@ -260,86 +198,41 @@ function drawDeuce(ctx: CanvasRenderingContext2D, center: Point, angle: number, 
         ctx.strokeStyle = BIG_CIRCLE_COLOR;
         ctx.lineWidth = CIRCLE_WIDTH;
         ctx.beginPath();
-        ctx.arc(realTop.x, realTop.y, realOne * (1 - circleMultiplier), angle + Math.PI / 2 - Math.PI / 5, angle + Math.PI / 2 + Math.PI / 5, false);
+        ctx.arc(realTop.x, realTop.y, one * (1 - circleMultiplier), angle + Math.PI / 2 - Math.PI / 5, angle + Math.PI / 2 + Math.PI / 5, false);
         ctx.stroke();
 
         // Bottom arc ('small')
         ctx.strokeStyle = SMALL_CIRCLE_COLOR;
         ctx.lineWidth = CIRCLE_WIDTH;
         ctx.beginPath();
-        ctx.arc(realCenter.x, realCenter.y, realOne * circleMultiplier, angle - Math.PI / 2 + Math.PI / 5, angle - Math.PI / 2 - Math.PI / 5, true);
+        ctx.arc(realCenter.x, realCenter.y, one * circleMultiplier, angle - Math.PI / 2 + Math.PI / 5, angle - Math.PI / 2 - Math.PI / 5, true);
         ctx.stroke();
     }
     drawThickRhombus();
 }
 
-
-const canvasPoints = [];
-const ctx = (document.getElementById('small') as HTMLCanvasElement).getContext('2d');
-document.getElementById('small').onclick = e => {
-    const point = canvasPoints.find(p => lengthOfLineSegment(p, new Point(e.offsetX, e.offsetY)) < 6);
-    if (!point) return;
-}
-
-export function drawIntersectionPoint(
-    point: PenroseIntersectionPoint, 
-    canvasContext: CanvasRenderingContext2D, 
-    pointConverter: (p: Point) => Point,
-    color: string,
-): void {
-    const real = pointConverter(point);
-    canvasContext.beginPath();
-    canvasContext.arc(real.x, real.y, 4, 0, 2 * Math.PI, false);
-    canvasContext.fillStyle = color;
-    canvasContext.fill();
-}
-
 export function drawVertexPoint(
+    one: number,
     point: PenroseVertexPoint, 
     canvasContext: CanvasRenderingContext2D, 
     pointConverter: (p: Point) => Point,
-    color: string,
 ): void {
     if (point.type === 'kite') {
         const thinRhombus = point.rhombuses.find(x => x.isThin);
-        // drawRhombus(thinRhombus, canvasContext, pointConverter, '', '');
-        const thinCenter = getPointBetweenPoints(thinRhombus.points[0], thinRhombus.points[2], .5);
+        const thinCenter = getPointBetweenPoints(thinRhombus.points[0], thinRhombus.points[2]);
         const vector = new Point(point.x - thinCenter.x, point.y - thinCenter.y);
         const angle = Math.atan2(vector.y, vector.x);
-        drawKite(canvasContext, point, angle, pointConverter);
+        drawKite(one, canvasContext, point, angle, pointConverter);
     } else if (point.type === 'deuce') {
         const thinRhombus = point.rhombuses.find(x => !x.isThin);
-        const thickCenter = getPointBetweenPoints(thinRhombus.points[0], thinRhombus.points[2], .5);
+        const thickCenter = getPointBetweenPoints(thinRhombus.points[0], thinRhombus.points[2]);
         const vector = new Point(point.x - thickCenter.x, point.y - thickCenter.y);
         const angle = Math.atan2(vector.y, vector.x);
-        drawDeuce(canvasContext, point, angle, pointConverter);
+        drawDeuce(one, canvasContext, point, angle, pointConverter);
     }
 }
 
-function indexOfPoint(arr, point) {
-    for (let i = 0; i < arr.length; i++) {
-        const p = arr[i];
-        if (lengthOfLineSegment(p, point) < .001) {
-            return i;
-        }
-    }
-    return -1;
-}
-
-function drawCircle(
-    canvas: CanvasRenderingContext2D, 
-    x: number, 
-    y: number,
-    r = 3, 
-    color = 'black',
-) {
-    canvas.beginPath();
-    canvas.arc(x, y, r, 0, 2 * Math.PI, false);
-    canvas.fillStyle = color;
-    canvas.fill();
-}
-
-function getPointBetweenPoints(point1: Point, point2: Point, closerToPoint1: number): Point {
+function getPointBetweenPoints(point1: Point, point2: Point, closerToPoint1 = .5): Point {
     const distX = point2.x - point1.x;
     const distY = point2.y - point1.y;
 
