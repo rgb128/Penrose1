@@ -1,7 +1,9 @@
 import { PenroseRhombus, PenroseIntersectionPoint, PenroseVertexPoint } from "./penrose";
 import { Point } from './point';
-import { HashTable, lengthOfLineSegment } from "./helpers";
+import {HashTable, lengthOfLineSegment, rotateVector, rotateVectorBySinAngCos} from "./helpers";
 
+
+//todo to be deleted
 let converter;
 export function drawRhombus(
     rhombus: PenroseRhombus, 
@@ -65,29 +67,141 @@ export function drawRhombus(
     }
 }
 
+function drawKite(ctx: CanvasRenderingContext2D, center: Point, angle: number, pointConverter: (p: Point) => Point) {
+    const THIN_BIG_HALF_DIAGONAL = Math.cos(Math.PI / 10);
+    const THIN_SMALL_HALF_DIAGONAL = Math.sin(Math.PI / 10);
+    const THICK_BIG_HALF_DIAGONAL = Math.cos(Math.PI / 5);
+    const THICK_SMALL_HALF_DIAGONAL = Math.sin(Math.PI / 5);
+    const THIN_FILL = '#f55';
+    const THICK_FILL = '#55f';
+    const CIRCLE_WIDTH = 5;
+    const SMALL_CIRCLE_COLOR = 'white';
+    const BIG_CIRCLE_COLOR = '#333';
+    const BORDER_COLOR = 'black';
+    const BORDER_WIDTH = 1;
+
+    // angle = 0;
+    angle -= Math.PI / 2; // It's because we draw horisontally, but rhombs are calculated verticcally
+    
+    const addXAndYAndRotate = (origin: Point, x: number, y: number, angle: number): Point => {
+        const rotated = rotateVector(new Point(x, y), angle);
+        // const rotated = rotateVector(new Point(x, y), 0);
+        return new Point(rotated.x + origin.x, rotated.y + origin.y);
+    }
+    
+    const moveTo = (point: Point) => {
+        ctx.moveTo(point.x, point.y);
+    }
+    const lineTo = (point: Point) => {
+        ctx.lineTo(point.x, point.y);
+    }
+
+    const realCenter =      pointConverter(center); // Not real center, but intersection point.
+    const realTop =         pointConverter(addXAndYAndRotate(center, 0, -THIN_SMALL_HALF_DIAGONAL * 2, angle));
+    const realBottom =      pointConverter(addXAndYAndRotate(center, 0, 1, angle));
+    const realLeftTop =     pointConverter(addXAndYAndRotate(center, -THIN_BIG_HALF_DIAGONAL, -THIN_SMALL_HALF_DIAGONAL, angle));
+    const realLeftBottom =  pointConverter(addXAndYAndRotate(center, -THIN_BIG_HALF_DIAGONAL, 1-THIN_SMALL_HALF_DIAGONAL, angle));
+    const realRightTop =    pointConverter(addXAndYAndRotate(center, THIN_BIG_HALF_DIAGONAL, -THIN_SMALL_HALF_DIAGONAL, angle));
+    const realRightBottom = pointConverter(addXAndYAndRotate(center, THIN_BIG_HALF_DIAGONAL, 1-THIN_SMALL_HALF_DIAGONAL, angle));
+    // const realOne = Math.abs(pointConverter(new Point(1, 0)).x);
+    const realOne = 50;
+    const circleMultiplier = .2;
+    
+    const drawThinRhombus = () => {
+        // Rhombus itself
+        ctx.strokeStyle = BORDER_COLOR;
+        ctx.lineWidth = BORDER_WIDTH;
+        ctx.fillStyle = THIN_FILL;
+        ctx.beginPath();
+        moveTo(realCenter);
+        lineTo(realRightTop);
+        lineTo(realTop);
+        lineTo(realLeftTop);
+        lineTo(realCenter);
+        ctx.stroke();
+        ctx.fill();
+        
+        // Top arc ('small')
+        ctx.strokeStyle = SMALL_CIRCLE_COLOR;
+        ctx.lineWidth = CIRCLE_WIDTH;
+        ctx.beginPath();
+        ctx.arc(realTop.x, realTop.y, realOne * circleMultiplier, angle + Math.PI / 10, angle + Math.PI - Math.PI / 10, false);
+        ctx.stroke();
+
+        // Bottom arc ('big')
+        ctx.strokeStyle = BIG_CIRCLE_COLOR;
+        ctx.lineWidth = CIRCLE_WIDTH;
+        ctx.beginPath();
+        ctx.arc(realCenter.x, realCenter.y, realOne * circleMultiplier, angle - Math.PI / 10, angle - Math.PI + Math.PI / 10, true);
+        ctx.stroke();
+    }
+    drawThinRhombus();
+    const drawLeftThickRhombus = () => {
+        // Rhombus itself
+        ctx.beginPath();
+        ctx.strokeStyle = BORDER_COLOR;
+        ctx.lineWidth = BORDER_WIDTH;
+        ctx.fillStyle = THICK_FILL;
+        moveTo(realCenter);
+        lineTo(realLeftTop);
+        lineTo(realLeftBottom);
+        lineTo(realBottom);
+        lineTo(realCenter);
+        ctx.stroke();
+        ctx.fill();
+
+        // Top arc ('big')
+        ctx.strokeStyle = BIG_CIRCLE_COLOR;
+        ctx.lineWidth = CIRCLE_WIDTH;
+        ctx.beginPath();
+        ctx.arc(realLeftTop.x, realLeftTop.y, realOne * (1 - circleMultiplier), angle + Math.PI / 10, angle + Math.PI / 2, false);
+        ctx.stroke();
+
+        // Bottom arc ('small')
+        ctx.strokeStyle = SMALL_CIRCLE_COLOR;
+        ctx.lineWidth = CIRCLE_WIDTH;
+        ctx.beginPath();
+        ctx.arc(realBottom.x, realBottom.y, realOne * circleMultiplier, angle - Math.PI / 2, angle - Math.PI / 2 - Math.PI / 5 * 2, true);
+        ctx.stroke();
+    }
+    drawLeftThickRhombus();
+
+    const drawRightThickRhombus = () => {
+        // Rhombus itself
+        ctx.beginPath();
+        ctx.strokeStyle = BORDER_COLOR;
+        ctx.lineWidth = BORDER_WIDTH;
+        ctx.fillStyle = THICK_FILL;
+        moveTo(realCenter);
+        lineTo(realRightTop);
+        lineTo(realRightBottom);
+        lineTo(realBottom);
+        lineTo(realCenter);
+        ctx.stroke();
+        ctx.fill();
+
+        // Top arc ('big')
+        ctx.strokeStyle = BIG_CIRCLE_COLOR;
+        ctx.lineWidth = CIRCLE_WIDTH;
+        ctx.beginPath();
+        ctx.arc(realRightTop.x, realRightTop.y, realOne * (1 - circleMultiplier), angle + Math.PI / 2, angle + Math.PI / 2 + Math.PI / 5 * 2, false);
+        ctx.stroke();
+
+        // Bottom arc ('small')
+        ctx.strokeStyle = SMALL_CIRCLE_COLOR;
+        ctx.lineWidth = CIRCLE_WIDTH;
+        ctx.beginPath();
+        ctx.arc(realBottom.x, realBottom.y, realOne * circleMultiplier, angle - Math.PI / 2, angle - Math.PI / 10, false);
+        ctx.stroke();
+    }
+    drawRightThickRhombus();
+}
+
 const canvasPoints = [];
 const ctx = (document.getElementById('small') as HTMLCanvasElement).getContext('2d');
 document.getElementById('small').onclick = e => {
     const point = canvasPoints.find(p => lengthOfLineSegment(p, new Point(e.offsetX, e.offsetY)) < 6);
     if (!point) return;
-
-    const points = point.rhombus.points.map(converter);
-    // console.log(point.rhombus.intersectionPoint.line1Family, point.rhombus.intersectionPoint.line2Family, point.rhombus.intersectionPoint.line1Number, point.rhombus.intersectionPoint.line2Number);
-    console.log(point.rhombus.intersectionPoint.line1Number, point.rhombus.intersectionPoint.line2Number);
-    // console.log((point.rhombus.intersectionPoint.line1Number + point.rhombus.intersectionPoint.line2Number + 200) % 2);
-
-    // ctx.beginPath();
-    // ctx.moveTo(points[0].x, points[0].y);
-    // ctx.lineTo(points[1].x, points[1].y);
-    // ctx.lineTo(points[2].x, points[2].y);
-    // ctx.lineTo(points[3].x, points[3].y);
-    // ctx.lineTo(points[0].x, points[0].y);
-    // // canvasContext.fillStyle = rhombus.isThin ? thinColor : thickColor;
-
-    // const color = 'black';
-        
-    // ctx.fillStyle = color;
-    // ctx.fill();
 }
 
 export function drawIntersectionPoint(
@@ -109,43 +223,13 @@ export function drawVertexPoint(
     pointConverter: (p: Point) => Point,
     color: string,
 ): void {
-    const real = pointConverter(point);
-    // drawCircle(canvasContext, real.x, real.y, 3, color);
-
-    const drawnRhombs: HashTable<boolean> = {};
-
-
-    // Kite / Deuce / Jack
-
     if (point.type === 'kite') {
-    // if (point.type === 'deuce') {
-    // if (point.type === 'kite' || point.type === 'deuce') {
-        for (const rhombus of point.rhombuses) {
-            // if (!rhombus.isThin) continue;
-            if (!drawnRhombs[rhombus.intersectionPoint.hash]) {
-                drawnRhombs[rhombus.intersectionPoint.hash] = true;
-                // drawRhombus(rhombus, canvasContext, pointConverter, '', '');
-                const indexOf = indexOfPoint(rhombus.points, point);
-                if (indexOf === 0 || indexOf === 2) {
-                    // console.log(indexOfPoint(rhombus.points, point), rhombus.intersectionPoint.type);
-                    drawRhombus(rhombus, canvasContext, pointConverter, '', '');
-                    const centerPoint = getPointBetweenPoints(rhombus.points[0], rhombus.points[2], .5);
-                    const ourPoint = getPointBetweenPoints(point, centerPoint, .5);
-                    const centerConverted = pointConverter(centerPoint);
-                    const ourConverted = pointConverter(ourPoint);                    
-                    const pointConverted = pointConverter(point);
-                    drawCircle(canvasContext, pointConverted.x, pointConverted.y, 3, 'yellow');
-                    const vector = new Point(point.x - centerPoint.x, point.y - centerPoint.y);
-                    // const vectorLen = Math.sqrt((vector.x * vector.x) + (vector.y * vector.y));
-                    // const sin = vector.y / vectorLen;
-                    // const cos = vector.x / vectorLen;
-                    const angle = Math.atan2(vector.y, vector.x);
-                    // console.log(Math.round((angle * 20 / Math.PI / 2) * 100) / 100, Math.round(angle * 360 / 2 / Math.PI * 100) / 100, rhombus.intersectionPoint.line1Family, rhombus.intersectionPoint.line2Family);
-                    console.log(Math.round((angle * 360 / 2 / Math.PI / 36 + 90 / 36) * 100) / 100, rhombus.intersectionPoint.line1Family, rhombus.intersectionPoint.line2Family);
-                    // console.log(Math.round(angle * 10 / Math.PI / 2 * 100) / 100, angle);
-                }
-            }
-        }
+        const thinRhombus = point.rhombuses.find(x => x.isThin);
+        // drawRhombus(thinRhombus, canvasContext, pointConverter, '', '');
+        const thinCenter = getPointBetweenPoints(thinRhombus.points[0], thinRhombus.points[2], .5);
+        const vector = new Point(point.x - thinCenter.x, point.y - thinCenter.y);
+        const angle = Math.atan2(vector.y, vector.x);
+        drawKite(canvasContext, point, angle, pointConverter);
     }
 }
 

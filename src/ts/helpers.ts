@@ -37,3 +37,14 @@ export function map(
     a += tobottom;
     return a;
 }
+
+export function rotateVector(vector: Point, angleRad: number) {
+    const sin = Math.sin(angleRad);
+    const cos = Math.cos(angleRad);
+    return rotateVectorBySinAngCos(vector, sin, cos);
+}
+export function rotateVectorBySinAngCos(vector: Point, sin: number, cos: number) {
+    const x = vector.x * cos - vector.y * sin;
+    const y = vector.x * sin + vector.y * cos;
+    return new Point(x, y);
+}
