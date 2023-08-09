@@ -37,7 +37,7 @@ export function drawRhombus(
         const secondPoint = getPointBetweenPoints(points[1], points[3], .2);
         const fourthPoint = getPointBetweenPoints(points[1], points[3], .8);
 
-        drawCircle(canvasContext, centerPoint.x, centerPoint.y, 6, 'black');
+        // drawCircle(canvasContext, centerPoint.x, centerPoint.y, 6, 'black');
         drawCircle(canvasContext, firstPoint.x, firstPoint.y, 3, 'darkgreen');
         canvasPoints.push({ ...centerPoint, rhombus });
         // drawCircle(canvasContext, secondPoint.x, secondPoint.y, 3, 'yellow');
@@ -121,14 +121,28 @@ export function drawVertexPoint(
     // if (point.type === 'deuce') {
     // if (point.type === 'kite' || point.type === 'deuce') {
         for (const rhombus of point.rhombuses) {
-            if (!rhombus.isThin) continue;
+            // if (!rhombus.isThin) continue;
             if (!drawnRhombs[rhombus.intersectionPoint.hash]) {
                 drawnRhombs[rhombus.intersectionPoint.hash] = true;
                 // drawRhombus(rhombus, canvasContext, pointConverter, '', '');
                 const indexOf = indexOfPoint(rhombus.points, point);
                 if (indexOf === 0 || indexOf === 2) {
-                    console.log(indexOfPoint(rhombus.points, point), rhombus.intersectionPoint.type);
+                    // console.log(indexOfPoint(rhombus.points, point), rhombus.intersectionPoint.type);
                     drawRhombus(rhombus, canvasContext, pointConverter, '', '');
+                    const centerPoint = getPointBetweenPoints(rhombus.points[0], rhombus.points[2], .5);
+                    const ourPoint = getPointBetweenPoints(point, centerPoint, .5);
+                    const centerConverted = pointConverter(centerPoint);
+                    const ourConverted = pointConverter(ourPoint);                    
+                    const pointConverted = pointConverter(point);
+                    drawCircle(canvasContext, pointConverted.x, pointConverted.y, 3, 'yellow');
+                    const vector = new Point(point.x - centerPoint.x, point.y - centerPoint.y);
+                    // const vectorLen = Math.sqrt((vector.x * vector.x) + (vector.y * vector.y));
+                    // const sin = vector.y / vectorLen;
+                    // const cos = vector.x / vectorLen;
+                    const angle = Math.atan2(vector.y, vector.x);
+                    // console.log(Math.round((angle * 20 / Math.PI / 2) * 100) / 100, Math.round(angle * 360 / 2 / Math.PI * 100) / 100, rhombus.intersectionPoint.line1Family, rhombus.intersectionPoint.line2Family);
+                    console.log(Math.round((angle * 360 / 2 / Math.PI / 36 + 90 / 36) * 100) / 100, rhombus.intersectionPoint.line1Family, rhombus.intersectionPoint.line2Family);
+                    // console.log(Math.round(angle * 10 / Math.PI / 2 * 100) / 100, angle);
                 }
             }
         }
