@@ -67,6 +67,10 @@ export function drawRhombus(
     }
 }
 
+/**
+ * Draws all 3 rhombuses
+ * @param angle Angle VERTEX -> CENTER OF THIN
+ */
 function drawKite(ctx: CanvasRenderingContext2D, center: Point, angle: number, pointConverter: (p: Point) => Point) {
     const THIN_BIG_HALF_DIAGONAL = Math.cos(Math.PI / 10);
     const THIN_SMALL_HALF_DIAGONAL = Math.sin(Math.PI / 10);
@@ -197,6 +201,79 @@ function drawKite(ctx: CanvasRenderingContext2D, center: Point, angle: number, p
     drawRightThickRhombus();
 }
 
+/** 
+ * It actually draws thick rhombus only
+ * @param angle Angle VERTEX -> CENTER OF THICK
+ */
+function drawDeuce(ctx: CanvasRenderingContext2D, center: Point, angle: number, pointConverter: (p: Point) => Point) {
+    const THIN_BIG_HALF_DIAGONAL = Math.cos(Math.PI / 10);
+    const THIN_SMALL_HALF_DIAGONAL = Math.sin(Math.PI / 10);
+    const THICK_BIG_HALF_DIAGONAL = Math.cos(Math.PI / 5);
+    const THICK_SMALL_HALF_DIAGONAL = Math.sin(Math.PI / 5);
+    const THIN_FILL = '#f55';
+    const THICK_FILL = '#55f';
+    const CIRCLE_WIDTH = 5;
+    const SMALL_CIRCLE_COLOR = 'white';
+    const BIG_CIRCLE_COLOR = '#333';
+    const BORDER_COLOR = 'black';
+    const BORDER_WIDTH = 1;
+
+    // angle = 0;
+    angle -= Math.PI / 2; // It's because we draw horisontally, but rhombs are calculated verticcally
+
+    const addXAndYAndRotate = (origin: Point, x: number, y: number, angle: number): Point => {
+        const rotated = rotateVector(new Point(x, y), angle);
+        // const rotated = rotateVector(new Point(x, y), 0);
+        return new Point(rotated.x + origin.x, rotated.y + origin.y);
+    }
+
+    const moveTo = (point: Point) => {
+        ctx.moveTo(point.x, point.y);
+    }
+    const lineTo = (point: Point) => {
+        ctx.lineTo(point.x, point.y);
+    }
+
+    const realCenter =      pointConverter(center); // Not real center, but intersection point. (and bottom)
+    const realTop =      pointConverter(addXAndYAndRotate(center, 0, -THICK_BIG_HALF_DIAGONAL * 2, angle));
+    const realLeft =     pointConverter(addXAndYAndRotate(center, -THICK_SMALL_HALF_DIAGONAL, -THICK_BIG_HALF_DIAGONAL, angle));
+    const realRight =     pointConverter(addXAndYAndRotate(center, THICK_SMALL_HALF_DIAGONAL, -THICK_BIG_HALF_DIAGONAL, angle));
+    // const realOne = Math.abs(pointConverter(new Point(1, 0)).x);
+    const realOne = 50;
+    const circleMultiplier = .2;
+
+    const drawThickRhombus = () => {
+        // Rhombus itself
+        ctx.beginPath();
+        ctx.strokeStyle = BORDER_COLOR;
+        ctx.lineWidth = BORDER_WIDTH;
+        ctx.fillStyle = THICK_FILL;
+        moveTo(realCenter);
+        lineTo(realRight);
+        lineTo(realTop);
+        lineTo(realLeft);
+        lineTo(realCenter);
+        ctx.stroke();
+        ctx.fill();
+
+        // Top arc ('big')
+        ctx.strokeStyle = BIG_CIRCLE_COLOR;
+        ctx.lineWidth = CIRCLE_WIDTH;
+        ctx.beginPath();
+        ctx.arc(realTop.x, realTop.y, realOne * (1 - circleMultiplier), angle + Math.PI / 2 - Math.PI / 5, angle + Math.PI / 2 + Math.PI / 5, false);
+        ctx.stroke();
+
+        // Bottom arc ('small')
+        ctx.strokeStyle = SMALL_CIRCLE_COLOR;
+        ctx.lineWidth = CIRCLE_WIDTH;
+        ctx.beginPath();
+        ctx.arc(realCenter.x, realCenter.y, realOne * circleMultiplier, angle - Math.PI / 2 + Math.PI / 5, angle - Math.PI / 2 - Math.PI / 5, true);
+        ctx.stroke();
+    }
+    drawThickRhombus();
+}
+
+
 const canvasPoints = [];
 const ctx = (document.getElementById('small') as HTMLCanvasElement).getContext('2d');
 document.getElementById('small').onclick = e => {
@@ -230,6 +307,12 @@ export function drawVertexPoint(
         const vector = new Point(point.x - thinCenter.x, point.y - thinCenter.y);
         const angle = Math.atan2(vector.y, vector.x);
         drawKite(canvasContext, point, angle, pointConverter);
+    } else if (point.type === 'deuce') {
+        const thinRhombus = point.rhombuses.find(x => !x.isThin);
+        const thickCenter = getPointBetweenPoints(thinRhombus.points[0], thinRhombus.points[2], .5);
+        const vector = new Point(point.x - thickCenter.x, point.y - thickCenter.y);
+        const angle = Math.atan2(vector.y, vector.x);
+        drawDeuce(canvasContext, point, angle, pointConverter);
     }
 }
 
