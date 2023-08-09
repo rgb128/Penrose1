@@ -17,14 +17,26 @@ const canvasManager = new CanvasnManager(
     smallCanvas,
     bigCanvas,
     (one, minX, maxX, minY, maxY, converter) => {
-        // smallContext.fillStyle = 'white';
-        // smallContext.fillRect(0, 0, document.documentElement.clientWidth, document.documentElement.clientHeight - 100);
+        const timeStart = window.performance.now();
+        smallContext.fillStyle = 'white';
+        smallContext.fillRect(0, 0, document.documentElement.clientWidth, document.documentElement.clientHeight - 100);
+        const timeClearCanvas = window.performance.now();
         const generated = generator.generate(minX, maxX, minY, maxY);
+        const timeGenerated = window.performance.now();
         fillTiling(generated);
+        const timeFill = window.performance.now();
         for (const vertex of Object.values(generated.vertexes)) {
             drawVertexPoint(one, vertex, smallContext, converter);
-            
         }
+        const timeDrawn = window.performance.now();
+        
+        console.log(
+`All time: ${(Math.round((timeDrawn - timeStart) * 1000) / 1000)}ms. ` +
+`Clear canvas: ${(Math.round((timeClearCanvas - timeStart) * 1000) / 1000)}ms, ` +
+`Generate: ${(Math.round((timeGenerated - timeClearCanvas) * 1000) / 1000)}ms, ` +
+`Fill: ${(Math.round((timeFill - timeGenerated) * 1000) / 1000)}ms, ` +
+`Draw: ${(Math.round((timeDrawn - timeFill) * 1000) / 1000)}ms.`);
+        
         return generated;
     },
 );
