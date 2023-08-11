@@ -4,8 +4,8 @@ import { PenroseTiligGenerator, fillTiling } from './penrose';
 import { Point } from './point';
 import {getSeed, Random} from "./random";
 
-const smallCanvas = document.getElementById('small') as HTMLCanvasElement;
-const smallContext = smallCanvas.getContext('2d', { willReadFrequently: true });
+// const smallCanvas = document.getElementById('small') as HTMLCanvasElement;
+// const smallContext = smallCanvas.getContext('2d', { willReadFrequently: true });
 const bigCanvas = document.getElementById('big') as HTMLCanvasElement;
 const bigContext = bigCanvas.getContext('2d',{ willReadFrequently: true });
 const middleCanvas = document.getElementById('middle') as HTMLCanvasElement;
@@ -27,19 +27,19 @@ const canvasManager = new CanvasManager(
     50,
     document.documentElement.clientWidth,
     document.documentElement.clientHeight - 100,
-    smallCanvas,
+    // smallCanvas,
     middleCanvas,
     bigCanvas,
-    (one, minX, maxX, minY, maxY, converter) => {
-        smallContext.fillStyle = 'white';
-        smallContext.fillRect(0, 0, document.documentElement.clientWidth, document.documentElement.clientHeight - 100);
-        const generated = generator.generate(minX, maxX, minY, maxY);
-        fillTiling(generated);
-        for (const vertex of Object.values(generated.vertexes)) {
-            drawVertexPoint(one, vertex, smallContext, converter);
-        }
-        return generated;
-    },
+    // (one, minX, maxX, minY, maxY, converter) => {
+    //     smallContext.fillStyle = 'white';
+    //     smallContext.fillRect(0, 0, document.documentElement.clientWidth, document.documentElement.clientHeight - 100);
+    //     const generated = generator.generate(minX, maxX, minY, maxY);
+    //     fillTiling(generated);
+    //     for (const vertex of Object.values(generated.vertexes)) {
+    //         drawVertexPoint(one, vertex, smallContext, converter);
+    //     }
+    //     return generated;
+    // },
     (one, minX, maxX, minY, maxY, converter) => {
         middleContext.fillStyle = 'white';
         middleContext.fillRect(0, 0, document.documentElement.clientWidth * 3, (document.documentElement.clientHeight - 100) * 3);
@@ -52,10 +52,10 @@ const canvasManager = new CanvasManager(
     },
 );
 
-document.getElementById('oneInput').oninput = e => {
-    const value = +(document.getElementById('oneInput') as HTMLInputElement).value;
-    canvasManager.changeOne(value);
-}
+// document.getElementById('oneInput').oninput = e => {
+//     const value = +(document.getElementById('oneInput') as HTMLInputElement).value;
+//     canvasManager.changeOne(value);
+// }
 
 window.onresize = e => {
     canvasManager.resize(document.documentElement.clientWidth, document.documentElement.clientHeight - 100);
@@ -166,7 +166,7 @@ async function imageDataToBlob(imageData: ImageData): Promise<Blob> {
         canvas.toBlob(resolve); // implied image/png format
     });
 }
-async function copyCanvas(context: CanvasRenderingContext2D, width: number, height: number, button: HTMLElement) {
+async function copyCanvas(context: CanvasRenderingContext2D, width: number, height: number, button: HTMLElement, x = 0, y = 0) {
     const innerText = button.innerText;
     button.innerText = 'copying';
     const blob = await imageDataToBlob(context.getImageData(0, 0, width, height));
@@ -188,15 +188,15 @@ async function copyCanvas(context: CanvasRenderingContext2D, width: number, heig
 
 //todo draw 'RGB128 text': https://github.com/rgb128/plus/blob/master/js/helpers.js#L82
 
-document.getElementById('copySmall').onclick = async e => {
-    await copyCanvas(smallContext, canvasManager.getWidth(), canvasManager.getHeight(), document.getElementById('copySmall'));
-}
+// document.getElementById('copySmall').onclick = async e => {
+//     await copyCanvas(middleContext, canvasManager.getWidth(), canvasManager.getHeight(), document.getElementById('copySmall'), canvasManager.getWidth(), canvasManager.getHeight());
+// }
 document.getElementById('copyBig').onclick = async e => {
     await copyCanvas(bigContext, canvasManager.getBigWidth(), canvasManager.getBigHeight(), document.getElementById('copyBig'));
 }
-document.getElementById('downloadSmall').onclick = e => {
-    downloadCanvas(smallCanvas);
-}
+// document.getElementById('downloadSmall').onclick = e => {
+//     downloadCanvas(smallCanvas);
+// }
 document.getElementById('downloadBig').onclick = e => {
     downloadCanvas(bigCanvas);
 }
