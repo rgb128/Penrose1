@@ -13,8 +13,16 @@
         <canvas id="small"></canvas>
     </div>
     
+    <div id="loading" class="hidden">
+        loading....
+    </div>
+    
     <div id="text">
-<!--        <div>One: <input type="range" min="50" max="500" step="10" value="100" id="oneInput" /></div>-->
+        <div>
+            One: <input type="range" min="10" max="200" step="10" value="50" id="oneInput" />: 
+            <span id="oneValue">50px</span> 
+            <button id="setOne">Set one</button>
+        </div>
         <div>
             <button id="copySmall">Copy small</button>
             <button id="copyBig">Copy big</button>

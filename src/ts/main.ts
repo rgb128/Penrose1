@@ -165,3 +165,18 @@ document.getElementById('downloadBig').onclick = e => {
 document.getElementById('downloadSmall').onclick = e => {
     downloadSmallCanvas(smallCanvas, smallContext);
 }
+
+document.getElementById('oneInput').oninput = e => {
+    document.getElementById('oneValue').innerText = +(document.getElementById('oneInput') as HTMLInputElement).value + 'px';
+}
+
+document.getElementById('setOne').onclick = async e => {
+    const one = +(document.getElementById('oneInput') as HTMLInputElement).value;
+    const loadingDiv = document.getElementById('loading');
+    loadingDiv.classList.remove('hidden');
+    console.log('start');
+    canvasManager.changeOne(one);
+    console.log('end');
+    loadingDiv.classList.add('hidden');
+}
+
