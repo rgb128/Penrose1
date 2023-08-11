@@ -41,3 +41,34 @@ canvas#big {
         left: -100%;
     }
 }
+
+body.horizontal {
+    #text {
+        text-align: justify;
+        position: fixed;
+        top: 0;
+        left: 50%;
+        width: 50%;
+        height: 100vh;
+        overflow: auto;
+    }
+
+    #smallContainer {
+        top: 0;
+        left: 0;
+        width: 50%;
+        height: 100vh;
+        display: block;
+        float: left;
+        overflow: hidden;
+        position: fixed;
+
+        > canvas#small {
+            position: absolute;
+            width: 150%;
+            height: 300vh;
+            top: -100vh;
+            left: -50%;
+        }
+    }
+}

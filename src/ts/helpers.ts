@@ -48,3 +48,21 @@ export function rotateVectorBySinAngCos(vector: Point, sin: number, cos: number)
     const y = vector.x * sin + vector.y * cos;
     return new Point(x, y);
 }
+export function getWidthAndHeight() {
+    const width = document.documentElement.clientWidth;
+    const height = document.documentElement.clientHeight;
+    if (width > height) {
+        return {
+            width: width / 2,
+            height,
+            horizontal: true,
+        };
+    } else {
+        return {
+            width,
+            height: height - 100,
+            horizontal: false,
+        };
+    }
+}
+
