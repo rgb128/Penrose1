@@ -6,9 +6,9 @@ import {copyCanvas, copySmallCanvas, downloadCanvas, downloadSmallCanvas} from "
 
 const bigCanvas = document.getElementById('big') as HTMLCanvasElement;
 const bigContext = bigCanvas.getContext('2d',{ willReadFrequently: true });
-const middleCanvas = document.getElementById('middle') as HTMLCanvasElement;
-const middleContext = middleCanvas.getContext('2d',{ willReadFrequently: true });
-const middleCanvasPosition = {
+const smallCanvas = document.getElementById('small') as HTMLCanvasElement;
+const smallContext = smallCanvas.getContext('2d',{ willReadFrequently: true });
+const smallCanvasPosition = {
     left: -document.documentElement.clientWidth,
     top: (100 - document.documentElement.clientHeight),
     x: 0,
@@ -28,7 +28,7 @@ const canvasManager = new CanvasManager(
     50,
     document.documentElement.clientWidth,
     document.documentElement.clientHeight - 100,
-    middleCanvas,
+    smallCanvas,
     bigCanvas,
 );
 
@@ -41,7 +41,7 @@ function setTouch() {
     let x = 0;
     let y = 0;
 
-    middleCanvas.ontouchstart =  e => {
+    smallCanvas.ontouchstart =  e => {
         if (e.touches.length === 1) {
             x = e.touches[0].clientX;
             y = e.touches[0].clientY;
@@ -49,7 +49,7 @@ function setTouch() {
         
     }
 
-    middleCanvas.ontouchmove =  e => {
+    smallCanvas.ontouchmove =  e => {
         e.preventDefault();
         e.stopImmediatePropagation();
         e.stopPropagation();
@@ -60,32 +60,32 @@ function setTouch() {
             x = e.touches[0].clientX;
             y = e.touches[0].clientY;
 
-            middleCanvasPosition.left += deltaX;
-            middleCanvasPosition.top += deltaY;
-            middleCanvasPosition.x -= deltaX;
-            middleCanvasPosition.y -= deltaY;
-            middleCanvas.style.top = middleCanvasPosition.top + 'px';
-            middleCanvas.style.left = middleCanvasPosition.left + 'px';
+            smallCanvasPosition.left += deltaX;
+            smallCanvasPosition.top += deltaY;
+            smallCanvasPosition.x -= deltaX;
+            smallCanvasPosition.y -= deltaY;
+            smallCanvas.style.top = smallCanvasPosition.top + 'px';
+            smallCanvas.style.left = smallCanvasPosition.left + 'px';
         }
     }
     
-    middleCanvas.ontouchend =  e => {
+    smallCanvas.ontouchend =  e => {
         e.preventDefault();
         e.stopImmediatePropagation();
         e.stopPropagation();
 
-        canvasManager.move(new Point(middleCanvasPosition.x, middleCanvasPosition.y));
-        middleCanvasPosition.x = 0;
-        middleCanvasPosition.y = 0;
-        middleCanvasPosition.left = -document.documentElement.clientWidth;
-        middleCanvasPosition.top = 100 - document.documentElement.clientHeight;
-        middleCanvas.style.top = middleCanvasPosition.top + 'px';
-        middleCanvas.style.left = middleCanvasPosition.left + 'px';
+        canvasManager.move(new Point(smallCanvasPosition.x, smallCanvasPosition.y));
+        smallCanvasPosition.x = 0;
+        smallCanvasPosition.y = 0;
+        smallCanvasPosition.left = -document.documentElement.clientWidth;
+        smallCanvasPosition.top = 100 - document.documentElement.clientHeight;
+        smallCanvas.style.top = smallCanvasPosition.top + 'px';
+        smallCanvas.style.left = smallCanvasPosition.left + 'px';
     }
 }
 setTouch();
 
-middleCanvas.onmousemove = async e => {
+smallCanvas.onmousemove = async e => {
     if (!e.buttons) return;
     e.preventDefault();
     e.stopImmediatePropagation();
@@ -93,22 +93,22 @@ middleCanvas.onmousemove = async e => {
     
     const x = -e.movementX;
     const y = -e.movementY;
-    middleCanvasPosition.left -= x;
-    middleCanvasPosition.top -= y;
-    middleCanvasPosition.x += x;
-    middleCanvasPosition.y += y;
-    middleCanvas.style.top = middleCanvasPosition.top + 'px';
-    middleCanvas.style.left = middleCanvasPosition.left + 'px';
+    smallCanvasPosition.left -= x;
+    smallCanvasPosition.top -= y;
+    smallCanvasPosition.x += x;
+    smallCanvasPosition.y += y;
+    smallCanvas.style.top = smallCanvasPosition.top + 'px';
+    smallCanvas.style.left = smallCanvasPosition.left + 'px';
 }
 
-middleCanvas.onmouseup = async e => {
-    canvasManager.move(new Point(middleCanvasPosition.x, middleCanvasPosition.y));
-    middleCanvasPosition.x = 0;
-    middleCanvasPosition.y = 0;
-    middleCanvasPosition.left = -document.documentElement.clientWidth;
-    middleCanvasPosition.top = 100 - document.documentElement.clientHeight;
-    middleCanvas.style.top = middleCanvasPosition.top + 'px';
-    middleCanvas.style.left = middleCanvasPosition.left + 'px';
+smallCanvas.onmouseup = async e => {
+    canvasManager.move(new Point(smallCanvasPosition.x, smallCanvasPosition.y));
+    smallCanvasPosition.x = 0;
+    smallCanvasPosition.y = 0;
+    smallCanvasPosition.left = -document.documentElement.clientWidth;
+    smallCanvasPosition.top = 100 - document.documentElement.clientHeight;
+    smallCanvas.style.top = smallCanvasPosition.top + 'px';
+    smallCanvas.style.left = smallCanvasPosition.left + 'px';
 }
 
 //todo draw 'RGB128 text': https://github.com/rgb128/plus/blob/master/js/helpers.js#L82
@@ -131,7 +131,7 @@ document.getElementById('copySmall').onclick = async e => {
     const copyBtn = document.getElementById('copySmall');
     copyBtn.innerText = 'copying';
     try {
-        await copySmallCanvas(middleCanvas, middleContext);
+        await copySmallCanvas(smallCanvas, smallContext);
         copyBtn.innerText = 'copied';
     } catch (ex) {
         console.error(ex);
@@ -145,5 +145,5 @@ document.getElementById('downloadBig').onclick = e => {
     downloadCanvas(bigCanvas, bigContext);
 }
 document.getElementById('downloadSmall').onclick = e => {
-    downloadSmallCanvas(middleCanvas, middleContext);
+    downloadSmallCanvas(smallCanvas, smallContext);
 }

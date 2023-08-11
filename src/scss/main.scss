@@ -17,12 +17,6 @@ body {
     }
 }
 
-canvas#small {
-    width: 100%;
-    height: calc(100vh - 100px);
-    display: none;
-    float: left;
-}
 canvas#big {
     display: none;
 }
@@ -31,7 +25,7 @@ canvas#big {
     text-align: justify;
 }
 
-#middleContainer {
+#smallContainer {
     width: 100%;
     height: calc(100vh - 100px);
     display: block;
@@ -39,7 +33,7 @@ canvas#big {
     overflow: hidden;
     position: relative;
     
-    > canvas#middle {
+    > canvas#small {
         position: absolute;
         width: 300%;
         height: calc((100vh - 100px) * 3);

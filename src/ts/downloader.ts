@@ -78,25 +78,6 @@ function downloadImgData(imgData: ImageData) {
     newCanvas.remove();
 }
 
-// function getImage(imgData: ImageData, canvas: HTMLCanvasElement, context: CanvasRenderingContext2D) {
-//     const newCanvas = document.createElement('canvas');
-//     newCanvas.style.display = 'none';
-//     newCanvas.style.width = imgData.width + 'px';
-//     newCanvas.style.height = imgData.height + 'px';
-//     newCanvas.width = imgData.width;
-//     newCanvas.height = imgData.height;
-//
-//     const newCtx = newCanvas.getContext('2d');
-//     newCtx.putImageData(imgData, 0, 0);
-//     drawText(newCtx, imgData.width, imgData.height);
-//
-//     const myImageDataUrl = newCanvas.toDataURL('image/png').replace('image/png', 'image/octet-stream');
-//     const img = document.createElement('img');
-//     img.src = myImageDataUrl
-//     newCanvas.remove();
-//     return img;
-// }
-
 async function imageDataToBlob(imageData): Promise<Blob> {
     const w = imageData.width;
     const h = imageData.height;

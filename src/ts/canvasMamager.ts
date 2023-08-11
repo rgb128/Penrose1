@@ -7,7 +7,7 @@ import {drawVertexPoint} from "./drawer";
 export class CanvasManager {
 
     private readonly bigContext: CanvasRenderingContext2D;
-    private readonly middleContext: CanvasRenderingContext2D;
+    private readonly smallContext: CanvasRenderingContext2D;
 
     private bigWidthPx: number;
     private bigHeightPx: number;
@@ -23,12 +23,12 @@ export class CanvasManager {
         private one: number,
         private pxWidth: number,
         private pxHeight: number,
-        private readonly middleCanvas: HTMLCanvasElement,
+        private readonly smallCanvas: HTMLCanvasElement,
         private readonly bigCanvas: HTMLCanvasElement,
         private centerUnits = new Point(0, 0),
     ) {
         this.bigContext = this.bigCanvas.getContext('2d', {willReadFrequently: true});
-        this.middleContext = this.middleCanvas.getContext('2d', {willReadFrequently: true});
+        this.smallContext = this.smallCanvas.getContext('2d', {willReadFrequently: true});
 
         this.bigWidthPx = this.pxWidth;
         this.bigHeightPx = this.pxHeight;
@@ -38,10 +38,10 @@ export class CanvasManager {
         this.bigCanvas.style.width = this.bigCanvas.width + 'px';
         this.bigCanvas.style.height = this.bigCanvas.height + 'px';
 
-        middleCanvas.width = this.pxWidth * 3;
-        middleCanvas.height = this.pxHeight * 3;
-        this.middleCanvas.style.width = this.middleCanvas.width + 'px';
-        this.middleCanvas.style.height = this.middleCanvas.height + 'px';
+        smallCanvas.width = this.pxWidth * 3;
+        smallCanvas.height = this.pxHeight * 3;
+        this.smallCanvas.style.width = this.smallCanvas.width + 'px';
+        this.smallCanvas.style.height = this.smallCanvas.height + 'px';
 
         this.smallPositionOnBigPx = new Point(0, 0);
 
@@ -93,12 +93,12 @@ export class CanvasManager {
     }
     
     private drawToCanvas(minX: number, maxX: number, minY: number, maxY: number) {
-        this.middleContext.fillStyle = 'white';
-        this.middleContext.fillRect(0, 0, document.documentElement.clientWidth * 3, (document.documentElement.clientHeight - 100) * 3);
+        this.smallContext.fillStyle = 'white';
+        this.smallContext.fillRect(0, 0, document.documentElement.clientWidth * 3, (document.documentElement.clientHeight - 100) * 3);
         const generated = this.generator.generate(minX, maxX, minY, maxY);
         fillTiling(generated);
         for (const vertex of Object.values(generated.vertexes)) {
-            drawVertexPoint(this.one, vertex, this.middleContext, (p => this.convertUnitsToPx(p)));
+            drawVertexPoint(this.one, vertex, this.smallContext, (p => this.convertUnitsToPx(p)));
         }
         return generated;
     }
@@ -121,12 +121,12 @@ export class CanvasManager {
         this.pxWidth = newWidth;
         this.pxHeight = newHeight;
         
-        this.middleCanvas.width = newWidth * 3;
-        this.middleCanvas.style.width = this.middleCanvas.width + 'px';
-        this.middleCanvas.height = newHeight * 3;
-        this.middleCanvas.style.height = this.middleCanvas.height + 'px';
-        this.middleCanvas.style.top = (-newHeight) + 'px';
-        this.middleCanvas.style.left = (-newWidth) + 'px';
+        this.smallCanvas.width = newWidth * 3;
+        this.smallCanvas.style.width = this.smallCanvas.width + 'px';
+        this.smallCanvas.height = newHeight * 3;
+        this.smallCanvas.style.height = this.smallCanvas.height + 'px';
+        this.smallCanvas.style.top = (-newHeight) + 'px';
+        this.smallCanvas.style.left = (-newWidth) + 'px';
         
         this.draw();
         
@@ -164,7 +164,7 @@ export class CanvasManager {
     }
 
     private moveToBig(): void {
-        const imageData = this.middleContext.getImageData(this.pxWidth, this.pxHeight, this.pxWidth, this.pxHeight);
+        const imageData = this.smallContext.getImageData(this.pxWidth, this.pxHeight, this.pxWidth, this.pxHeight);
         this.bigContext.putImageData(imageData, this.smallPositionOnBigPx.x, this.smallPositionOnBigPx.y);
     }
 
