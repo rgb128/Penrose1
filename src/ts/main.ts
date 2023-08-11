@@ -4,8 +4,6 @@ import { PenroseTiligGenerator, fillTiling } from './penrose';
 import { Point } from './point';
 import {getSeed, Random} from "./random";
 
-// const smallCanvas = document.getElementById('small') as HTMLCanvasElement;
-// const smallContext = smallCanvas.getContext('2d', { willReadFrequently: true });
 const bigCanvas = document.getElementById('big') as HTMLCanvasElement;
 const bigContext = bigCanvas.getContext('2d',{ willReadFrequently: true });
 const middleCanvas = document.getElementById('middle') as HTMLCanvasElement;
@@ -27,19 +25,8 @@ const canvasManager = new CanvasManager(
     50,
     document.documentElement.clientWidth,
     document.documentElement.clientHeight - 100,
-    // smallCanvas,
     middleCanvas,
     bigCanvas,
-    // (one, minX, maxX, minY, maxY, converter) => {
-    //     smallContext.fillStyle = 'white';
-    //     smallContext.fillRect(0, 0, document.documentElement.clientWidth, document.documentElement.clientHeight - 100);
-    //     const generated = generator.generate(minX, maxX, minY, maxY);
-    //     fillTiling(generated);
-    //     for (const vertex of Object.values(generated.vertexes)) {
-    //         drawVertexPoint(one, vertex, smallContext, converter);
-    //     }
-    //     return generated;
-    // },
     (one, minX, maxX, minY, maxY, converter) => {
         middleContext.fillStyle = 'white';
         middleContext.fillRect(0, 0, document.documentElement.clientWidth * 3, (document.documentElement.clientHeight - 100) * 3);
@@ -124,10 +111,6 @@ middleCanvas.onmousemove = async e => {
     middleCanvasPosition.y += y;
     middleCanvas.style.top = middleCanvasPosition.top + 'px';
     middleCanvas.style.left = middleCanvasPosition.left + 'px';
-    
-    (async () => {
-        // canvasManager.move(new Point(x, y));
-    })();
 }
 
 middleCanvas.onmouseup = async e => {
@@ -160,7 +143,6 @@ async function imageDataToBlob(imageData: ImageData): Promise<Blob> {
     canvas.height = h;
     const ctx = canvas.getContext('2d');
     ctx.putImageData(imageData, 0, 0);
-    // drawText(ctx);
   
     return new Promise((resolve) => {
         canvas.toBlob(resolve); // implied image/png format
@@ -188,15 +170,9 @@ async function copyCanvas(context: CanvasRenderingContext2D, width: number, heig
 
 //todo draw 'RGB128 text': https://github.com/rgb128/plus/blob/master/js/helpers.js#L82
 
-// document.getElementById('copySmall').onclick = async e => {
-//     await copyCanvas(middleContext, canvasManager.getWidth(), canvasManager.getHeight(), document.getElementById('copySmall'), canvasManager.getWidth(), canvasManager.getHeight());
-// }
 document.getElementById('copyBig').onclick = async e => {
     await copyCanvas(bigContext, canvasManager.getBigWidth(), canvasManager.getBigHeight(), document.getElementById('copyBig'));
 }
-// document.getElementById('downloadSmall').onclick = e => {
-//     downloadCanvas(smallCanvas);
-// }
 document.getElementById('downloadBig').onclick = e => {
     downloadCanvas(bigCanvas);
 }

@@ -7,7 +7,6 @@ export class CanvasManager {
 
     private readonly bigContext: CanvasRenderingContext2D;
     private readonly middleContext: CanvasRenderingContext2D;
-    // private readonly smallContext: CanvasRenderingContext2D;
 
     private bigWidthPx: number;
     private bigHeightPx: number;
@@ -22,21 +21,13 @@ export class CanvasManager {
         private one: number,
         private pxWidth: number,
         private pxHeight: number,
-        // private readonly smallCanvas: HTMLCanvasElement,
         private readonly middleCanvas: HTMLCanvasElement,
         private readonly bigCanvas: HTMLCanvasElement,
-        // private readonly redraw: (one: number, minX: number, maxX: number, minY: number, maxY: number, converter: (p: Point) => Point) => PenroseTiling,
-        private readonly redrawMiddle: (one: number, minX: number, maxX: number, minY: number, maxY: number, converter: (p: Point) => Point) => PenroseTiling,
+        private readonly redraw: (one: number, minX: number, maxX: number, minY: number, maxY: number, converter: (p: Point) => Point) => PenroseTiling,
         private centerUnits = new Point(0, 0),
     ) {
-        // smallCanvas.width = this.pxWidth;
-        // smallCanvas.height = this.pxHeight;
-        // this.smallCanvas.style.width = this.smallCanvas.width + 'px';
-        // this.smallCanvas.style.height = this.smallCanvas.height + 'px';
-
         this.bigContext =    this.bigCanvas.getContext('2d', { willReadFrequently: true });
         this.middleContext = this.middleCanvas.getContext('2d', { willReadFrequently: true });
-        // this.smallContext =  this.smallCanvas.getContext('2d', { willReadFrequently: true });
 
         this.bigWidthPx = this.pxWidth;
         this.bigHeightPx = this.pxHeight;
@@ -53,8 +44,7 @@ export class CanvasManager {
 
         this.smallPositionOnBigPx = new Point(0, 0);
 
-        this.drawMiddle();
-        // this.draw();
+        this.draw();
         this.moveToBig();
     }
 
@@ -123,10 +113,10 @@ export class CanvasManager {
         return this.tiling;
     }
 
-    public drawMiddle(): void {
+    public draw(): void {
         const halfWidthUnits = this.pxWidth / this.one / 2;
         const halfHeightUnits = this.pxHeight / this.one / 2;
-        this.tiling = this.redrawMiddle(
+        this.tiling = this.redraw(
             this.one,
             this.centerUnits.x - halfWidthUnits * 6,
             this.centerUnits.x + halfWidthUnits * 6,
@@ -134,32 +124,14 @@ export class CanvasManager {
             this.centerUnits.y + halfHeightUnits * 6,
             p => { return this.convertUnitsToPxForMiddle(p); },
         );
-        // this.moveToBig();
     }
-    // private draw(): void {
-    //     const halfWidthUnits = this.pxWidth / this.one / 2;
-    //     const halfHeightUnits = this.pxHeight / this.one / 2;
-    //     this.tiling = this.redraw(
-    //         this.one,
-    //         this.centerUnits.x - halfWidthUnits,
-    //         this.centerUnits.x + halfWidthUnits,
-    //         this.centerUnits.y - halfHeightUnits,
-    //         this.centerUnits.y + halfHeightUnits,
-    //         p => { return this.convertUnitsToPx(p); },
-    //     );
-    //     // this.moveToBig();
-    // }
+
 
     public resize(newWidth, newHeight): void {
         this.smallPositionOnBigPx.x -= (newWidth - this.pxWidth) / 2;
         this.smallPositionOnBigPx.y -= (newHeight - this.pxHeight) / 2;
         this.pxWidth = newWidth;
         this.pxHeight = newHeight;
-        
-        // this.smallCanvas.width = newWidth;
-        // this.smallCanvas.style.width = this.smallCanvas.width + 'px';
-        // this.smallCanvas.height = newHeight;
-        // this.smallCanvas.style.height = this.smallCanvas.height + 'px';
         
         this.middleCanvas.width = newWidth * 3;
         this.middleCanvas.style.width = this.middleCanvas.width + 'px';
@@ -168,10 +140,9 @@ export class CanvasManager {
         this.middleCanvas.style.top = (-newHeight) + 'px';
         this.middleCanvas.style.left = (-newWidth) + 'px';
         
-        this.drawMiddle();
+        this.draw();
         
         (async () => {
-            // this.draw();
             this.checkBigSize();
             this.moveToBig();
         })();
@@ -180,8 +151,7 @@ export class CanvasManager {
     public changeOne(newOne: number): void {
         this.one = newOne;
 
-        // this.draw();
-        this.drawMiddle();
+        this.draw();
         
         (async () => {
             this.moveToBig();
@@ -197,8 +167,7 @@ export class CanvasManager {
         this.smallPositionOnBigPx.x += vector.x;
         this.smallPositionOnBigPx.y += vector.y;
 
-        // this.draw();
-        this.drawMiddle();
+        this.draw();
 
         (async () => {
             this.checkBigSize();
@@ -207,7 +176,6 @@ export class CanvasManager {
     }
 
     private moveToBig(): void {
-        // const imageData = this.smallContext.getImageData(0, 0, this.pxWidth, this.pxHeight);
         const imageData = this.middleContext.getImageData(this.pxWidth, this.pxHeight, this.pxWidth, this.pxHeight);
         this.bigContext.putImageData(imageData, this.smallPositionOnBigPx.x, this.smallPositionOnBigPx.y);
     }
