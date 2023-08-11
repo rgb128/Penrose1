@@ -135,36 +135,16 @@ export class PenroseTiligGenerator {
         const line1Number = this.findSectionOnLineFamily(line1Family, (minX + maxX) / 2, (minY + maxY) / 2);
         const line2Number = this.findSectionOnLineFamily(line2Family, (minX + maxX) / 2, (minY + maxY) / 2);
         const points: PenroseIntersectionPoint[] = [];
-    
-        // const goFromPoint = (l1N: number, l2N: number) => {
-        //     if (points.find(a => a.line1Number === l1N && a.line2Number === l2N)) return;
-        //     const point = this.getIntersectionPoint(line1Family, l1N, line2Family, l2N);
-        //     if (point.x < minX || point.x > maxX || point.y < minY || point.y > maxY) return;
-        //     points.push(new PenroseIntersectionPoint(
-        //         point.x,
-        //         point.y,
-        //         line1Family,
-        //         line2Family,
-        //         l1N,
-        //         l2N,
-        //     ));
-        //     goFromPoint(l1N - 1, l2N);
-        //     goFromPoint(l1N + 1, l2N);
-        //     goFromPoint(l1N, l2N - 1);
-        //     goFromPoint(l1N, l2N + 1);
-        // }
         
         const pointsToGo: { l1N: number, l2N: number }[] = [];
     
         const max = 1;
         for (let i = -max; i <= max; i++) {
             for (let j = -max; j <= max; j++) {
-                // goFromPoint(line1Number + i, line2Number + j);
                 pointsToGo.push({ l1N: line1Number + i, l2N: line2Number + j });
             }
         }
         
-        // console.log(pointsToGo);
         while (pointsToGo.length) {
             const { l1N, l2N } = pointsToGo.pop();
 
