@@ -146,6 +146,7 @@ export class CanvasManager {
         })();
     }
 
+    /** Accepts pixels */
     public move(vector: Point): void {
         const x = vector.x / this.one;
         const y = vector.y / this.one;

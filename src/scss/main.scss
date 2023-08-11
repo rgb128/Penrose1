@@ -30,14 +30,15 @@ canvas#big {
     height: calc(100vh - 100px);
     display: block;
     float: left;
-    overflow: hidden;
+    overflow: scroll;
     position: relative;
+    cursor: grab;
     
     > canvas#small {
-        position: absolute;
+        //position: absolute;
         width: 300%;
         height: calc((100vh - 100px) * 3);
-        top: calc(100px - 100vh);
-        left: -100%;
+        //top: calc(100px - 100vh);
+        //left: -100%;
     }
 }
