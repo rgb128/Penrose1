@@ -2,7 +2,7 @@ import { CanvasManager } from './canvasMamager';
 import { drawVertexPoint } from './drawer';
 import { PenroseTiligGenerator, fillTiling } from './penrose';
 import { Point } from './point';
-import {getSeed, Random} from "./random";
+import {generateShifts, getSeed, Random} from "./random";
 
 const bigCanvas = document.getElementById('big') as HTMLCanvasElement;
 const bigContext = bigCanvas.getContext('2d',{ willReadFrequently: true });
@@ -16,33 +16,21 @@ const middleCanvasPosition = {
 };
 
 const seed = await getSeed();
-const random = new Random(seed);
+// const random = new Random(seed); // Prod
+const random = new Random(Date.now()); // Dev
 
-const generator = new PenroseTiligGenerator(50);
+const shifts = generateShifts(random);
+const generator = new PenroseTiligGenerator(shifts);
 
 const canvasManager = new CanvasManager(
     random,
+    generator,
     50,
     document.documentElement.clientWidth,
     document.documentElement.clientHeight - 100,
     middleCanvas,
     bigCanvas,
-    (one, minX, maxX, minY, maxY, converter) => {
-        middleContext.fillStyle = 'white';
-        middleContext.fillRect(0, 0, document.documentElement.clientWidth * 3, (document.documentElement.clientHeight - 100) * 3);
-        const generated = generator.generate(minX, maxX, minY, maxY);
-        fillTiling(generated);
-        for (const vertex of Object.values(generated.vertexes)) {
-            drawVertexPoint(one, vertex, middleContext, converter);
-        }
-        return generated;
-    },
 );
-
-// document.getElementById('oneInput').oninput = e => {
-//     const value = +(document.getElementById('oneInput') as HTMLInputElement).value;
-//     canvasManager.changeOne(value);
-// }
 
 window.onresize = e => {
     canvasManager.resize(document.documentElement.clientWidth, document.documentElement.clientHeight - 100);

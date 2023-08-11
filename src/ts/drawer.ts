@@ -8,16 +8,14 @@ const THIN_BIG_HALF_DIAGONAL = Math.cos(Math.PI / 10);
 const THIN_SMALL_HALF_DIAGONAL = Math.sin(Math.PI / 10);
 const THICK_BIG_HALF_DIAGONAL = Math.cos(Math.PI / 5);
 const THICK_SMALL_HALF_DIAGONAL = Math.sin(Math.PI / 5);
-// const THIN_FILL = '#f55';
-// const THICK_FILL = '#55f';
-const THIN_FILL = '#4d3611';
-const THICK_FILL = '#ffbff5';
-const CIRCLE_WIDTH = 5;
-const SMALL_CIRCLE_COLOR = 'white';
-const BIG_CIRCLE_COLOR = 'white';
-const BORDER_COLOR = 'rgba(0, 0, 0, 0)';
+const THIN_FILL = '#d9d8ff';
+const THICK_FILL = '#ffdbdb';
+const CIRCLE_WIDTH_MULT = .075; // one * CIRCLE_WIDTH_MULT
+const SMALL_CIRCLE_COLOR = '#6d6dff';
+const BIG_CIRCLE_COLOR = '#ff7171';
+const BORDER_COLOR = 'rgba(0, 0, 0, 1)';
 const BORDER_WIDTH = 1;
-const CIRCLE_MULTIPLIER = .25;
+const CIRCLE_MULTIPLIER = .2;
 
 /**
  * Draws all 3 rhombuses
@@ -71,14 +69,14 @@ function drawKite(
         
         // Top arc ('small')
         ctx.strokeStyle = SMALL_CIRCLE_COLOR;
-        ctx.lineWidth = CIRCLE_WIDTH;
+        ctx.lineWidth = one * CIRCLE_WIDTH_MULT;
         ctx.beginPath();
         ctx.arc(realTop.x, realTop.y, one * CIRCLE_MULTIPLIER, angle + Math.PI / 10, angle + Math.PI - Math.PI / 10, false);
         ctx.stroke();
 
         // Bottom arc ('big')
         ctx.strokeStyle = BIG_CIRCLE_COLOR;
-        ctx.lineWidth = CIRCLE_WIDTH;
+        ctx.lineWidth = one * CIRCLE_WIDTH_MULT;
         ctx.beginPath();
         ctx.arc(realCenter.x, realCenter.y, one * CIRCLE_MULTIPLIER, angle - Math.PI / 10, angle - Math.PI + Math.PI / 10, true);
         ctx.stroke();
@@ -100,14 +98,14 @@ function drawKite(
 
         // Top arc ('big')
         ctx.strokeStyle = BIG_CIRCLE_COLOR;
-        ctx.lineWidth = CIRCLE_WIDTH;
+        ctx.lineWidth = one * CIRCLE_WIDTH_MULT;
         ctx.beginPath();
         ctx.arc(realLeftTop.x, realLeftTop.y, one * (1 - CIRCLE_MULTIPLIER), angle + Math.PI / 10, angle + Math.PI / 2, false);
         ctx.stroke();
 
         // Bottom arc ('small')
         ctx.strokeStyle = SMALL_CIRCLE_COLOR;
-        ctx.lineWidth = CIRCLE_WIDTH;
+        ctx.lineWidth = one * CIRCLE_WIDTH_MULT;
         ctx.beginPath();
         ctx.arc(realBottom.x, realBottom.y, one * CIRCLE_MULTIPLIER, angle - Math.PI / 2, angle - Math.PI / 2 - Math.PI / 5 * 2, true);
         ctx.stroke();
@@ -130,14 +128,14 @@ function drawKite(
 
         // Top arc ('big')
         ctx.strokeStyle = BIG_CIRCLE_COLOR;
-        ctx.lineWidth = CIRCLE_WIDTH;
+        ctx.lineWidth = one * CIRCLE_WIDTH_MULT;
         ctx.beginPath();
         ctx.arc(realRightTop.x, realRightTop.y, one * (1 - CIRCLE_MULTIPLIER), angle + Math.PI / 2, angle + Math.PI / 2 + Math.PI / 5 * 2, false);
         ctx.stroke();
 
         // Bottom arc ('small')
         ctx.strokeStyle = SMALL_CIRCLE_COLOR;
-        ctx.lineWidth = CIRCLE_WIDTH;
+        ctx.lineWidth = one * CIRCLE_WIDTH_MULT;
         ctx.beginPath();
         ctx.arc(realBottom.x, realBottom.y, one * CIRCLE_MULTIPLIER, angle - Math.PI / 2, angle - Math.PI / 10, false);
         ctx.stroke();
@@ -193,14 +191,14 @@ function drawDeuce(
 
         // Top arc ('big')
         ctx.strokeStyle = BIG_CIRCLE_COLOR;
-        ctx.lineWidth = CIRCLE_WIDTH;
+        ctx.lineWidth = one * CIRCLE_WIDTH_MULT;
         ctx.beginPath();
         ctx.arc(realTop.x, realTop.y, one * (1 - CIRCLE_MULTIPLIER), angle + Math.PI / 2 - Math.PI / 5, angle + Math.PI / 2 + Math.PI / 5, false);
         ctx.stroke();
 
         // Bottom arc ('small')
         ctx.strokeStyle = SMALL_CIRCLE_COLOR;
-        ctx.lineWidth = CIRCLE_WIDTH;
+        ctx.lineWidth = one * CIRCLE_WIDTH_MULT;
         ctx.beginPath();
         ctx.arc(realCenter.x, realCenter.y, one * CIRCLE_MULTIPLIER, angle - Math.PI / 2 + Math.PI / 5, angle - Math.PI / 2 - Math.PI / 5, true);
         ctx.stroke();

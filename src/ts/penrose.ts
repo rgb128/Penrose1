@@ -2,7 +2,6 @@ import { Point } from './point';
 import { mathSum, lengthOfLineSegment, HashTable, map } from './helpers';
 
 const LINES_DISTANCE = 2.5;
-const SHIFT_MULTIPLIER = 1;
 const FILL_STOCK = 5;
 
 export class PenroseTiling {
@@ -72,14 +71,10 @@ export class PenroseRhombus {
 
 export class PenroseTiligGenerator {
 
-    public readonly shifts: number[];
 
     constructor(
-        public readonly one = 50,
-        shifts: number[] = null,
-    ) {
-        this.shifts = shifts || this.generateShifts();
-    }
+        public readonly shifts: number[],
+    ) { }
 
     public generate(
         minX: number, 
@@ -107,18 +102,6 @@ export class PenroseTiligGenerator {
         //     `generateRhombusFromPoint: ${(Math.round((rhombusesPointsGot - intersectionPointsGot) * 1000) / 1000)}ms, `);
         
         return new PenroseTiling(vertexes, rhombuses)
-    }
-
-    private generateShifts(count = 5): number[] {
-        const res = [ 0 ];
-        let sum = 0;
-        for (let i = 0; i < count - 2; i++) {
-            const s = map(Math.random(), 0, 1, -SHIFT_MULTIPLIER, SHIFT_MULTIPLIER);
-            sum += s;
-            res.push(s);
-        }
-        res.push(-sum);
-        return res;
     }
     
     private getIntersectionPoint(

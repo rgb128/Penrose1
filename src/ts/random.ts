@@ -1,3 +1,5 @@
+// import { map } from "./helpers";
+// const SHIFT_MULTIPLIER = 1;
 
 export class Random {
     private seed: number;
@@ -75,4 +77,17 @@ export async function getSeed(): Promise<number> {
     localStorage[SEED_KEY] = seed;
     
     return seed;
+}
+
+export function generateShifts(random: Random, count = 5): number[] {
+    const res = [ 0 ];
+    let sum = 0;
+    for (let i = 0; i < count - 2; i++) {
+        // const s = map(Math.random(), 0, 1, -SHIFT_MULTIPLIER, SHIFT_MULTIPLIER);
+        const s = random.nextInRange(-1, 1);
+        sum += s;
+        res.push(s);
+    }
+    res.push(-sum);
+    return res;
 }

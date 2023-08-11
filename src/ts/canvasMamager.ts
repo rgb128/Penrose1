@@ -1,7 +1,8 @@
 import { Point} from './point';
 import { map } from './helpers';
-import { PenroseTiling } from './penrose';
+import {fillTiling, PenroseTiligGenerator, PenroseTiling} from './penrose';
 import { Random } from "./random";
+import {drawVertexPoint} from "./drawer";
 
 export class CanvasManager {
 
@@ -18,20 +19,20 @@ export class CanvasManager {
      */
     constructor(
         private readonly random: Random,
+        private readonly generator: PenroseTiligGenerator,
         private one: number,
         private pxWidth: number,
         private pxHeight: number,
         private readonly middleCanvas: HTMLCanvasElement,
         private readonly bigCanvas: HTMLCanvasElement,
-        private readonly redraw: (one: number, minX: number, maxX: number, minY: number, maxY: number, converter: (p: Point) => Point) => PenroseTiling,
         private centerUnits = new Point(0, 0),
     ) {
-        this.bigContext =    this.bigCanvas.getContext('2d', { willReadFrequently: true });
-        this.middleContext = this.middleCanvas.getContext('2d', { willReadFrequently: true });
+        this.bigContext = this.bigCanvas.getContext('2d', {willReadFrequently: true});
+        this.middleContext = this.middleCanvas.getContext('2d', {willReadFrequently: true});
 
         this.bigWidthPx = this.pxWidth;
         this.bigHeightPx = this.pxHeight;
-        
+
         bigCanvas.width = this.pxWidth;
         bigCanvas.height = this.pxHeight;
         this.bigCanvas.style.width = this.bigCanvas.width + 'px';
@@ -47,29 +48,7 @@ export class CanvasManager {
         this.draw();
         this.moveToBig();
     }
-
     public convertUnitsToPx(point: Point): Point {
-        const halfWidthUnits = this.pxWidth / this.one / 2;
-        const halfHeightUnits = this.pxHeight / this.one / 2;
-
-        const x = map(
-            point.x, 
-            this.centerUnits.x - halfWidthUnits, 
-            this.centerUnits.x + halfWidthUnits,
-            0,
-            this.pxWidth
-        );
-        const y = map(
-            point.y, 
-            this.centerUnits.y - halfHeightUnits, 
-            this.centerUnits.y + halfHeightUnits,
-            0,
-            this.pxHeight
-        );
-
-        return new Point(x, y);
-    }
-    public convertUnitsToPxForMiddle(point: Point): Point {
         const halfWidthUnits = this.pxWidth / this.one / 2;
         const halfHeightUnits = this.pxHeight / this.one / 2;
 
@@ -112,17 +91,26 @@ export class CanvasManager {
     public getTiling(): PenroseTiling {
         return this.tiling;
     }
+    
+    private drawToCanvas(minX: number, maxX: number, minY: number, maxY: number) {
+        this.middleContext.fillStyle = 'white';
+        this.middleContext.fillRect(0, 0, document.documentElement.clientWidth * 3, (document.documentElement.clientHeight - 100) * 3);
+        const generated = this.generator.generate(minX, maxX, minY, maxY);
+        fillTiling(generated);
+        for (const vertex of Object.values(generated.vertexes)) {
+            drawVertexPoint(this.one, vertex, this.middleContext, (p => this.convertUnitsToPx(p)));
+        }
+        return generated;
+    }
 
     public draw(): void {
         const halfWidthUnits = this.pxWidth / this.one / 2;
         const halfHeightUnits = this.pxHeight / this.one / 2;
-        this.tiling = this.redraw(
-            this.one,
+        this.tiling = this.drawToCanvas(
             this.centerUnits.x - halfWidthUnits * 6,
             this.centerUnits.x + halfWidthUnits * 6,
             this.centerUnits.y - halfHeightUnits * 6,
             this.centerUnits.y + halfHeightUnits * 6,
-            p => { return this.convertUnitsToPxForMiddle(p); },
         );
     }
 
