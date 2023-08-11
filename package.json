@@ -13,6 +13,7 @@
         "homepage": "http://rgb128.github.io/Penrose1"
     },
     "devDependencies": {
+        "copy-webpack-plugin": "^11.0.0",
         "css-loader": "^6.5.1",
         "gh-pages": "^6.0.0",
         "html-webpack-plugin": "^5.5.0",

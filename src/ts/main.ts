@@ -4,6 +4,7 @@ import { Point } from './point';
 import { generateShifts, getSeed, Random } from "./random";
 import { copyCanvas, copySmallCanvas, downloadCanvas, downloadSmallCanvas } from "./downloader";
 import {TILING_COLORS} from "./colors";
+import {setFavicon} from "./favicon";
 
 const bigCanvas = document.getElementById('big') as HTMLCanvasElement;
 const bigContext = bigCanvas.getContext('2d',{ willReadFrequently: true });
@@ -19,7 +20,10 @@ const darkMode = !!(window.matchMedia && window.matchMedia('(prefers-color-schem
 
 const seed = await getSeed();
 // const random = new Random(seed); // Prod
-const random = new Random(Date.now()); // Dev
+// const random = new Random(Date.now()); // Dev
+const random = new Random(420); // Dev
+
+setFavicon(random);
 
 const shifts = generateShifts(random);
 // const colorTheme = random.nextArrayValue(TILING_COLORS)[darkMode ? 'dark' : 'light'];
