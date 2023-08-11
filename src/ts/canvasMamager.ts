@@ -1,8 +1,9 @@
 import { Point} from './point';
 import { map } from './helpers';
 import { PenroseTiling } from './penrose';
+import { Random } from "./random";
 
-export class CanvasnManager {
+export class CanvasManager {
 
     private readonly bigContext: CanvasRenderingContext2D;
     private readonly middleContext: CanvasRenderingContext2D;
@@ -17,6 +18,7 @@ export class CanvasnManager {
      * @param centerUnits Center of screen in units (Small center units)
      */
     constructor(
+        private readonly random: Random,
         private one: number,
         private pxWidth: number,
         private pxHeight: number,

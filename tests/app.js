@@ -115,3 +115,29 @@ for(const canvas of document.querySelectorAll('canvas')) {
 
 
 
+class Random {
+    seed;
+
+    constructor(seed = 420) {
+        this.seed = seed;
+    }
+
+    _random() {
+        const x = Math.sin(this.seed++) * 10000;
+        return x - Math.floor(x);
+    }
+
+    next() {
+        return this._random();
+    }
+
+    nextInRange(a, b) {
+        if (a >= b) {
+            throw new Error('Invalid range: a must be less than b');
+        }
+        return a + (this._random() * (b - a));
+    }
+}
+
+
+let rnd = new Random();

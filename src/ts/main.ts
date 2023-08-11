@@ -1,7 +1,8 @@
-import { CanvasnManager } from './canvasMamager';
+import { CanvasManager } from './canvasMamager';
 import { drawVertexPoint } from './drawer';
 import { PenroseTiligGenerator, fillTiling } from './penrose';
 import { Point } from './point';
+import {getSeed, Random} from "./random";
 
 const smallCanvas = document.getElementById('small') as HTMLCanvasElement;
 const smallContext = smallCanvas.getContext('2d', { willReadFrequently: true });
@@ -16,9 +17,13 @@ const middleCanvasPosition = {
     y: 0,
 };
 
+const seed = await getSeed();
+const random = new Random(seed);
+
 const generator = new PenroseTiligGenerator(50);
 
-const canvasManager = new CanvasnManager(
+const canvasManager = new CanvasManager(
+    random,
     50,
     document.documentElement.clientWidth,
     document.documentElement.clientHeight - 100,
