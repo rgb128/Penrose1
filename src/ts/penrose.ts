@@ -6,7 +6,7 @@ const FILL_STOCK = 5;
 
 export class PenroseTiling {
     constructor(
-        public readonly vertexes: HashTable<PenroseVertexPoint>,
+        public readonly vertices: HashTable<PenroseVertexPoint>,
         public readonly rhombuses: PenroseRhombus[],
     ) { }
 }
@@ -91,8 +91,8 @@ export class PenroseTiligGenerator {
         );
         const intersectionPointsGot = window.performance.now();
 
-        const vertexes: HashTable<PenroseVertexPoint> = {};
-        const rhombuses = intersectionPoints.map(p => this.generateRhombusFromPoint(p, vertexes));
+        const vertices: HashTable<PenroseVertexPoint> = {};
+        const rhombuses = intersectionPoints.map(p => this.generateRhombusFromPoint(p, vertices));
 
         const rhombusesPointsGot = window.performance.now();
 
@@ -101,7 +101,7 @@ export class PenroseTiligGenerator {
         //     `getAllIntersectionPoints: ${(Math.round((intersectionPointsGot - generateStart) * 1000) / 1000)}ms, ` +
         //     `generateRhombusFromPoint: ${(Math.round((rhombusesPointsGot - intersectionPointsGot) * 1000) / 1000)}ms, `);
         
-        return new PenroseTiling(vertexes, rhombuses)
+        return new PenroseTiling(vertices, rhombuses)
     }
     
     private getIntersectionPoint(
@@ -190,7 +190,7 @@ export class PenroseTiligGenerator {
 
     private generateRhombusFromPoint(
         point: PenroseIntersectionPoint, 
-        vertexes: HashTable<PenroseVertexPoint>,
+        vertices: HashTable<PenroseVertexPoint>,
     ): PenroseRhombus {
         const defaultK = [0, 1, 2, 3, 4].map(a => this.findSectionOnLineFamily(a, point.x, point.y));
         
@@ -209,19 +209,19 @@ export class PenroseTiligGenerator {
         k3[point.line2Family] = point.line2Number;
         k4[point.line2Family] = point.line2Number - 1;
 
-        const current_vertexes = [
+        const current_vertices = [
             new PenroseVertexPoint(k1),
             new PenroseVertexPoint(k2),
             new PenroseVertexPoint(k3),
             new PenroseVertexPoint(k4),
         ];
 
-        const rhombus = new PenroseRhombus(current_vertexes, point);
+        const rhombus = new PenroseRhombus(current_vertices, point);
 
-        for (const current_vertex of current_vertexes) {
-            let existing = vertexes[current_vertex.hash];
+        for (const current_vertex of current_vertices) {
+            let existing = vertices[current_vertex.hash];
             if (!existing) {
-                vertexes[current_vertex.hash] = current_vertex;
+                vertices[current_vertex.hash] = current_vertex;
                 existing = current_vertex;
             }
             existing.rhombuses.push(rhombus);
@@ -260,7 +260,7 @@ export function fillTiling(tiling: PenroseTiling): void {
         return 'uncomplete';
     }
 
-    for (const vertex of Object.values(tiling.vertexes)) {
+    for (const vertex of Object.values(tiling.vertices)) {
         const thinCount = vertex.rhombuses.filter(x => x.isThin).length;
         const thickCount = vertex.rhombuses.length - thinCount;
         vertex.type = getType(thinCount, thickCount);

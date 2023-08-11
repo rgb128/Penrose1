@@ -1,5 +1,6 @@
 {
     "name": "penrose1",
+    "author": "Creative association Grayness (rgb128)",
     "version": "1.0.0",
     "scripts": {
         "build": "webpack --mode production",

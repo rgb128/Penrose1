@@ -22,7 +22,8 @@ const seed = await getSeed();
 const random = new Random(Date.now()); // Dev
 
 const shifts = generateShifts(random);
-const colorTheme = random.nextArrayValue(TILING_COLORS)[darkMode ? 'dark' : 'light'];
+// const colorTheme = random.nextArrayValue(TILING_COLORS)[darkMode ? 'dark' : 'light'];
+const colorTheme = TILING_COLORS[0]['dark'];
 const generator = new PenroseTiligGenerator(shifts);
 
 const canvasManager = new CanvasManager(

@@ -77,7 +77,7 @@ export class CanvasManager {
         this.smallContext.fillRect(0, 0, document.documentElement.clientWidth * 3, (document.documentElement.clientHeight - 100) * 3);
         const generated = this.generator.generate(minX, maxX, minY, maxY);
         fillTiling(generated);
-        for (const vertex of Object.values(generated.vertexes)) {
+        for (const vertex of Object.values(generated.vertices)) {
             drawVertexPoint(this.one, vertex, this.smallContext, (p => this.convertUnitsToPx(p)), this.colorTheme);
         }
         return generated;
