@@ -1,0 +1,1 @@
+*{margin:0px;padding:0px;box-sizing:border-box}canvas#big{display:none}#text{text-align:justify}#smallContainer{width:100%;height:calc(100vh - 100px);display:block;float:left;overflow:hidden;position:relative}#smallContainer>canvas#small{position:absolute;width:300%;height:calc((100vh - 100px)*3);top:calc(100px - 100vh);left:-100%}
