@@ -1,7 +1,6 @@
-import { PenroseRhombus, PenroseIntersectionPoint, PenroseVertexPoint } from "./penrose";
+import { PenroseVertexPoint } from "./penrose";
 import { Point } from './point';
-import {HashTable, lengthOfLineSegment, rotateVector, rotateVectorBySinAngCos} from "./helpers";
-
+import { rotateVector } from "./helpers";
 
 
 const THIN_BIG_HALF_DIAGONAL = Math.cos(Math.PI / 10);

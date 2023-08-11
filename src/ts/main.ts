@@ -1,8 +1,8 @@
 import { CanvasManager } from './canvasMamager';
-import { drawVertexPoint } from './drawer';
-import { PenroseTiligGenerator, fillTiling } from './penrose';
+import { PenroseTiligGenerator } from './penrose';
 import { Point } from './point';
-import {generateShifts, getSeed, Random} from "./random";
+import { generateShifts, getSeed, Random } from "./random";
+import {copyCanvas, copySmallCanvas, downloadCanvas, downloadSmallCanvas} from "./downloader";
 
 const bigCanvas = document.getElementById('big') as HTMLCanvasElement;
 const bigContext = bigCanvas.getContext('2d',{ willReadFrequently: true });
@@ -111,57 +111,39 @@ middleCanvas.onmouseup = async e => {
     middleCanvas.style.left = middleCanvasPosition.left + 'px';
 }
 
-function downloadCanvas(canvas: HTMLCanvasElement, filename = 'penrose.png'): void {
-    const myImageDataUrl = canvas.toDataURL('image/png').replace('image/png', 'image/octet-stream');
-    const link = document.createElement('a');
-    link.style.display = 'none';
-    link.href = myImageDataUrl;
-    link.download = filename;
-
-    link.click();
-
-    link.remove();
-}
-
-async function imageDataToBlob(imageData: ImageData): Promise<Blob> {
-    const w = imageData.width;
-    const h = imageData.height;
-    const canvas = document.createElement('canvas');
-    canvas.width = w;
-    canvas.height = h;
-    const ctx = canvas.getContext('2d');
-    ctx.putImageData(imageData, 0, 0);
-  
-    return new Promise((resolve) => {
-        canvas.toBlob(resolve); // implied image/png format
-    });
-}
-async function copyCanvas(context: CanvasRenderingContext2D, width: number, height: number, button: HTMLElement, x = 0, y = 0) {
-    const innerText = button.innerText;
-    button.innerText = 'copying';
-    const blob = await imageDataToBlob(context.getImageData(0, 0, width, height));
-    try {
-        await navigator.clipboard.write([
-            new ClipboardItem({
-                'image/png': blob,
-            })
-        ]);
-        button.innerText = 'copied';
-    } catch (ex) {
-        console.error(ex);
-        button.innerText = 'failed';
-    }
-    setTimeout(() => {
-        button.innerText = innerText;
-    }, 2000);
- }
-
 //todo draw 'RGB128 text': https://github.com/rgb128/plus/blob/master/js/helpers.js#L82
 
 document.getElementById('copyBig').onclick = async e => {
-    await copyCanvas(bigContext, canvasManager.getBigWidth(), canvasManager.getBigHeight(), document.getElementById('copyBig'));
+    const copyBtn = document.getElementById('copyBig');
+    copyBtn.innerText = 'copying';
+    try {
+        await copyCanvas(bigCanvas, bigContext);
+        copyBtn.innerText = 'copied';
+    } catch (ex) {
+        console.error(ex);
+        copyBtn.innerText = 'failed';
+    }
+    setTimeout(() => {
+        copyBtn.innerText = 'copy big';
+    }, 2000);
+}
+document.getElementById('copySmall').onclick = async e => {
+    const copyBtn = document.getElementById('copySmall');
+    copyBtn.innerText = 'copying';
+    try {
+        await copySmallCanvas(middleCanvas, middleContext);
+        copyBtn.innerText = 'copied';
+    } catch (ex) {
+        console.error(ex);
+        copyBtn.innerText = 'failed';
+    }
+    setTimeout(() => {
+        copyBtn.innerText = 'copy small';
+    }, 2000);
 }
 document.getElementById('downloadBig').onclick = e => {
-    downloadCanvas(bigCanvas);
+    downloadCanvas(bigCanvas, bigContext);
 }
-
+document.getElementById('downloadSmall').onclick = e => {
+    downloadSmallCanvas(middleCanvas, middleContext);
+}
