@@ -1,18 +1,15 @@
 import { PenroseVertexPoint } from "./penrose";
 import { Point } from './point';
 import { rotateVector } from "./helpers";
+import {ColorTheme} from "./colors";
 
 
 const THIN_BIG_HALF_DIAGONAL = Math.cos(Math.PI / 10);
 const THIN_SMALL_HALF_DIAGONAL = Math.sin(Math.PI / 10);
 const THICK_BIG_HALF_DIAGONAL = Math.cos(Math.PI / 5);
 const THICK_SMALL_HALF_DIAGONAL = Math.sin(Math.PI / 5);
-const THIN_FILL = '#d9d8ff';
-const THICK_FILL = '#ffdbdb';
+
 const CIRCLE_WIDTH_MULT = .075; // one * CIRCLE_WIDTH_MULT
-const SMALL_CIRCLE_COLOR = '#6d6dff';
-const BIG_CIRCLE_COLOR = '#ff7171';
-const BORDER_COLOR = 'rgba(0, 0, 0, 1)';
 const BORDER_WIDTH = 1;
 const CIRCLE_MULTIPLIER = .2;
 
@@ -25,7 +22,8 @@ function drawKite(
     ctx: CanvasRenderingContext2D, 
     center: Point, 
     angle: number, 
-    pointConverter: (p: Point) => Point
+    pointConverter: (p: Point) => Point,
+    colorTheme: ColorTheme,
 ) {
 
     // angle = 0;
@@ -54,9 +52,9 @@ function drawKite(
     
     const drawThinRhombus = () => {
         // Rhombus itself
-        ctx.strokeStyle = BORDER_COLOR;
+        ctx.strokeStyle = colorTheme.border;
         ctx.lineWidth = BORDER_WIDTH;
-        ctx.fillStyle = THIN_FILL;
+        ctx.fillStyle = colorTheme.thin;
         ctx.beginPath();
         moveTo(realCenter);
         lineTo(realRightTop);
@@ -67,14 +65,14 @@ function drawKite(
         ctx.fill();
         
         // Top arc ('small')
-        ctx.strokeStyle = SMALL_CIRCLE_COLOR;
+        ctx.strokeStyle = colorTheme.smallCircle;
         ctx.lineWidth = one * CIRCLE_WIDTH_MULT;
         ctx.beginPath();
         ctx.arc(realTop.x, realTop.y, one * CIRCLE_MULTIPLIER, angle + Math.PI / 10, angle + Math.PI - Math.PI / 10, false);
         ctx.stroke();
 
         // Bottom arc ('big')
-        ctx.strokeStyle = BIG_CIRCLE_COLOR;
+        ctx.strokeStyle = colorTheme.bigCircle;
         ctx.lineWidth = one * CIRCLE_WIDTH_MULT;
         ctx.beginPath();
         ctx.arc(realCenter.x, realCenter.y, one * CIRCLE_MULTIPLIER, angle - Math.PI / 10, angle - Math.PI + Math.PI / 10, true);
@@ -84,9 +82,9 @@ function drawKite(
     const drawLeftThickRhombus = () => {
         // Rhombus itself
         ctx.beginPath();
-        ctx.strokeStyle = BORDER_COLOR;
+        ctx.strokeStyle = colorTheme.border;
         ctx.lineWidth = BORDER_WIDTH;
-        ctx.fillStyle = THICK_FILL;
+        ctx.fillStyle = colorTheme.thick;
         moveTo(realCenter);
         lineTo(realLeftTop);
         lineTo(realLeftBottom);
@@ -96,14 +94,14 @@ function drawKite(
         ctx.fill();
 
         // Top arc ('big')
-        ctx.strokeStyle = BIG_CIRCLE_COLOR;
+        ctx.strokeStyle = colorTheme.bigCircle;
         ctx.lineWidth = one * CIRCLE_WIDTH_MULT;
         ctx.beginPath();
         ctx.arc(realLeftTop.x, realLeftTop.y, one * (1 - CIRCLE_MULTIPLIER), angle + Math.PI / 10, angle + Math.PI / 2, false);
         ctx.stroke();
 
         // Bottom arc ('small')
-        ctx.strokeStyle = SMALL_CIRCLE_COLOR;
+        ctx.strokeStyle = colorTheme.smallCircle;
         ctx.lineWidth = one * CIRCLE_WIDTH_MULT;
         ctx.beginPath();
         ctx.arc(realBottom.x, realBottom.y, one * CIRCLE_MULTIPLIER, angle - Math.PI / 2, angle - Math.PI / 2 - Math.PI / 5 * 2, true);
@@ -114,9 +112,9 @@ function drawKite(
     const drawRightThickRhombus = () => {
         // Rhombus itself
         ctx.beginPath();
-        ctx.strokeStyle = BORDER_COLOR;
+        ctx.strokeStyle = colorTheme.border;
         ctx.lineWidth = BORDER_WIDTH;
-        ctx.fillStyle = THICK_FILL;
+        ctx.fillStyle = colorTheme.thick;
         moveTo(realCenter);
         lineTo(realRightTop);
         lineTo(realRightBottom);
@@ -126,14 +124,14 @@ function drawKite(
         ctx.fill();
 
         // Top arc ('big')
-        ctx.strokeStyle = BIG_CIRCLE_COLOR;
+        ctx.strokeStyle = colorTheme.bigCircle;
         ctx.lineWidth = one * CIRCLE_WIDTH_MULT;
         ctx.beginPath();
         ctx.arc(realRightTop.x, realRightTop.y, one * (1 - CIRCLE_MULTIPLIER), angle + Math.PI / 2, angle + Math.PI / 2 + Math.PI / 5 * 2, false);
         ctx.stroke();
 
         // Bottom arc ('small')
-        ctx.strokeStyle = SMALL_CIRCLE_COLOR;
+        ctx.strokeStyle = colorTheme.smallCircle;
         ctx.lineWidth = one * CIRCLE_WIDTH_MULT;
         ctx.beginPath();
         ctx.arc(realBottom.x, realBottom.y, one * CIRCLE_MULTIPLIER, angle - Math.PI / 2, angle - Math.PI / 10, false);
@@ -151,7 +149,8 @@ function drawDeuce(
     ctx: CanvasRenderingContext2D, 
     center: Point, 
     angle: number, 
-    pointConverter: (p: Point) => Point
+    pointConverter: (p: Point) => Point,
+    colorTheme: ColorTheme,
 ) {
 
     angle -= Math.PI / 2; // It's because we draw horizontally, but rhombs are calculated vertically
@@ -177,9 +176,9 @@ function drawDeuce(
     const drawThickRhombus = () => {
         // Rhombus itself
         ctx.beginPath();
-        ctx.strokeStyle = BORDER_COLOR;
+        ctx.strokeStyle = colorTheme.border;
         ctx.lineWidth = BORDER_WIDTH;
-        ctx.fillStyle = THICK_FILL;
+        ctx.fillStyle = colorTheme.thick;
         moveTo(realCenter);
         lineTo(realRight);
         lineTo(realTop);
@@ -189,14 +188,14 @@ function drawDeuce(
         ctx.fill();
 
         // Top arc ('big')
-        ctx.strokeStyle = BIG_CIRCLE_COLOR;
+        ctx.strokeStyle = colorTheme.bigCircle;
         ctx.lineWidth = one * CIRCLE_WIDTH_MULT;
         ctx.beginPath();
         ctx.arc(realTop.x, realTop.y, one * (1 - CIRCLE_MULTIPLIER), angle + Math.PI / 2 - Math.PI / 5, angle + Math.PI / 2 + Math.PI / 5, false);
         ctx.stroke();
 
         // Bottom arc ('small')
-        ctx.strokeStyle = SMALL_CIRCLE_COLOR;
+        ctx.strokeStyle = colorTheme.smallCircle;
         ctx.lineWidth = one * CIRCLE_WIDTH_MULT;
         ctx.beginPath();
         ctx.arc(realCenter.x, realCenter.y, one * CIRCLE_MULTIPLIER, angle - Math.PI / 2 + Math.PI / 5, angle - Math.PI / 2 - Math.PI / 5, true);
@@ -210,19 +209,20 @@ export function drawVertexPoint(
     point: PenroseVertexPoint, 
     canvasContext: CanvasRenderingContext2D, 
     pointConverter: (p: Point) => Point,
+    colorTheme: ColorTheme,
 ): void {
     if (point.type === 'kite') {
         const thinRhombus = point.rhombuses.find(x => x.isThin);
         const thinCenter = getPointBetweenPoints(thinRhombus.points[0], thinRhombus.points[2]);
         const vector = new Point(point.x - thinCenter.x, point.y - thinCenter.y);
         const angle = Math.atan2(vector.y, vector.x);
-        drawKite(one, canvasContext, point, angle, pointConverter);
+        drawKite(one, canvasContext, point, angle, pointConverter, colorTheme);
     } else if (point.type === 'deuce') {
         const thinRhombus = point.rhombuses.find(x => !x.isThin);
         const thickCenter = getPointBetweenPoints(thinRhombus.points[0], thinRhombus.points[2]);
         const vector = new Point(point.x - thickCenter.x, point.y - thickCenter.y);
         const angle = Math.atan2(vector.y, vector.x);
-        drawDeuce(one, canvasContext, point, angle, pointConverter);
+        drawDeuce(one, canvasContext, point, angle, pointConverter, colorTheme);
     }
 }
 

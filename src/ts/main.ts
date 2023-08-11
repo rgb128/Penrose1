@@ -2,7 +2,8 @@ import { CanvasManager } from './canvasMamager';
 import { PenroseTiligGenerator } from './penrose';
 import { Point } from './point';
 import { generateShifts, getSeed, Random } from "./random";
-import {copyCanvas, copySmallCanvas, downloadCanvas, downloadSmallCanvas} from "./downloader";
+import { copyCanvas, copySmallCanvas, downloadCanvas, downloadSmallCanvas } from "./downloader";
+import {TILING_COLORS} from "./colors";
 
 const bigCanvas = document.getElementById('big') as HTMLCanvasElement;
 const bigContext = bigCanvas.getContext('2d',{ willReadFrequently: true });
@@ -14,17 +15,20 @@ const smallCanvasPosition = {
     x: 0,
     y: 0,
 };
+const darkMode = !!(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
 
 const seed = await getSeed();
 // const random = new Random(seed); // Prod
 const random = new Random(Date.now()); // Dev
 
 const shifts = generateShifts(random);
+const colorTheme = random.nextArrayValue(TILING_COLORS)[darkMode ? 'dark' : 'light'];
 const generator = new PenroseTiligGenerator(shifts);
 
 const canvasManager = new CanvasManager(
     random,
     generator,
+    colorTheme,
     50,
     document.documentElement.clientWidth,
     document.documentElement.clientHeight - 100,
@@ -110,8 +114,6 @@ smallCanvas.onmouseup = async e => {
     smallCanvas.style.top = smallCanvasPosition.top + 'px';
     smallCanvas.style.left = smallCanvasPosition.left + 'px';
 }
-
-//todo draw 'RGB128 text': https://github.com/rgb128/plus/blob/master/js/helpers.js#L82
 
 document.getElementById('copyBig').onclick = async e => {
     const copyBtn = document.getElementById('copyBig');

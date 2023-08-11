@@ -6,7 +6,7 @@
     font: 'bold 30px Arial',
     strokeWidth: 4,
 };
-const DARK = false;
+const DARK = !!(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
 
 export function downloadCanvas(canvas: HTMLCanvasElement, context: CanvasRenderingContext2D) {
     const imageData = context.getImageData(0, 0, canvas.width, canvas.height);

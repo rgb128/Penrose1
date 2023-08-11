@@ -3,6 +3,7 @@ import { map } from './helpers';
 import {fillTiling, PenroseTiligGenerator, PenroseTiling} from './penrose';
 import { Random } from "./random";
 import {drawVertexPoint} from "./drawer";
+import {ColorTheme} from "./colors";
 
 export class CanvasManager {
 
@@ -20,6 +21,7 @@ export class CanvasManager {
     constructor(
         private readonly random: Random,
         private readonly generator: PenroseTiligGenerator,
+        private readonly colorTheme: ColorTheme,
         private one: number,
         private pxWidth: number,
         private pxHeight: number,
@@ -69,28 +71,6 @@ export class CanvasManager {
 
         return new Point(x, y);
     }
-
-    public getWidth(): number {
-        return this.pxWidth;
-    }
-    public getHeight(): number {
-        return this.pxHeight;
-    }
-    public getBigHeight(): number {
-        return this.bigHeightPx;
-    }
-    public getBigWidth(): number {
-        return this.bigWidthPx;
-    }
-    public getOne(): number {
-        return this.one;
-    }
-    public getCenter(): Point {
-        return new Point(this.centerUnits.x * this.one, this.centerUnits.y * this.one);
-    }
-    public getTiling(): PenroseTiling {
-        return this.tiling;
-    }
     
     private drawToCanvas(minX: number, maxX: number, minY: number, maxY: number) {
         this.smallContext.fillStyle = 'white';
@@ -98,7 +78,7 @@ export class CanvasManager {
         const generated = this.generator.generate(minX, maxX, minY, maxY);
         fillTiling(generated);
         for (const vertex of Object.values(generated.vertexes)) {
-            drawVertexPoint(this.one, vertex, this.smallContext, (p => this.convertUnitsToPx(p)));
+            drawVertexPoint(this.one, vertex, this.smallContext, (p => this.convertUnitsToPx(p)), this.colorTheme);
         }
         return generated;
     }
@@ -113,7 +93,6 @@ export class CanvasManager {
             this.centerUnits.y + halfHeightUnits * 6,
         );
     }
-
 
     public resize(newWidth, newHeight): void {
         this.smallPositionOnBigPx.x -= (newWidth - this.pxWidth) / 2;
