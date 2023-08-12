@@ -20,14 +20,14 @@ const darkMode = !!(window.matchMedia && window.matchMedia('(prefers-color-schem
 
 const seed = await getSeed();
 // const random = new Random(seed); // Prod
-// const random = new Random(Date.now()); // Dev
-const random = new Random(420); // Dev
+const random = new Random(Date.now()); // Dev
+// const random = new Random(420); // Dev
 
 setFavicon(random);
 
 const shifts = generateShifts(random);
-// const colorTheme = random.nextArrayValue(TILING_COLORS)[darkMode ? 'dark' : 'light'];
-const colorTheme = TILING_COLORS[0]['dark'];
+const colorTheme = random.nextArrayValue(TILING_COLORS)[darkMode ? 'dark' : 'light'];
+//const colorTheme = TILING_COLORS[1]['light'];
 const generator = new PenroseTiligGenerator(shifts);
 
 const canvasManager = new CanvasManager(
