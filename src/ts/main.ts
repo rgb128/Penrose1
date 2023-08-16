@@ -5,14 +5,16 @@ import { generateShifts, getSeed, Random } from "./random";
 import { copyCanvas, copySmallCanvas, downloadCanvas, downloadSmallCanvas } from "./downloader";
 import {TILING_COLORS} from "./colors";
 import {setFavicon} from "./favicon";
+import {getWidthAndHeight} from "./helpers";
 
 const bigCanvas = document.getElementById('big') as HTMLCanvasElement;
 const bigContext = bigCanvas.getContext('2d',{ willReadFrequently: true });
 const smallCanvas = document.getElementById('small') as HTMLCanvasElement;
 const smallContext = smallCanvas.getContext('2d',{ willReadFrequently: true });
+let widthAmdHeight = getWidthAndHeight();
 const smallCanvasPosition = {
-    left: -document.documentElement.clientWidth,
-    top: (100 - document.documentElement.clientHeight),
+    left: -widthAmdHeight.width,
+    top: -widthAmdHeight.height,
     x: 0,
     y: 0,
 };
@@ -35,14 +37,23 @@ const canvasManager = new CanvasManager(
     generator,
     colorTheme,
     50,
-    document.documentElement.clientWidth,
-    document.documentElement.clientHeight - 100,
+    widthAmdHeight.width,
+    widthAmdHeight.height,
     smallCanvas,
     bigCanvas,
 );
 
+if (document.documentElement.clientWidth > document.documentElement.clientHeight) {
+    document.body.classList.add('horizontal');
+}
 window.onresize = e => {
-    canvasManager.resize(document.documentElement.clientWidth, document.documentElement.clientHeight - 100);
+    widthAmdHeight = getWidthAndHeight();
+    if (widthAmdHeight.horizontal) {
+        document.body.classList.add('horizontal');
+    } else {
+        document.body.classList.remove('horizontal');
+    }
+    canvasManager.resize(widthAmdHeight.width, widthAmdHeight.height);
 }
 
 
@@ -86,8 +97,8 @@ function setTouch() {
         canvasManager.move(new Point(smallCanvasPosition.x, smallCanvasPosition.y));
         smallCanvasPosition.x = 0;
         smallCanvasPosition.y = 0;
-        smallCanvasPosition.left = -document.documentElement.clientWidth;
-        smallCanvasPosition.top = 100 - document.documentElement.clientHeight;
+        smallCanvasPosition.left = -widthAmdHeight.width;
+        smallCanvasPosition.top = -widthAmdHeight.height;
         smallCanvas.style.top = smallCanvasPosition.top + 'px';
         smallCanvas.style.left = smallCanvasPosition.left + 'px';
     }
@@ -114,8 +125,8 @@ smallCanvas.onmouseup = async e => {
     canvasManager.move(new Point(smallCanvasPosition.x, smallCanvasPosition.y));
     smallCanvasPosition.x = 0;
     smallCanvasPosition.y = 0;
-    smallCanvasPosition.left = -document.documentElement.clientWidth;
-    smallCanvasPosition.top = 100 - document.documentElement.clientHeight;
+    smallCanvasPosition.left = -widthAmdHeight.width;
+    smallCanvasPosition.top = -widthAmdHeight.height;
     smallCanvas.style.top = smallCanvasPosition.top + 'px';
     smallCanvas.style.left = smallCanvasPosition.left + 'px';
 }
@@ -154,3 +165,18 @@ document.getElementById('downloadBig').onclick = e => {
 document.getElementById('downloadSmall').onclick = e => {
     downloadSmallCanvas(smallCanvas, smallContext);
 }
+
+// document.getElementById('oneInput').oninput = e => {
+//     document.getElementById('oneValue').innerText = +(document.getElementById('oneInput') as HTMLInputElement).value + 'px';
+// }
+//
+// document.getElementById('setOne').onclick = async e => {
+//     const one = +(document.getElementById('oneInput') as HTMLInputElement).value;
+//     const loadingDiv = document.getElementById('loading');
+//     loadingDiv.classList.remove('hidden');
+//     console.log('start');
+//     canvasManager.changeOne(one);
+//     console.log('end');
+//     loadingDiv.classList.add('hidden');
+// }
+

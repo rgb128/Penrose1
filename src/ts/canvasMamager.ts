@@ -1,5 +1,5 @@
 import { Point} from './point';
-import { map } from './helpers';
+import {getWidthAndHeight, map} from './helpers';
 import {fillTiling, PenroseTiligGenerator, PenroseTiling} from './penrose';
 import { Random } from "./random";
 import {drawVertexPoint} from "./drawer";
@@ -73,8 +73,9 @@ export class CanvasManager {
     }
     
     private drawToCanvas(minX: number, maxX: number, minY: number, maxY: number) {
+        const widthAmdHeight = getWidthAndHeight();
         this.smallContext.fillStyle = 'white';
-        this.smallContext.fillRect(0, 0, document.documentElement.clientWidth * 3, (document.documentElement.clientHeight - 100) * 3);
+        this.smallContext.fillRect(0, 0, widthAmdHeight.width, widthAmdHeight.height * 3);
         const generated = this.generator.generate(minX, maxX, minY, maxY);
         fillTiling(generated);
         for (const vertex of Object.values(generated.vertices)) {

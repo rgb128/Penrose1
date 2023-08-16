@@ -6,6 +6,10 @@
     box-sizing: border-box;
 }
 
+.hidden {
+    display: none !important;
+}
+
 canvas {
     // border: 5px solid black;
 }
@@ -28,6 +32,7 @@ canvas#big {
     float: left;
     overflow: hidden;
     position: relative;
+    z-index: 2;
     
     > canvas#small {
         position: absolute;
@@ -118,5 +123,62 @@ button{
     }
     button{
         margin: 0;
+    }
+}
+#loading {
+    width: 100%;
+    height: calc(100vh - 100px);
+    display: block;
+    float: left;
+    overflow: hidden;
+    position: absolute;
+    top: 0;
+    left: 0;
+    font-size: 100px;
+    z-index: 4;
+    background-color: white;
+}
+
+body.horizontal {
+    #text {
+        text-align: justify;
+        position: fixed;
+        top: 0;
+        left: 50%;
+        width: 50%;
+        height: 100vh;
+        overflow: auto;
+    }
+
+    #smallContainer {
+        top: 0;
+        left: 0;
+        width: 50%;
+        height: 100vh;
+        display: block;
+        float: left;
+        overflow: hidden;
+        position: fixed;
+        z-index: 2;
+
+        > canvas#small {
+            position: absolute;
+            width: 150%;
+            height: 300vh;
+            top: -100vh;
+            left: -50%;
+        }
+    }
+
+    #loading {
+        top: 0;
+        left: 0;
+        width: 50%;
+        height: 100vh;
+        display: block;
+        float: left;
+        overflow: hidden;
+        position: fixed;
+        z-index: 4;
     }
 }
