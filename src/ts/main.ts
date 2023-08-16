@@ -21,8 +21,8 @@ const smallCanvasPosition = {
 const darkMode = !!(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
 
 const seed = await getSeed();
-// const random = new Random(seed); // Prod
-const random = new Random(Date.now()); // Dev
+const random = new Random(seed); // Prod
+// const random = new Random(Date.now()); // Dev
 // const random = new Random(420); // Dev
 
 setFavicon(random);
