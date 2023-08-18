@@ -166,6 +166,11 @@ document.getElementById('downloadSmall').onclick = e => {
     downloadSmallCanvas(smallCanvas, smallContext);
 }
 
+const text = document.getElementById('text');
+text.onclick = e => {
+    text.classList.toggle('open');
+}
+
 // document.getElementById('oneInput').oninput = e => {
 //     document.getElementById('oneValue').innerText = +(document.getElementById('oneInput') as HTMLInputElement).value + 'px';
 // }
