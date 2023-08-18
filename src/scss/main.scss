@@ -132,12 +132,14 @@ canvas#big {
 	color: black;
 	padding: 20px 10px;
 	overflow: hidden;
+	background: white;
 }
 #text p{
 	font-size: 0;
 }
 #text.open p {
-	font-size: 1.2rem
+	font-size: 1.2rem;
+	padding: 5px 0;
 }
 
 
