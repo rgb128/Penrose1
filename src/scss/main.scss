@@ -1,184 +1,247 @@
 @import './file2.scss';
 
 * {
-    margin: 0px;
-    padding: 0px;
-    box-sizing: border-box;
+	margin: 0px;
+	padding: 0px;
+	box-sizing: border-box;
+	font-family:system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif
 }
 
 .hidden {
-    display: none !important;
+	display: none !important;
 }
 
 canvas {
-    // border: 5px solid black;
+	// border: 5px solid black;
 }
 
 
 body {
-    div {
-        // color: red;
-    }
+	div {
+		// color: red;
+	}
 }
 
 canvas#big {
-    display: none;
+	display: none;
 }
 
+
+
+
+
+.left{
+	float: left;
+	position: relative;
+	width: 100%;
+	height: 100%;
+}
 #smallContainer {
-    width: 100%;
-    height: 100vh;
-    display: block;
-    float: left;
-    overflow: hidden;
-    position: relative;
-    z-index: 2;
-    
-    > canvas#small {
-        position: absolute;
-        width: 300%;
-        height: calc((100vh - 100px) * 3);
-        top: calc(100px - 100vh);
-        left: -100%;
-    }
-}
-
-#back{
-    position: fixed;
-    left: 20px;
-    top: 20px;
-    width: 50px;
-    height: 50px;
-    background: black;
-    opacity: 0.5;
-}
-#back:hover{
-    opacity: 1;
-}
-#back span{
-    width: 100%;
-    height: 100%;
-    padding-left: 10px;
-    line-height: 50px;
-    color: white;
-    font-size: 2rem;
-}
-@media screen and (width <= 1200px) {
-    #back{
-        opacity: 1;
-    }
-}
-@media screen and (width <= 600px) {
-    #back{
-        width: 40px;
-        height: 40px;
-        left: 10px;
-        top: 10px
-    }
-    #back span{
-        padding-left: 12px;
-        line-height: 40px;
-        font-size: 1.5rem;
-    }
-}
-
-
-#text{
-    width: calc(100% - 40px);
-    position: absolute;
-    left: 20px;
-    bottom: 20px;
-    padding: 0;
-    margin: 0;
-}
-button{
-    padding: 8px 20px;
-    border: none;
-    background: black;
-    font-size: 1rem;
-    color: white;
-    margin: 0 10px;
-}
-@media screen and (width <= 1200px) {
-    #text>div{
-        display: flex;
-        flex-direction: row;
-        gap: 5px;
-    }
-    button{
-        margin: 0;
-    }
-}
-@media screen and (width <= 600px) {
-    #text{
-        width: calc(100% - 20px);
-        position: absolute;
-        left: 10px;
-        bottom: 10px;
-    }
-    #text>div{
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 5px;
-    }
-    button{
-        margin: 0;
-    }
+	width: 100%;
+	height: 100vh;
+	display: block;
+	float: left;
+	overflow: hidden;
+	position: relative;
+	z-index: 2;
+	
+	> canvas#small {
+		position: absolute;
+		width: 300%;
+		height: 100%;
+		top: 0;
+		left: 0;
+	}
 }
 #loading {
-    width: 100%;
-    height: calc(100vh - 100px);
-    display: block;
-    float: left;
-    overflow: hidden;
-    position: absolute;
-    top: 0;
-    left: 0;
-    font-size: 100px;
-    z-index: 4;
-    background-color: white;
+	width: 100%;
+	height: 100%;
+	overflow: hidden;
+	position: absolute;
+	top: 0;
+	left: 0;
+	font-size: 100px;
+	z-index: 4;
+	background-color: white;
 }
 
+
+
+.right{
+	position: absolute;
+	width: 50%;
+	height: 100%;
+	padding: 50px;
+}
+#buttons{
+	width: 100%;
+	position: fixed;
+	left: 0;
+	bottom: 0;
+	z-index: 9;
+	padding: 10px;
+}
+#buttons > div{
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 10px;
+}
+#buttons > div > * {
+	width: auto;
+	height: 50px;
+	line-height: 50px;
+	padding: 0 15px;
+	margin: 0;
+	border: none;
+	background: black;
+	color: white;
+	font-size: 1rem;
+	cursor: pointer;
+}
+#buttons > div > a {
+	position: fixed;
+	top: 10px;
+	left: 10px;
+	width: 50px;
+}
+
+#buttons > div > a > span {
+	line-height: 50px;
+	margin-left: 3px;
+}
+#text{
+	position: fixed;
+	width: 50px;
+	height: 50px;
+	top: 10px;
+	right: 10px;
+	z-index: 9;
+	background-color: white;
+	padding: 20px 10px;
+	overflow: hidden;
+	background-image: url(https://cdn3.iconfinder.com/data/icons/google-material-design-icons/48/ic_info_outline_48px-1024.png);
+	background-size: 100%;
+}
+#text.open{
+	position: fixed;
+	width: calc(100% - 20px);
+	height: auto;
+	top: 70px;
+	right: 10px;
+	z-index: 99;
+	color: black;
+	padding: 20px 10px;
+	overflow: hidden;
+}
+#text p{
+	font-size: 0;
+}
+#text.open p {
+	font-size: 1.2rem
+}
+
+
+
+
 body.horizontal {
-    #text {
-        text-align: justify;
-        position: fixed;
-        top: 0;
-        left: 50%;
-        width: 50%;
-        height: 100vh;
-        overflow: auto;
-    }
+	.left{
+		float: left;
+		position: relative;
+		width: 50%;
+		height: 100%;
+	}
+	#smallContainer {
+		width: 100%;
+		height: 100vh;
+		display: block;
+		float: left;
+		overflow: hidden;
+		position: relative;
+		z-index: 2;
+		
+		> canvas#small {
+			position: absolute;
+			width: 300%;
+			height: 100%;
+			top: 0;
+			left: 0;
+		}
+	}
+	#loading {
+		width: 100%;
+		height: 100%;
+		overflow: hidden;
+		position: absolute;
+		top: 0;
+		left: 0;
+		font-size: 100px;
+		z-index: 4;
+		background-color: white;
+	}
+	
 
-    #smallContainer {
-        top: 0;
-        left: 0;
-        width: 50%;
-        height: 100vh;
-        display: block;
-        float: left;
-        overflow: hidden;
-        position: fixed;
-        z-index: 2;
 
-        > canvas#small {
-            position: absolute;
-            width: 150%;
-            height: 300vh;
-            top: -100vh;
-            left: -50%;
-        }
-    }
-
-    #loading {
-        top: 0;
-        left: 0;
-        width: 50%;
-        height: 100vh;
-        display: block;
-        float: left;
-        overflow: hidden;
-        position: fixed;
-        z-index: 4;
-    }
+	.right{
+		float: left;
+		position: relative;
+		width: 50%;
+		height: 100%;
+		padding: 50px;
+	}
+	@media screen and (width <= 1200px) {
+		.right{
+			padding: 20px;
+		}
+	}
+	#buttons{
+		position: relative;
+		margin-bottom: 20px;
+		padding: 0;
+	}
+	#buttons > div{
+		display: flex;
+		justify-content: space-between;
+	}
+	#buttons > div > * {
+		width: auto;
+		height: 40px;
+		line-height: 40px;
+		padding: 0 15px;
+		margin: 0;
+		border: none;
+		background: black;
+		color: white;
+		font-size: 1rem;
+		cursor: pointer;
+		margin: 0;
+	}
+	#buttons > div > a {
+		position: relative;
+		width: 40px;
+		top: 0;
+		left: 0;
+	}
+	
+	#buttons > div > a > span {
+		line-height: 40px;
+		margin-left: -3px;
+	}
+	#text{
+		position: relative;
+		width: auto;
+		height: auto;
+		top: 0;
+		right: 0;
+		z-index: 9;
+		background: white;
+		padding: 0;
+		overflow: hidden;
+		color: white;
+		background-image: none;
+	}
+	#text p{
+		font-size: 1.2rem;
+		padding: 5px 0;
+		color: black;
+	}
 }
