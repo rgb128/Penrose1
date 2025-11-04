@@ -97,7 +97,6 @@ canvas#big {
 	color: white;
 	font-size: 1rem;
 	cursor: pointer;
-	word-break: break-all;
 }
 #buttons > div > a {
 	position: fixed;
@@ -122,6 +121,7 @@ canvas#big {
 	overflow: hidden;
 	background-image: url(https://cdn3.iconfinder.com/data/icons/google-material-design-icons/48/ic_info_outline_48px-1024.png);
 	background-size: 100%;
+	text-align: justify;
 }
 #text.open{
 	position: fixed;
@@ -204,6 +204,7 @@ body.horizontal {
 	#buttons > div{
 		display: flex;
 		justify-content: space-between;
+		flex-wrap: wrap;
 	}
 	#buttons > div > * {
 		width: auto;
