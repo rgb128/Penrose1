@@ -131,34 +131,46 @@ smallCanvas.onmouseup = async e => {
     smallCanvas.style.left = smallCanvasPosition.left + 'px';
 }
 
-document.getElementById('copyBig').onclick = async e => {
+document.getElementById('copyBig').onclick = e => {
     const copyBtn = document.getElementById('copyBig');
     copyBtn.innerText = 'copying';
-    try {
-        await copyCanvas(bigCanvas, bigContext);
-        copyBtn.innerText = 'copied';
-    } catch (ex) {
-        console.error(ex);
-        copyBtn.innerText = 'failed';
-    }
-    setTimeout(() => {
-        copyBtn.innerText = 'copy big';
-    }, 2000);
-}
-document.getElementById('copySmall').onclick = async e => {
+
+    // Call the function and chain .then() and .catch() to handle the result.
+    copyCanvas(bigCanvas)
+        .then(() => {
+            copyBtn.innerText = 'copied';
+        })
+        .catch(ex => {
+            console.error(ex);
+            copyBtn.innerText = 'failed';
+        })
+        .finally(() => {
+            // This will run after the promise is settled (either resolved or rejected).
+            setTimeout(() => {
+                copyBtn.innerText = 'copy big';
+            }, 2000);
+        });
+};
+
+document.getElementById('copySmall').onclick = e => {
     const copyBtn = document.getElementById('copySmall');
     copyBtn.innerText = 'copying';
-    try {
-        await copySmallCanvas(smallCanvas, smallContext);
-        copyBtn.innerText = 'copied';
-    } catch (ex) {
-        console.error(ex);
-        copyBtn.innerText = 'failed';
-    }
-    setTimeout(() => {
-        copyBtn.innerText = 'copy small';
-    }, 2000);
-}
+
+    // The same pattern is applied here.
+    copySmallCanvas(smallCanvas, smallContext)
+        .then(() => {
+            copyBtn.innerText = 'copied';
+        })
+        .catch(ex => {
+            console.error(ex);
+            copyBtn.innerText = 'failed';
+        })
+        .finally(() => {
+            setTimeout(() => {
+                copyBtn.innerText = 'copy small';
+            }, 2000);
+        });
+};
 document.getElementById('downloadBig').onclick = e => {
     downloadCanvas(bigCanvas, bigContext);
 }
